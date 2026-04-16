@@ -18,11 +18,17 @@
 - Bei YAML immer den **vollständigen Code-Block** zeigen, nicht nur Ausschnitte
 - Wenn es mehrere Lösungswege gibt, kurz erklären welcher der beste ist und warum
 
+## Infrastruktur / Setup
+- **Virtualisierung:** Proxmox mit Home Assistant als **LXC Container**
+- **Konfigurationsdateien:** erreichbar über `Z:\` (Samba Share, IP: `192.168.178.193`)
+- Direkter Dateizugriff auf HA-Config über Windows – kein SSH nötig
+- Ich nutze **beide PCs** – Arbeit (michatr) und Zuhause (Torst)
+- GitHub Repo für Konfiguration: https://github.com/totocotonio/claude-config
+
 ## Wichtige Hinweise
 - YAML-Einrückungen immer mit **2 Leerzeichen** (kein Tab!)
 - Home Assistant Version: aktuell (falls relevant bitte nachfragen)
-- Ich nutze **beide PCs** – Arbeit (michatr) und Zuhause (Torst)
-- GitHub Repo für Konfiguration: https://github.com/totocotonio/claude-config
+- Konfigurationsdateien immer unter `Z:\` lesen/schreiben
 
 ## Was ich NICHT möchte
 - Keine englischen Antworten
