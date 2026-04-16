@@ -11,6 +11,21 @@
 - **Python Scripts** – Shell Commands, Python Scripts in Home Assistant
 - **Automationen** – Trigger, Conditions, Actions in HA
 
+## Aktive Projekte
+
+### MP-Feuer-Ticketsystem
+- Selbst gehostetes Ticketsystem, zusammen mit Claude entwickelt
+- Stack: **Python, FastAPI, SQLAlchemy, Jinja2, uvicorn**
+- Features: User-Auth, Tickets, Kommentare, Anhänge, E-Mail-Benachrichtigungen, Admin-Tasks
+- Versionierung als ZIP-Dateien lokal (`C:\Users\Torst\Documents\CLAUDE CODE\ticketsystem\`)
+- Aktuell: **v94**
+
+### AutoElektrik Pro
+- KFZ Elektrik Rechner, zusammen mit Claude entwickelt
+- Stack: **HTML, CSS, JavaScript** – Single-File App (`autoelektrik-pro.html`)
+- PWA-fähig (installierbar auf Mobilgeräten)
+- Datei: `C:\Users\Torst\autoelektrik-pro\autoelektrik-pro.html`
+
 ## Wie ich Antworten möchte
 - **Immer auf Deutsch**
 - **Ausführlich erklären** – ich möchte verstehen warum etwas so gemacht wird
