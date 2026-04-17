@@ -43,8 +43,9 @@
 
 ## Wie ich Antworten möchte
 - **Immer auf Deutsch**
-- **Ausführlich erklären** – ich möchte verstehen warum etwas so gemacht wird
-- Schritt-für-Schritt vorgehen, nicht alles auf einmal
+- **Keine Einleitung, keine Floskeln** – kein „Natürlich", kein „Gerne", kein „Super"
+- **Direkt auf den Punkt** – nur das was gefragt wird
+- **Kurze Sätze** – kein unnötiger Fülltext
 - Bei YAML immer den **vollständigen Code-Block** zeigen, nicht nur Ausschnitte
 - Wenn es mehrere Lösungswege gibt, kurz erklären welcher der beste ist und warum
 - Nach Änderungen **immer direkt committen und pushen** ohne zu fragen
