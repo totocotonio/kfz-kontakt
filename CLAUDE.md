@@ -11,6 +11,10 @@
 - **Python Scripts** – Shell Commands, Python Scripts in Home Assistant
 - **Automationen** – Trigger, Conditions, Actions in HA
 
+## Claude Memory-Dateien
+- Pfad: `C:\Users\Torst\.claude\projects\`
+- Projektspezifische Memories je Unterordner (MEMORY.md + Referenzdateien)
+
 ## Aktive Projekte
 
 ### MP-Feuer-Ticketsystem
@@ -40,6 +44,12 @@
   - AWG-Umrechnung, Kabelfarben, Kondensator, Sensorwerte u.v.m.
 - Fonts: lokal gehostet (kein Google CDN), DSGVO-konform
 - Service Worker mit automatischem Update-Banner
+
+### porsche-standard.de
+- WordPress-Seite über Porsche-Traktoren
+- WordPress-Banner für AutoElektrik Pro gebaut
+- Banner-Datei: `C:\Users\Torst\Documents\CLAUDE CODE\autoelektrik-pro\wordpress-banner\banner.html`
+- Einbinden via Plugin „WPCode" → Header Scripts
 
 ## Wie ich Antworten möchte
 - **Immer auf Deutsch**
