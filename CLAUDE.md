@@ -22,7 +22,7 @@
 - Stack: **Python, FastAPI, SQLAlchemy, Jinja2, uvicorn**
 - Features: User-Auth, Tickets, Kommentare, Anhänge, E-Mail-Benachrichtigungen, Admin-Tasks
 - Versionierung als ZIP-Dateien lokal (`C:\Users\Torst\Documents\CLAUDE CODE\ticketsystem\`)
-- Aktuell: **v94**
+- Aktuell: **v1.7.71**
 
 ### AutoElektrik Pro
 - KFZ Elektrik Rechner & Wohnmobil-Tools, zusammen mit Claude entwickelt
@@ -31,7 +31,7 @@
 - Live: **https://autoelektrik-pro.michaely.de**
 - GitHub: **https://github.com/totocotonio/autoelektrik-pro**
 - Lokaler Pfad: `C:\Users\Torst\Documents\CLAUDE CODE\autoelektrik-pro\`
-- Aktuell: **v1.7.55**
+- Aktuell: **v1.7.71**
 - Deployment: automatisch per Pre-Push-Hook (Version-Bump → gzip → SFTP auf webgo24.de)
 - Features (36 Werkzeuge u.a.):
   - Ohmsches Gesetz, Leistung, Kabelquerschnitt, Sicherung, Spannungsabfall
