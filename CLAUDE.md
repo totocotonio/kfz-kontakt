@@ -31,7 +31,7 @@
 - Live: **https://autoelektrik-pro.michaely.de**
 - GitHub: **https://github.com/totocotonio/autoelektrik-pro**
 - Lokaler Pfad: `C:\Users\Torst\Documents\CLAUDE CODE\autoelektrik-pro\`
-- Aktuell: **v1.7.71**
+- Aktuell: **v1.7.80**
 - Deployment: automatisch per Pre-Push-Hook (Version-Bump → gzip → SFTP auf webgo24.de)
 - Features (36 Werkzeuge u.a.):
   - Ohmsches Gesetz, Leistung, Kabelquerschnitt, Sicherung, Spannungsabfall
