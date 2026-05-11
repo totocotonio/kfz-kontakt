@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block nav %}{% endblock %}
+{% block title %}Anmelden{% endblock %}
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;">
+  <div style="width:100%;max-width:420px;">
+    <div style="text-align:center;margin-bottom:2rem;">
+      <img src="/static/logo.png" style="height:64px;width:64px;object-fit:contain;margin-bottom:12px;">
+      <div style="font-family:var(--mono);font-size:0.8rem;color:var(--accent);letter-spacing:.1em;margin-bottom:12px;">● MP-FEUER-TICKETSYSTEM</div>
+      <h1 style="font-size:1.75rem;font-weight:700;">Willkommen zurück</h1>
+      <p style="color:var(--text2);margin-top:6px;font-size:0.9rem;">MP-Feuer-Ticketsystem des Landkreises Saarlouis</p>
+    </div>
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
+    {% if request.query_params.get('registered') %}
+      <div class="alert alert-success">✅ Konto aktiviert! Sie können sich jetzt anmelden.</div>
+    {% endif %}
+    {% if request.query_params.get('verify') %}
+      <div class="alert alert-success">📧 Bitte bestätigen Sie Ihre E-Mail-Adresse. Wir haben Ihnen einen Link gesendet.</div>
+    {% endif %}
+    <div class="card">
+      <form method="post" action="/login">
+        <div class="form-group">
+          <label class="form-label">E-Mail</label>
+          <input type="email" name="email" class="form-control" placeholder="ihre@email.de" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Passwort</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:11px;">Anmelden</button>
+      </form>
+    </div>
+    <p style="text-align:center;margin-top:1rem;font-size:0.875rem;color:var(--text2);">
+      Noch kein Konto? <a href="/register">Registrieren</a>
+    </p>
+    <p style="text-align:center;margin-top:0.5rem;font-size:0.875rem;color:var(--text2);">
+      <a href="/forgot-password">Passwort vergessen?</a>
+    </p>
+    <p style="text-align:center;margin-top:0.5rem;font-size:0.875rem;color:var(--text2);">
+      <a href="/">← Zurück</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
