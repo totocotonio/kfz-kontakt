@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KFZ Kontakt Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="dashboard">
+        <sidebar class="sidebar">
+            <div class="logo">🚗 KFZ Kontakt</div>
+            <nav class="nav">
+                <button class="nav-item active" data-tab="messages">
+                    <span class="icon">💬</span> Nachrichten
+                </button>
+                <button class="nav-item" data-tab="qrcodes">
+                    <span class="icon">📱</span> QR-Codes
+                </button>
+                <button class="nav-item" data-tab="stats">
+                    <span class="icon">📊</span> Statistiken
+                </button>
+            </nav>
+        </sidebar>
+
+        <main class="main-content">
+            <header class="header">
+                <h1 id="pageTitle">Nachrichten</h1>
+                <div class="header-right">
+                    <div class="stats-quick">
+                        <div class="stat">
+                            <span class="stat-value" id="unreadCount">0</span>
+                            <span class="stat-label">Ungelesen</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Messages Tab -->
+                <div id="messages" class="tab-content active">
+                    <div class="messages-list" id="messagesList">
+                        <div class="loading">Lädt...</div>
+                    </div>
+                </div>
+
+                <!-- QR Codes Tab -->
+                <div id="qrcodes" class="tab-content">
+                    <div class="qrcodes-section">
+                        <div class="section-header">
+                            <h2>Meine QR-Codes</h2>
+                            <button class="btn btn-primary" id="generateBtn">+ Neuer QR-Code</button>
+                        </div>
+
+                        <div class="qr-generator-modal" id="generatorModal" style="display: none;">
+                            <div class="modal-content">
+                                <h3>Neuen QR-Code erstellen</h3>
+                                <div class="form-group">
+                                    <label>Beschreibung (z.B. "Mein Auto")</label>
+                                    <input type="text" id="qrLabel" placeholder="Mein Auto" value="Mein Auto">
+                                </div>
+                                <div class="form-group">
+                                    <label>Design</label>
+                                    <select id="qrDesign">
+                                        <option value="default">Standard</option>
+                                        <option value="minimal">Minimal</option>
+                                        <option value="professional">Professionell</option>
+                                    </select>
+                                </div>
+                                <div class="modal-buttons">
+                                    <button class="btn btn-primary" id="createQrBtn">Erstellen</button>
+                                    <button class="btn btn-secondary" id="closeModalBtn">Abbrechen</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="qrcodes-grid" id="qrcodesGrid">
+                            <div class="loading">Lädt...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Tab -->
+                <div id="stats" class="tab-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-title">Gesamt Nachrichten</div>
+                            <div class="stat-card-value" id="totalMessages">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-title">Ungelesen</div>
+                            <div class="stat-card-value" id="statsUnread">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-title">Beantwortet</div>
+                            <div class="stat-card-value" id="statsResponded">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Message Detail Modal -->
+    <div class="modal" id="messageModal" style="display: none;">
+        <div class="modal-content large">
+            <button class="close-btn" id="closeMessageBtn">&times;</button>
+            <div id="messageDetail"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="markUnreadBtn">Als ungelesen markieren</button>
+                <button class="btn btn-primary" id="markRespondedBtn">Als beantwortet markieren</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
