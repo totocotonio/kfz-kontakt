@@ -200,7 +200,8 @@
       "Bash(git -C C:/Users/Torst/AppData/Local/Temp/ts_temp commit -m 'v3.9.10: Fixes und UX-Verbesserungen \\(Entwurf speichern, Auto-Badge, System-Kommentar, 500er-Fix\\)')",
       "Bash(dir \"C:\\\\Users\\\\Torst\\\\Documents\\\\CLAUDE CODE\\\\ticketsystem\")",
       "Read(//mnt/c/Users/Torst/**)",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "PowerShell(python3 -c $script)"
     ]
   }
 }
