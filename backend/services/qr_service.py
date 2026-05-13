@@ -64,24 +64,8 @@ class QRService:
         if label:
             draw.text((sticker_width // 2 - 60, 420), label, fill=(100, 100, 100))
 
-        # Zeichne Telefon-Icon unten (vereinfacht)
-        icon_x = sticker_width // 2 - 12
-        icon_y = 458
-        icon_color = (100, 150, 200)
-
-        # Rechteckiger Telefonrahmen
-        draw.rectangle(
-            [(icon_x, icon_y), (icon_x + 24, icon_y + 32)],
-            outline=icon_color,
-            width=2
-        )
-
-        # Kleine Antenne oben rechts
-        draw.line(
-            [(icon_x + 22, icon_y + 2), (icon_x + 28, icon_y - 4)],
-            fill=icon_color,
-            width=2
-        )
+        # Zeichne grünes Telefon-Icon unten
+        QRService._draw_phone_icon(draw, sticker_width // 2 - 15, 455, size=30, color=(0, 180, 0))
 
         return sticker
 
@@ -95,21 +79,8 @@ class QRService:
         draw = ImageDraw.Draw(sticker)
         draw.rectangle([(10, 10), (qr_size + 30, qr_size + 70)], outline=(200, 200, 200), width=1)
 
-        # Telefon-Icon unten
-        icon_x = (qr_size + 40) // 2 - 12
-        icon_y = qr_size + 35
-        icon_color = (150, 150, 150)
-
-        draw.rectangle(
-            [(icon_x, icon_y), (icon_x + 24, icon_y + 32)],
-            outline=icon_color,
-            width=2
-        )
-        draw.line(
-            [(icon_x + 22, icon_y + 2), (icon_x + 28, icon_y - 4)],
-            fill=icon_color,
-            width=2
-        )
+        # Grünes Telefon-Icon unten
+        QRService._draw_phone_icon(draw, (qr_size + 40) // 2 - 15, qr_size + 32, size=28, color=(0, 180, 0))
 
         return sticker
 
@@ -172,6 +143,38 @@ class QRService:
             pass
 
         return sticker
+
+    @staticmethod
+    def _draw_phone_icon(draw, x, y, size=30, color=(0, 180, 0)):
+        """Zeichnet ein schönes grünes Telefon-Icon"""
+        # Hauptkörper des Telefons (abgerundetes Rechteck)
+        margin = size // 8
+        draw.rectangle(
+            [(x + margin, y), (x + size - margin, y + size)],
+            fill=color,
+            outline=color,
+            width=1
+        )
+
+        # Innerer Bereich (Bildschirm-ähnlich)
+        inner_margin = size // 5
+        screen_color = (0, 220, 0)  # Helleres Grün
+        draw.rectangle(
+            [(x + inner_margin, y + inner_margin),
+             (x + size - inner_margin, y + size - inner_margin)],
+            fill=screen_color,
+            outline=screen_color,
+            width=1
+        )
+
+        # Kleine Sprechmuschel (unten)
+        mouth_y = y + size - size // 6
+        draw.ellipse(
+            [(x + size // 3, mouth_y), (x + 2 * size // 3, mouth_y + size // 8)],
+            fill=color,
+            outline=color,
+            width=1
+        )
 
     @staticmethod
     def generate_unique_id() -> str:
