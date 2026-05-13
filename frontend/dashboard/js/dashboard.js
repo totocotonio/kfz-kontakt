@@ -4,24 +4,18 @@ let confirmCallback = null;
 
 // Helper für API-Calls mit Basic Auth
 async function apiFetch(url, options = {}) {
-    let password = localStorage.getItem('dashboardPassword');
+    const password = localStorage.getItem('dashboardPassword');
 
-    // Wenn kein Password gespeichert, frage ab
+    // Passwort MUSS vorhanden sein - wird in DOMContentLoaded abgefragt
     if (!password) {
-        password = prompt('Dashboard Passwort:');
-        if (password) {
-            localStorage.setItem('dashboardPassword', password);
-        } else {
-            return { status: 401, ok: false, json: async () => ({ detail: 'Passwort erforderlich' }) };
-        }
+        console.error('Kein Passwort in localStorage gefunden!');
+        alert('Passwort erforderlich. Bitte Seite neu laden.');
+        return { status: 401, ok: false, json: async () => ({ detail: 'Passwort erforderlich' }) };
     }
 
-    // Erstelle neue headers Object - nicht referenz zu options.headers!
+    // Erstelle neue headers Object
     const headers = { ...options.headers };
-
-    if (password) {
-        headers['Authorization'] = 'Basic ' + btoa(':' + password);
-    }
+    headers['Authorization'] = 'Basic ' + btoa(':' + password);
 
     const fetchOptions = {
         ...options,
@@ -31,10 +25,8 @@ async function apiFetch(url, options = {}) {
 
     const response = await fetch(url, fetchOptions);
 
-    // Bei 401: Error zeigen statt nochmal abfragen
     if (response.status === 401) {
-        console.error('401 Unauthorized - Passwort ungültig');
-        localStorage.removeItem('dashboardPassword');
+        console.error('401 Unauthorized');
         alert('Passwort ungültig. Bitte Seite neu laden.');
     }
 
