@@ -2,26 +2,22 @@ const API_BASE = '/api';
 let currentMessageId = null;
 let confirmCallback = null;
 
-// Helper für API-Calls mit Basic Auth
-async function apiFetch(url, options = {}, _isRetry = false) {
-    let password = localStorage.getItem('dashboardPassword');
-    const headers = options.headers || {};
+// Globale Variable für Passwort
+let dashboardPassword = null;
 
-    // Wenn kein Password gespeichert, frage einmal ab
-    if (!password) {
-        password = prompt('Dashboard Passwort:');
-        if (password) {
-            localStorage.setItem('dashboardPassword', password);
-        } else {
-            return { status: 401, ok: false, json: () => ({ detail: 'Passwort erforderlich' }) };
+// Helper für API-Calls mit Basic Auth
+async function apiFetch(url, options = {}) {
+    // Wenn Passwort nicht gespeichert, fragen
+    if (!dashboardPassword) {
+        dashboardPassword = prompt('Dashboard Passwort:');
+        if (!dashboardPassword) {
+            alert('Passwort erforderlich!');
+            return { status: 401, ok: false, json: async () => ({ detail: 'Passwort erforderlich' }) };
         }
     }
 
-    if (password) {
-        headers['Authorization'] = 'Basic ' + btoa(':' + password);
-    }
-
-    console.log('apiFetch:', url, 'Auth:', headers['Authorization'] ? 'yes' : 'no', 'Retry:', _isRetry);
+    const headers = { ...options.headers };
+    headers['Authorization'] = 'Basic ' + btoa(':' + dashboardPassword);
 
     const fetchOptions = {
         ...options,
@@ -31,19 +27,10 @@ async function apiFetch(url, options = {}, _isRetry = false) {
 
     const response = await fetch(url, fetchOptions);
 
-    // Wenn 401 und nicht schon retry: Passwort löschen und nochmal fragen
-    if (response.status === 401 && !_isRetry) {
-        console.error('401 Unauthorized - Passwort ungültig, frage erneut');
-        localStorage.removeItem('dashboardPassword');
-
-        const newPassword = prompt('Passwort falsch. Bitte erneut eingeben:');
-        if (newPassword) {
-            localStorage.setItem('dashboardPassword', newPassword);
-            // Retry the request mit neuem Passwort
-            return apiFetch(url, options, true);
-        } else {
-            return response;
-        }
+    if (response.status === 401) {
+        dashboardPassword = null; // Reset für neuen Versuch
+        alert('Passwort falsch. Bitte erneut eingeben.');
+        return apiFetch(url, options); // Retry
     }
 
     return response;
@@ -156,10 +143,7 @@ async function loadWhatsAppNumber() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Passwort wird nur in apiFetch abgefragt, nicht hier!
-    // Das verhindert doppelte Abfragen
-
-    // Version wird SERVER-SIDE injiziert - nicht hier laden!
+    // Passwort wird erst in apiFetch() abgefragt, wenn nötig
     setupNavigation();
     loadMessages();
     loadStats();
