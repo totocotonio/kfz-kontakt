@@ -11,6 +11,6 @@ def verify_dashboard_auth(credentials: HTTPBasicCredentials = Depends(security))
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Ungültiges Passwort",
-            headers={"WWW-Authenticate": "Basic"},
+            # WICHTIG: Kein WWW-Authenticate Header - sonst zeigt Browser seinen eigenen Dialog!
         )
     return True
