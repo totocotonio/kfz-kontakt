@@ -147,19 +147,25 @@ async function loadWhatsAppNumber() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    // Passwort wird nur in apiFetch abgefragt, nicht hier!
-    // Das verhindert doppelte Abfragen
+document.addEventListener('DOMContentLoaded', () => {
+    // WICHTIG: Passwort ZUERST abfragen, bevor irgendwelche API-Calls kommen
+    // Das verhindert Race Conditions und doppelte Passwortabfragen
+    let password = localStorage.getItem('dashboardPassword');
+
+    if (!password) {
+        password = prompt('Dashboard Passwort:');
+        if (!password) {
+            alert('Passwort erforderlich!');
+            return;
+        }
+        localStorage.setItem('dashboardPassword', password);
+    }
 
     // Version wird SERVER-SIDE injiziert - nicht hier laden!
     setupNavigation();
-
-    // WICHTIG: Nacheinander mit await, nicht parallel!
-    // Sonst fragen mehrere apiFetch() gleichzeitig das Passwort ab
-    await loadMessages();
-    await loadStats();
-    await loadQRCodes();
-
+    loadMessages();
+    loadStats();
+    loadQRCodes();
     setupQRCodeGenerator();
     setupWhatsApp();
 });
