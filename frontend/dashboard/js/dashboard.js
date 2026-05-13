@@ -1,13 +1,176 @@
 const API_BASE = '/api';
 let currentMessageId = null;
+let confirmCallback = null;
+
+// Helper für API-Calls mit Basic Auth
+async function apiFetch(url, options = {}) {
+    let password = localStorage.getItem('dashboardPassword');
+    const headers = options.headers || {};
+
+    // Wenn kein Password gespeichert, frage einmal ab
+    if (!password) {
+        password = prompt('Dashboard Passwort:');
+        if (password) {
+            localStorage.setItem('dashboardPassword', password);
+        } else {
+            return { status: 401, ok: false, json: () => ({ detail: 'Passwort erforderlich' }) };
+        }
+    }
+
+    if (password) {
+        headers['Authorization'] = 'Basic ' + btoa(':' + password);
+    }
+
+    console.log('apiFetch:', url, 'Auth:', headers['Authorization'] ? 'yes' : 'no');
+
+    const fetchOptions = {
+        ...options,
+        headers,
+        credentials: 'include'
+    };
+
+    const response = await fetch(url, fetchOptions);
+
+    // Wenn 401, zeige Fehler und lösche Passwort
+    if (response.status === 401) {
+        console.error('401 Unauthorized - Passwort ungültig');
+        localStorage.removeItem('dashboardPassword');
+        // Reload die Seite damit User nochmal Passwort eingeben kann
+        location.reload();
+    }
+
+    return response;
+}
+
+function showConfirm(title, message, onConfirm) {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmMessage').textContent = message;
+    document.getElementById('confirmModal').style.display = 'flex';
+    confirmCallback = onConfirm;
+}
+
+function showError(message) {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorModal').style.display = 'flex';
+}
+
+document.getElementById('confirmCancel')?.addEventListener('click', () => {
+    document.getElementById('confirmModal').style.display = 'none';
+    confirmCallback = null;
+});
+
+document.getElementById('confirmOk')?.addEventListener('click', () => {
+    document.getElementById('confirmModal').style.display = 'none';
+    if (confirmCallback) confirmCallback();
+    confirmCallback = null;
+});
+
+document.getElementById('errorOk')?.addEventListener('click', () => {
+    document.getElementById('errorModal').style.display = 'none';
+});
+
+function showDownloadModal(qrId, filename, label) {
+    document.getElementById('downloadPreview').src = `${API_BASE}/qrcode/${qrId}/image`;
+    document.getElementById('downloadLabel').textContent = label;
+    document.getElementById('downloadModal').dataset.qrId = qrId;
+    document.getElementById('downloadModal').dataset.filename = filename;
+    document.getElementById('downloadModal').style.display = 'flex';
+}
+
+async function downloadQRCode() {
+    const qrId = document.getElementById('downloadModal').dataset.qrId;
+    const filename = document.getElementById('downloadModal').dataset.filename;
+
+    try {
+        const res = await apiFetch(`${API_BASE}/qrcode/${qrId}/image`);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        document.getElementById('downloadModal').style.display = 'none';
+    } catch (e) {
+        showError('Fehler beim Download: ' + e.message);
+    }
+}
+
+document.getElementById('closeDownloadBtn')?.addEventListener('click', () => {
+    document.getElementById('downloadModal').style.display = 'none';
+});
+
+document.getElementById('closeDownloadBtnBottom')?.addEventListener('click', () => {
+    document.getElementById('downloadModal').style.display = 'none';
+});
+
+document.getElementById('confirmDownloadBtn')?.addEventListener('click', downloadQRCode);
+
+function setupWhatsApp() {
+    loadWhatsAppNumber();
+
+    document.getElementById('saveWhatsappBtn')?.addEventListener('click', async () => {
+        const number = document.getElementById('whatsappNumber').value;
+        if (!number) {
+            showError('Bitte gebe eine WhatsApp-Nummer ein');
+            return;
+        }
+
+        try {
+            const res = await apiFetch(`${API_BASE}/dashboard/whatsapp`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ whatsapp_number: number })
+            });
+
+            if (res.ok) {
+                showConfirm('Erfolg', 'WhatsApp-Nummer gespeichert!', () => {});
+            } else {
+                showError('Fehler beim Speichern');
+            }
+        } catch (e) {
+            showError('Fehler: ' + e.message);
+        }
+    });
+}
+
+async function loadWhatsAppNumber() {
+    try {
+        const res = await apiFetch(`${API_BASE}/dashboard/whatsapp`);
+        const data = await res.json();
+        if (data.whatsapp_number) {
+            document.getElementById('whatsappNumber').value = data.whatsapp_number;
+        }
+    } catch (e) {
+        console.error('Fehler beim Laden der WhatsApp-Nummer:', e);
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+    const savedPassword = localStorage.getItem('dashboardPassword');
+
+    if (!savedPassword) {
+        const pw = prompt('Dashboard-Passwort:');
+        if (pw) {
+            localStorage.setItem('dashboardPassword', pw);
+        } else {
+            alert('Passwort erforderlich!');
+            return;
+        }
+    }
+
+    // Version wird SERVER-SIDE injiziert - nicht hier laden!
     setupNavigation();
     loadMessages();
     loadStats();
     loadQRCodes();
     setupQRCodeGenerator();
+    setupWhatsApp();
 });
+
+// Version wird SERVER-SIDE injiziert in das HTML - nicht hier laden!
 
 function setupNavigation() {
     document.querySelectorAll('.nav-item').forEach(btn => {
@@ -39,7 +202,7 @@ function switchTab(tabName) {
 
 async function loadMessages() {
     try {
-        const res = await fetch(`${API_BASE}/dashboard/messages`);
+        const res = await apiFetch(`${API_BASE}/dashboard/messages`);
         const data = await res.json();
         const list = document.getElementById('messagesList');
 
@@ -69,7 +232,7 @@ async function loadMessages() {
 
 async function openMessage(msgId) {
     try {
-        const res = await fetch(`${API_BASE}/dashboard/messages/${msgId}`);
+        const res = await apiFetch(`${API_BASE}/dashboard/messages/${msgId}`);
         const msg = await res.json();
         currentMessageId = msgId;
 
@@ -123,7 +286,7 @@ async function updateMessage(msgId, data) {
 
 async function loadStats() {
     try {
-        const res = await fetch(`${API_BASE}/dashboard/stats`);
+        const res = await apiFetch(`${API_BASE}/dashboard/stats`);
         const data = await res.json();
 
         document.getElementById('totalMessages').textContent = data.total_messages;
@@ -136,7 +299,7 @@ async function loadStats() {
 
 async function loadQRCodes() {
     try {
-        const res = await fetch(`${API_BASE}/qrcodes/list`);
+        const res = await apiFetch(`${API_BASE}/qrcodes/list`);
         const data = await res.json();
         const grid = document.getElementById('qrcodesGrid');
 
@@ -145,15 +308,19 @@ async function loadQRCodes() {
             return;
         }
 
+        const timestamp = new Date().getTime();
         grid.innerHTML = data.qrcodes.map(qr => `
             <div class="qrcode-card">
                 <div class="qrcode-preview">
-                    <img src="${API_BASE}/qrcode/${qr.id}/image" alt="${qr.label}">
+                    <img src="${API_BASE}/qrcode/${qr.id}/image?t=${timestamp}" alt="${qr.label}">
                 </div>
                 <div class="qrcode-label">${qr.label}</div>
+                <div style="font-size: 12px; color: #999; margin-top: 5px; word-break: break-all;">ID: ${qr.unique_id}</div>
                 <div style="font-size: 12px; color: #999; margin-bottom: 10px;">Design: ${qr.design}</div>
                 <div class="qrcode-actions">
-                    <a href="${API_BASE}/qrcode/${qr.id}/image" download="qr_${qr.id}.png" class="btn btn-primary">Runterladen</a>
+                    <button onclick="showDownloadModal(${qr.id}, 'qr_${qr.id}.png', '${qr.label}')" class="btn btn-primary">Runterladen</button>
+                    <button class="btn btn-secondary" data-qrid="${qr.id}" data-label="${qr.label}" data-title="${qr.title}" data-design="${qr.design}" data-license-plate="${qr.license_plate || ''}" data-vehicle-image-path="${qr.vehicle_image_path || ''}" onclick="editQRCodeClick(this)">Bearbeiten</button>
+                    <button onclick="deleteQRCode(${qr.id})" class="btn btn-secondary" style="background: #ff6b6b;">Löschen</button>
                 </div>
             </div>
         `).join('');
@@ -163,6 +330,19 @@ async function loadQRCodes() {
 }
 
 function setupQRCodeGenerator() {
+    const designSelect = document.getElementById('qrDesign');
+    const designInfo = document.getElementById('designInfo');
+
+    const designDescriptions = {
+        default: 'Standard: 400×500px, hellgrau mit blauem Rahmen und Text "Kontakt via QR"',
+        minimal: 'Minimal: 340×340px, kompakt mit dünnem grauem Rahmen – perfekt für kleine Plätze',
+        professional: 'Professionell: 450×550px, schwarzer doppelter Rahmen mit rotem Akzent und großem Text "FAHRZEUG-KONTAKT"'
+    };
+
+    designSelect?.addEventListener('change', () => {
+        designInfo.textContent = designDescriptions[designSelect.value];
+    });
+
     document.getElementById('generateBtn')?.addEventListener('click', () => {
         document.getElementById('generatorModal').style.display = 'flex';
     });
@@ -173,21 +353,230 @@ function setupQRCodeGenerator() {
 
     document.getElementById('createQrBtn')?.addEventListener('click', async () => {
         const label = document.getElementById('qrLabel').value;
+        const title = document.getElementById('qrTitle').value;
         const design = document.getElementById('qrDesign').value;
+        const licensePlate = document.getElementById('qrLicensePlate').value || null;
+        const vehicleImageFile = document.getElementById('qrVehicleImage').files[0];
+
+        console.log('[QR Create] Daten:', { label, title, design, license_plate: licensePlate });
 
         try {
-            const res = await fetch(`${API_BASE}/qrcode/generate`, {
+            const res = await apiFetch(`${API_BASE}/qrcode/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ label, design })
+                body: JSON.stringify({ label, title, design, license_plate: licensePlate })
             });
 
+            console.log('[QR Create] Response Status:', res.status, res.ok);
+
             if (res.ok) {
+                const qrData = await res.json();
+                console.log('[QR Create] Success, ID:', qrData.id);
+
+                // Upload Fahrzeugbild falls vorhanden
+                if (vehicleImageFile) {
+                    const formData = new FormData();
+                    formData.append('file', vehicleImageFile);
+                    await apiFetch(`${API_BASE}/qrcode/${qrData.id}/upload-image`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+
                 document.getElementById('generatorModal').style.display = 'none';
+                document.getElementById('qrLabel').value = 'Mein Auto';
+                document.getElementById('qrTitle').value = 'KONTAKT FAHRZEUGHALTER';
+                document.getElementById('qrDesign').value = 'default';
+                document.getElementById('qrLicensePlate').value = '';
+                document.getElementById('qrVehicleImage').value = '';
                 loadQRCodes();
+            } else {
+                console.error('[QR Create] Response NOT ok:', res.status);
+                const errorData = await res.json().catch(() => ({}));
+                console.error('[QR Create] Error data:', errorData);
             }
         } catch (e) {
-            console.error('Fehler beim Erstellen des QR-Codes:', e);
+            console.error('[QR Create] Fehler:', e);
+        }
+    });
+}
+
+function editQRCodeClick(btn) {
+    const qrId = btn.dataset.qrid;
+    const label = btn.dataset.label;
+    const title = btn.dataset.title;
+    const design = btn.dataset.design;
+    const licensePlate = btn.dataset.licensePlate;
+    const vehicleImagePath = btn.dataset.vehicleImagePath;
+
+    // Speichere original title für später
+    document.getElementById('editQRModal').dataset.originalTitle = title;
+    document.getElementById('editQRModal').dataset.qrId = qrId;
+
+    editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath);
+}
+
+function editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath) {
+    document.getElementById('editQRLabel').value = label || '';
+    document.getElementById('editQRTitle').value = title || '';
+    document.getElementById('editQRDesign').value = design || '';
+    document.getElementById('editLicensePlate').value = licensePlate || '';
+    document.getElementById('editVehicleImage').value = '';
+    document.getElementById('editQRModal').style.display = 'flex';
+    document.getElementById('editQRModal').dataset.qrId = qrId;
+    updateEditDesignInfo(design);
+
+    // Zeige Fahrzeugbild Vorschau, falls vorhanden
+    const previewDiv = document.getElementById('vehicleImagePreview');
+    if (vehicleImagePath) {
+        previewDiv.innerHTML = `
+            <div style="position: relative;">
+                <img src="${vehicleImagePath}" alt="Fahrzeugbild" style="max-width: 300px; border-radius: 8px;">
+                <button type="button" class="btn btn-secondary" id="removeImageBtn" style="margin-top: 10px; width: 100%;">Bild entfernen</button>
+            </div>
+        `;
+        document.getElementById('removeImageBtn').addEventListener('click', () => {
+            previewDiv.innerHTML = '';
+        });
+    } else {
+        previewDiv.innerHTML = '';
+    }
+}
+
+function updateEditDesignInfo(design) {
+    const designDescriptions = {
+        default: 'Standard: 400×500px, hellgrau mit blauem Rahmen und Text "Kontakt via QR"',
+        minimal: 'Minimal: 340×340px, kompakt mit dünnem grauem Rahmen – perfekt für kleine Plätze',
+        professional: 'Professionell: 450×550px, schwarzer doppelter Rahmen mit rotem Akzent und großem Text "FAHRZEUG-KONTAKT"'
+    };
+    document.getElementById('editDesignInfo').textContent = designDescriptions[design] || '';
+}
+
+document.getElementById('closeEditBtn')?.addEventListener('click', () => {
+    document.getElementById('editQRModal').style.display = 'none';
+});
+
+document.getElementById('cancelEditBtn')?.addEventListener('click', () => {
+    document.getElementById('editQRModal').style.display = 'none';
+});
+
+document.getElementById('editQRDesign')?.addEventListener('change', (e) => {
+    updateEditDesignInfo(e.target.value);
+});
+
+document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
+    const editModal = document.getElementById('editQRModal');
+    const qrId = editModal.dataset.qrId;
+    const newLabel = document.getElementById('editQRLabel').value || '';
+    const newTitle = document.getElementById('editQRTitle').value || editModal.dataset.originalTitle || '';
+    const newDesign = document.getElementById('editQRDesign').value || '';
+    const newLicensePlate = document.getElementById('editLicensePlate').value || '';
+    const vehicleImageFile = document.getElementById('editVehicleImage').files[0];
+
+    console.log('Saving:', {qrId, newLabel, newTitle, newDesign, newLicensePlate});
+
+    try {
+        // Speichere QR-Code Metadaten
+        const res = await apiFetch(`${API_BASE}/qrcode/${qrId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ label: newLabel, title: newTitle, design: newDesign, license_plate: newLicensePlate })
+        });
+
+        if (res.ok) {
+            // Wenn ein neues Bild ausgewählt wurde, lade es hoch
+            if (vehicleImageFile) {
+                await uploadVehicleImage(qrId, vehicleImageFile);
+            }
+
+            document.getElementById('editQRModal').style.display = 'none';
+            // Cache-Buster für Bilder
+            const timestamp = new Date().getTime();
+            document.querySelectorAll(`img[src*="/qrcode/${qrId}/image"]`).forEach(img => {
+                img.src = `${API_BASE}/qrcode/${qrId}/image?t=${timestamp}`;
+            });
+            loadQRCodes();
+        } else {
+            showError('Fehler beim Aktualisieren');
+        }
+    } catch (e) {
+        showError('Fehler: ' + e.message);
+    }
+});
+
+async function uploadVehicleImage(qrId, file) {
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const password = localStorage.getItem('dashboardPassword');
+        const headers = {};
+        if (password) {
+            headers['Authorization'] = 'Basic ' + btoa(':' + password);
+        }
+
+        const res = await fetch(`${API_BASE}/qrcode/${qrId}/upload-image`, {
+            method: 'POST',
+            headers,
+            body: formData,
+            credentials: 'include'
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.detail || 'Fehler beim Upload');
+        }
+
+        return await res.json();
+    } catch (e) {
+        showError('Fehler beim Bild-Upload: ' + e.message);
+        throw e;
+    }
+}
+
+document.getElementById('uploadVehicleImageBtn')?.addEventListener('click', async () => {
+    const file = document.getElementById('editVehicleImage').files[0];
+    if (!file) {
+        showError('Bitte wähle ein Bild aus');
+        return;
+    }
+
+    const qrId = document.getElementById('editQRModal').dataset.qrId;
+    if (!qrId) {
+        showError('QR-Code ID nicht gefunden');
+        return;
+    }
+
+    try {
+        await uploadVehicleImage(qrId, file);
+        const data = await (await apiFetch(`${API_BASE}/qrcode/${qrId}`)).json();
+
+        // Aktualisiere die Vorschau
+        const previewDiv = document.getElementById('vehicleImagePreview');
+        if (data.vehicle_image_path) {
+            previewDiv.innerHTML = `
+                <div style="position: relative;">
+                    <img src="${data.vehicle_image_path}?t=${new Date().getTime()}" alt="Fahrzeugbild" style="max-width: 300px; border-radius: 8px;">
+                    <button type="button" class="btn btn-secondary" id="removeImageBtn" style="margin-top: 10px; width: 100%;">Bild entfernen</button>
+                </div>
+            `;
+        }
+    } catch (e) {
+        console.error('Upload-Fehler:', e);
+    }
+});
+
+function deleteQRCode(qrId) {
+    showConfirm('QR-Code löschen', 'QR-Code wirklich löschen?', async () => {
+        try {
+            const res = await apiFetch(`${API_BASE}/qrcode/${qrId}`, { method: 'DELETE' });
+            if (res.ok) {
+                loadQRCodes();
+            } else {
+                showError('Fehler beim Löschen');
+            }
+        } catch (e) {
+            showError('Fehler: ' + e.message);
         }
     });
 }
@@ -200,5 +589,9 @@ window.addEventListener('click', (e) => {
     const msgModal = document.getElementById('messageModal');
     if (e.target === msgModal) {
         msgModal.style.display = 'none';
+    }
+    const editModal = document.getElementById('editQRModal');
+    if (e.target === editModal) {
+        editModal.style.display = 'none';
     }
 });

@@ -31,9 +31,8 @@ class TelegramService:
     @staticmethod
     async def send_new_message_notification(qr_label: str, sender: str, message: str, category: str = None):
         text = f"""
-<b>🚗 Neue Kontaktanfrage!</b>
+<b>🚗 Neue Nachricht über QR-Code: {qr_label}</b>
 
-<b>QR-Code:</b> {qr_label}
 <b>Von:</b> {sender}
 """
         if category:

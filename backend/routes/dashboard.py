@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from models import Message, QRCode, User, Category
 from database import get_db
 from pydantic import BaseModel
+from auth import verify_dashboard_auth
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
 
@@ -10,8 +11,11 @@ class MessageUpdate(BaseModel):
     read: bool = None
     responded: bool = None
 
+class WhatsAppUpdate(BaseModel):
+    whatsapp_number: str
+
 @router.get("/dashboard/messages")
-def get_messages(db: Session = Depends(get_db)):
+def get_messages(db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
     user = db.query(User).first()
     if not user:
         raise HTTPException(status_code=404, detail="User nicht gefunden")
@@ -35,7 +39,7 @@ def get_messages(db: Session = Depends(get_db)):
     }
 
 @router.get("/dashboard/messages/{message_id}")
-def get_message(message_id: int, db: Session = Depends(get_db)):
+def get_message(message_id: int, db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
     message = db.query(Message).filter(Message.id == message_id).first()
     if not message:
         raise HTTPException(status_code=404, detail="Nachricht nicht gefunden")
@@ -56,7 +60,7 @@ def get_message(message_id: int, db: Session = Depends(get_db)):
     }
 
 @router.patch("/dashboard/messages/{message_id}")
-def update_message(message_id: int, data: MessageUpdate, db: Session = Depends(get_db)):
+def update_message(message_id: int, data: MessageUpdate, db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
     message = db.query(Message).filter(Message.id == message_id).first()
     if not message:
         raise HTTPException(status_code=404, detail="Nachricht nicht gefunden")
@@ -70,7 +74,7 @@ def update_message(message_id: int, data: MessageUpdate, db: Session = Depends(g
     return {"status": "success"}
 
 @router.get("/dashboard/stats")
-def get_stats(db: Session = Depends(get_db)):
+def get_stats(db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
     user = db.query(User).first()
     if not user:
         raise HTTPException(status_code=404, detail="User nicht gefunden")
@@ -105,3 +109,31 @@ def get_categories(db: Session = Depends(get_db)):
             for cat in categories
         ]
     }
+
+@router.get("/dashboard/whatsapp")
+def get_whatsapp(db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
+    user = db.query(User).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User nicht gefunden")
+
+    return {"whatsapp_number": user.whatsapp_number or ""}
+
+@router.patch("/dashboard/whatsapp")
+def update_whatsapp(data: WhatsAppUpdate, db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
+    user = db.query(User).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User nicht gefunden")
+
+    user.whatsapp_number = data.whatsapp_number
+    db.commit()
+
+    return {"status": "success", "whatsapp_number": user.whatsapp_number}
+
+@router.get("/whatsapp")
+def get_whatsapp_public(db: Session = Depends(get_db)):
+    """Öffentlicher Endpoint für WhatsApp-Nummer (keine Auth erforderlich)"""
+    user = db.query(User).first()
+    if not user:
+        return {"whatsapp_number": ""}
+
+    return {"whatsapp_number": user.whatsapp_number or ""}

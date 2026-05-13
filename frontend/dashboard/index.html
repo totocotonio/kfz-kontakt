@@ -27,6 +27,7 @@
             <header class="header">
                 <h1 id="pageTitle">Nachrichten</h1>
                 <div class="header-right">
+                    <div class="version-badge">v<span id="version">-</span></div>
                     <div class="stats-quick">
                         <div class="stat">
                             <span class="stat-value" id="unreadCount">0</span>
@@ -48,6 +49,23 @@
                 <div id="qrcodes" class="tab-content">
                     <div class="qrcodes-section">
                         <div class="section-header">
+                            <h2>Einstellungen & QR-Codes</h2>
+                        </div>
+
+                        <!-- WhatsApp Settings -->
+                        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 15px;">WhatsApp Kontakt</h3>
+                            <div class="form-group">
+                                <label>WhatsApp Nummer (z.B. +491234567890)</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="whatsappNumber" placeholder="+49..." style="flex: 1;">
+                                    <button class="btn btn-primary" id="saveWhatsappBtn" style="width: auto;">Speichern</button>
+                                </div>
+                                <small style="color: #999; margin-top: 5px; display: block;">Besucher können dich direkt über WhatsApp kontaktieren</small>
+                            </div>
+                        </div>
+
+                        <div class="section-header">
                             <h2>Meine QR-Codes</h2>
                             <button class="btn btn-primary" id="generateBtn">+ Neuer QR-Code</button>
                         </div>
@@ -60,12 +78,28 @@
                                     <input type="text" id="qrLabel" placeholder="Mein Auto" value="Mein Auto">
                                 </div>
                                 <div class="form-group">
+                                    <label>Text auf Sticker</label>
+                                    <input type="text" id="qrTitle" placeholder="KONTAKT FAHRZEUGHALTER" value="KONTAKT FAHRZEUGHALTER">
+                                </div>
+                                <div class="form-group">
                                     <label>Design</label>
                                     <select id="qrDesign">
-                                        <option value="default">Standard</option>
-                                        <option value="minimal">Minimal</option>
-                                        <option value="professional">Professionell</option>
+                                        <option value="default">Standard – Mit Rahmen und Label</option>
+                                        <option value="minimal">Minimal – Kompakt, nur QR-Code</option>
+                                        <option value="professional">Professionell – Großer Rahmen mit Titel</option>
                                     </select>
+                                    <small style="color: #999; margin-top: 5px; display: block;" id="designInfo">
+                                        Standard: 400×500px, hellgrau mit blauem Rahmen
+                                    </small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Kennzeichen (z.B. AB-CD 1234)</label>
+                                    <input type="text" id="qrLicensePlate" placeholder="AB-CD 1234">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fahrzeugbild</label>
+                                    <input type="file" id="qrVehicleImage" accept="image/png,image/jpeg,image/webp">
+                                    <small style="color: #999; margin-top: 5px; display: block;">PNG, JPG oder WebP, max. 5MB</small>
                                 </div>
                                 <div class="modal-buttons">
                                     <button class="btn btn-primary" id="createQrBtn">Erstellen</button>
@@ -76,6 +110,50 @@
 
                         <div class="qrcodes-grid" id="qrcodesGrid">
                             <div class="loading">Lädt...</div>
+                        </div>
+                    </div>
+
+                    <!-- Edit QR Code Modal -->
+                    <div class="modal" id="editQRModal" style="display: none;">
+                        <div class="modal-content">
+                            <button class="close-btn" id="closeEditBtn">&times;</button>
+                            <h3>QR-Code bearbeiten</h3>
+                            <div class="form-group">
+                                <label>Beschreibung</label>
+                                <input type="text" id="editQRLabel" placeholder="Mein Auto">
+                            </div>
+                            <div class="form-group">
+                                <label>Text auf Sticker</label>
+                                <input type="text" id="editQRTitle" placeholder="KONTAKT FAHRZEUGHALTER">
+                            </div>
+                            <div class="form-group">
+                                <label>Design</label>
+                                <select id="editQRDesign">
+                                    <option value="default">Standard – Mit Rahmen und Label</option>
+                                    <option value="minimal">Minimal – Kompakt, nur QR-Code</option>
+                                    <option value="professional">Professionell – Großer Rahmen mit Titel</option>
+                                </select>
+                                <small style="color: #999; margin-top: 5px; display: block;" id="editDesignInfo">
+                                    Standard: 400×500px, hellgrau mit blauem Rahmen
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label>Kennzeichen (z.B. AB-CD 1234)</label>
+                                <input type="text" id="editLicensePlate" placeholder="AB-CD 1234">
+                            </div>
+                            <div class="form-group">
+                                <label>Fahrzeugbild</label>
+                                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                                    <input type="file" id="editVehicleImage" accept="image/png,image/jpeg,image/webp" style="flex: 1;">
+                                    <button type="button" class="btn btn-primary" id="uploadVehicleImageBtn" style="width: auto;">Hochladen</button>
+                                </div>
+                                <small style="color: #999; margin-top: 5px; display: block;">PNG, JPG oder WebP, max. 5MB</small>
+                                <div id="vehicleImagePreview" style="margin-top: 10px;"></div>
+                            </div>
+                            <div class="modal-buttons">
+                                <button class="btn btn-primary" id="saveEditBtn">Speichern</button>
+                                <button class="btn btn-secondary" id="cancelEditBtn">Abbrechen</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -113,6 +191,45 @@
         </div>
     </div>
 
-    <script src="js/dashboard.js"></script>
+    <!-- Bestätigung Modal -->
+    <div class="modal" id="confirmModal" style="display: none;">
+        <div class="modal-content">
+            <h3 id="confirmTitle">Bestätigung</h3>
+            <p id="confirmMessage"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="confirmCancel">Abbrechen</button>
+                <button class="btn btn-primary" id="confirmOk">Bestätigen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fehler Modal -->
+    <div class="modal" id="errorModal" style="display: none;">
+        <div class="modal-content">
+            <h3>Fehler</h3>
+            <p id="errorMessage"></p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="errorOk">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Modal -->
+    <div class="modal" id="downloadModal" style="display: none;">
+        <div class="modal-content">
+            <button class="close-btn" id="closeDownloadBtn">&times;</button>
+            <h3>QR-Code Herunterladen</h3>
+            <div style="text-align: center; margin: 20px 0;">
+                <img id="downloadPreview" src="" alt="QR-Code" style="max-width: 300px; border-radius: 8px;">
+            </div>
+            <div style="text-align: center; color: #666; font-size: 14px; margin-bottom: 20px;" id="downloadLabel"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="closeDownloadBtnBottom">Abbrechen</button>
+                <button class="btn btn-primary" id="confirmDownloadBtn">Herunterladen</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js?v=0"></script>
 </body>
 </html>

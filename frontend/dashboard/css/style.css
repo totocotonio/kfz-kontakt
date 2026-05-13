@@ -79,6 +79,15 @@ body {
     color: #333;
 }
 
+.version-badge {
+    background: #f0f0f0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #999;
+    font-weight: 600;
+}
+
 .stats-quick {
     display: flex;
     gap: 20px;

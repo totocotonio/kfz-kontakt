@@ -1,0 +1,83 @@
+# Mein Projekt-Kontext für Claude
+
+## Über mich
+- Ich bin Torsten (GitHub: totocotonio)
+- Ich arbeite mit verschiedenen Programmiersprachen – je nach Projekt
+- Mein Hauptthema ist **Home Assistant / Smart Home**
+
+## Schwerpunkte
+- **YAML Konfiguration** – configuration.yaml, automations.yaml, scripts.yaml usw.
+- **Lovelace Dashboard / UI** – Cards, Views, custom:button-card, picture-elements usw.
+- **Python Scripts** – Shell Commands, Python Scripts in Home Assistant
+- **Automationen** – Trigger, Conditions, Actions in HA
+
+## Claude Memory-Dateien
+- Pfad: `C:\Users\Torst\.claude\projects\`
+- Projektspezifische Memories je Unterordner (MEMORY.md + Referenzdateien)
+
+## Aktive Projekte
+
+### MP-Feuer-Ticketsystem
+- Selbst gehostetes Ticketsystem, zusammen mit Claude entwickelt
+- Stack: **Python, FastAPI, SQLAlchemy, Jinja2, uvicorn**
+- Features: User-Auth, Tickets, Kommentare, Anhänge, E-Mail-Benachrichtigungen, Admin-Tasks
+- Versionierung als ZIP-Dateien lokal (`C:\Users\Torst\Documents\CLAUDE CODE\ticketsystem\`)
+- Aktuell: **v1.7.71**
+
+### AutoElektrik Pro
+- KFZ Elektrik Rechner & Wohnmobil-Tools, zusammen mit Claude entwickelt
+- Stack: **HTML, CSS, JavaScript** – Single-File PWA (`index.html`)
+- PWA-fähig (installierbar auf Mobilgeräten, offline nutzbar)
+- Live: **https://autoelektrik-pro.michaely.de**
+- GitHub: **https://github.com/totocotonio/autoelektrik-pro**
+- Lokaler Pfad: `C:\Users\Torst\Documents\CLAUDE CODE\autoelektrik-pro\`
+- Aktuell: **v1.7.80**
+- Deployment: automatisch per Pre-Push-Hook (Version-Bump → gzip → SFTP auf webgo24.de)
+- Features (36 Werkzeuge u.a.):
+  - Ohmsches Gesetz, Leistung, Kabelquerschnitt, Sicherung, Spannungsabfall
+  - Batterie, Batterietest, Gesamtlast, Ruhestrom-Messung
+  - Lima-Diagnose, Glühkerzen-Diagnose, Zündspulen-Diagnose, Anlasser-Check
+  - Solar-Rechner, Energiebilanz, B2B-Lader, Wechselrichter, Laderegler
+  - Batterietyp-Vergleich (AGM/Gel/LiFePO4), Dieselheizung-Rechner
+  - Wohnmobil-Übersicht, Reihe & Parallel, LED-Vorwiderstand, CAN-Bus
+  - OBD-Codes, Klemmenbezeichnungen, Steckerbelegungen, Relaisbelegung
+  - AWG-Umrechnung, Kabelfarben, Kondensator, Sensorwerte u.v.m.
+- Fonts: lokal gehostet (kein Google CDN), DSGVO-konform
+- Service Worker mit automatischem Update-Banner
+
+### porsche-standard.de
+- WordPress-Seite über Porsche-Traktoren
+- WordPress-Banner für AutoElektrik Pro gebaut
+- Banner-Datei: `C:\Users\Torst\Documents\CLAUDE CODE\autoelektrik-pro\wordpress-banner\banner.html`
+- Einbinden via Plugin „WPCode" → Header Scripts
+
+## Wie ich Antworten möchte
+- **Immer auf Deutsch**
+- **Keine Einleitung, keine Floskeln** – kein „Natürlich", kein „Gerne", kein „Super"
+- **Direkt auf den Punkt** – nur das was gefragt wird
+- **Kurze Sätze** – kein unnötiger Fülltext
+- Bei YAML immer den **vollständigen Code-Block** zeigen, nicht nur Ausschnitte
+- Wenn es mehrere Lösungswege gibt, kurz erklären welcher der beste ist und warum
+- Nach Änderungen **immer direkt committen und pushen** ohne zu fragen
+
+## Infrastruktur / Setup
+- **Virtualisierung:** Proxmox mit Home Assistant als **LXC Container**
+- **Konfigurationsdateien:** erreichbar über `Z:\` (Samba Share, IP: `192.168.178.193`)
+- Direkter Dateizugriff auf HA-Config über Windows – kein SSH nötig
+- Ich nutze **beide PCs** – Arbeit (michatr) und Zuhause (Torst)
+- GitHub Repo für Konfiguration: https://github.com/totocotonio/claude-config
+
+## Wichtige Hinweise
+- YAML-Einrückungen immer mit **2 Leerzeichen** (kein Tab!)
+- Home Assistant Version: aktuell (falls relevant bitte nachfragen)
+- Konfigurationsdateien immer unter `Z:\` lesen/schreiben
+
+## Was ich NICHT möchte
+- Keine englischen Antworten
+- Keinen Code ohne Erklärung
+- Nicht zu viel auf einmal – lieber kleine Schritte
+
+## Nützliche Befehle (Home Assistant)
+- HA Konfiguration prüfen: `ha core check`
+- HA neu starten: `ha core restart`
+- Logs anzeigen: `ha core logs`

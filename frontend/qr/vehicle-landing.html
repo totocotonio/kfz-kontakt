@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fahrzeug Kontakt</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+        .vehicle-image-container {
+            width: 100%;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .vehicle-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .license-plate {
+            background: #ffcc00;
+            color: #000;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            margin-top: -4px;
+            border-radius: 0 0 8px 8px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+        button {
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .loading {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="vehicle-image-container" id="imageContainer">
+            <img id="vehicleImage" src="" alt="Fahrzeugbild">
+            <div class="license-plate" id="licensePlate"></div>
+        </div>
+
+        <h1>🚗 Fahrzeug Kontakt</h1>
+        <p class="subtitle" id="subtitle">Möchtest du den Besitzer dieses Fahrzeugs kontaktieren?</p>
+
+        <div class="button-container">
+            <button onclick="goToContactForm()">📝 Nachricht senden</button>
+            <button onclick="goBack()" style="background: #999;">← Zurück</button>
+        </div>
+    </div>
+
+    <script>
+        // Lese Parameter aus URL-Query
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        const uniqueId = getQueryParam('qr');
+        const licensePlate = getQueryParam('license_plate');
+        const vehicleImagePath = getQueryParam('vehicle_image_path');
+
+        function goToContactForm() {
+            if (!uniqueId) {
+                alert('QR-Code ID fehlt');
+                return;
+            }
+            window.location.href = `/select-category.html?qr=${encodeURIComponent(uniqueId)}`;
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Setze Fahrzeugbild und Kennzeichen
+        if (vehicleImagePath) {
+            document.getElementById('vehicleImage').src = decodeURIComponent(vehicleImagePath);
+        } else {
+            // Verstecke Bildcontainer falls kein Bild vorhanden
+            document.getElementById('imageContainer').style.display = 'none';
+        }
+
+        if (licensePlate && licensePlate.trim()) {
+            document.getElementById('licensePlate').textContent = decodeURIComponent(licensePlate);
+        } else {
+            document.getElementById('licensePlate').textContent = '— FAHRZEUG —';
+        }
+
+        // Debug: Log die Parameter
+        console.log('QR:', uniqueId, 'Plate:', licensePlate, 'Image:', vehicleImagePath);
+    </script>
+</body>
+</html>

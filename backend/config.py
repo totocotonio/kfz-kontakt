@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     HOST: str = "0.0.0.0"
     PORT: int = 8000
+    BASE_URL: str = "https://kfz-kontakt.michaely.de"
+    DASHBOARD_PASSWORD: str = "Schmelz112"
+    UPLOAD_DIR: str = str(BASE_DIR.parent / "uploads")
+    MAX_FILE_SIZE: int = 5 * 1024 * 1024  # 5MB
 
     class Config:
         env_file = ".env"

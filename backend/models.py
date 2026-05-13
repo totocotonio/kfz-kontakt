@@ -10,6 +10,7 @@ class User(Base):
     name = Column(String(255), index=True)
     telegram_chat_id = Column(String(255), unique=True)
     telegram_username = Column(String(255), nullable=True)
+    whatsapp_number = Column(String(20), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     qr_codes = relationship("QRCode", back_populates="user")
@@ -23,8 +24,11 @@ class QRCode(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     unique_id = Column(String(50), unique=True, index=True)
     label = Column(String(255), nullable=True)
+    title = Column(String(255), nullable=True)
     design = Column(String(50), default="default")
     logo = Column(String(500), nullable=True)
+    license_plate = Column(String(50), nullable=True)
+    vehicle_image_path = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="qr_codes")

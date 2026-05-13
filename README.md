@@ -2,6 +2,8 @@
 
 Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrsteilnehmern über QR-Codes.
 
+**Status:** ✅ Production Ready - Auto-Deploy aktiv
+
 ## Features
 
 ✅ **QR-Code Generator** - Erstelle einzigartige QR-Codes mit verschiedenen Designs  

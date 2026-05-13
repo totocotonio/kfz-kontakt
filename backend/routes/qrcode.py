@@ -1,10 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, File
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from models import QRCode, User
 from database import get_db
 from pydantic import BaseModel
+from typing import Optional
 from services.qr_service import QRService
+from services.file_service import save_vehicle_image, delete_vehicle_image
+from config import settings
+from auth import verify_dashboard_auth
 from io import BytesIO
 import io
 
@@ -12,10 +16,13 @@ router = APIRouter(prefix="/api", tags=["qrcode"])
 
 class QRCodeCreate(BaseModel):
     label: str = "Mein Auto"
+    title: str = "KONTAKT FAHRZEUGHALTER"
     design: str = "default"
+    license_plate: Optional[str] = None
+    vehicle_image_path: Optional[str] = None
 
 @router.post("/qrcode/generate")
-def generate_qrcode(data: QRCodeCreate, db: Session = Depends(get_db)):
+def generate_qrcode(data: QRCodeCreate, db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
     user = db.query(User).first()
     if not user:
         raise HTTPException(status_code=404, detail="User nicht gefunden")
@@ -25,7 +32,10 @@ def generate_qrcode(data: QRCodeCreate, db: Session = Depends(get_db)):
         user_id=user.id,
         unique_id=unique_id,
         label=data.label,
-        design=data.design
+        title=data.title,
+        design=data.design,
+        license_plate=data.license_plate,
+        vehicle_image_path=data.vehicle_image_path
     )
     db.add(qr_code)
     db.commit()
@@ -39,33 +49,33 @@ def generate_qrcode(data: QRCodeCreate, db: Session = Depends(get_db)):
     }
 
 @router.get("/qrcode/{qr_id}/image")
-def get_qr_image(qr_id: int, db: Session = Depends(get_db)):
+def get_qr_image(qr_id: int, request: Request, db: Session = Depends(get_db)):
     qr = db.query(QRCode).filter(QRCode.id == qr_id).first()
     if not qr:
         raise HTTPException(status_code=404, detail="QR-Code nicht gefunden")
 
-    base_url = "http://localhost:8000"
-    qr_data = f"{base_url}/qr/{qr.unique_id}"
+    qr_data = f"{settings.BASE_URL}/qr/{qr.unique_id}"
 
     qr_image = QRService.generate_qr_code(qr_data)
     sticker = QRService.generate_sticker_with_design(
         qr_image,
         design=qr.design,
-        label=qr.label
+        label=qr.label,
+        title=qr.title
     )
 
     img_io = io.BytesIO()
     sticker.save(img_io, "PNG")
     img_io.seek(0)
 
-    return FileResponse(
+    return StreamingResponse(
         io.BytesIO(img_io.getvalue()),
         media_type="image/png",
-        filename=f"qr_sticker_{qr.id}.png"
+        headers={"Content-Disposition": f"attachment; filename=qr_sticker_{qr.id}.png"}
     )
 
 @router.get("/qrcodes/list")
-def list_qrcodes(db: Session = Depends(get_db)):
+def list_qrcodes(db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
     user = db.query(User).first()
     if not user:
         raise HTTPException(status_code=404, detail="User nicht gefunden")
@@ -76,10 +86,89 @@ def list_qrcodes(db: Session = Depends(get_db)):
             {
                 "id": qr.id,
                 "label": qr.label,
+                "title": qr.title,
                 "unique_id": qr.unique_id,
                 "design": qr.design,
+                "license_plate": qr.license_plate,
+                "vehicle_image_path": qr.vehicle_image_path,
                 "created_at": qr.created_at
             }
             for qr in qr_codes
         ]
     }
+
+@router.patch("/qrcode/{qr_id}")
+def update_qrcode(qr_id: int, data: QRCodeCreate, db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
+    qr = db.query(QRCode).filter(QRCode.id == qr_id).first()
+    if not qr:
+        raise HTTPException(status_code=404, detail="QR-Code nicht gefunden")
+
+    qr.label = data.label
+    qr.title = data.title
+    qr.design = data.design
+    if data.license_plate is not None:
+        qr.license_plate = data.license_plate
+    db.commit()
+    db.refresh(qr)
+
+    return {"status": "success", "id": qr.id}
+
+@router.get("/qrcode/{qr_id}")
+def get_qrcode(qr_id: int, db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
+    qr = db.query(QRCode).filter(QRCode.id == qr_id).first()
+    if not qr:
+        raise HTTPException(status_code=404, detail="QR-Code nicht gefunden")
+
+    return {
+        "id": qr.id,
+        "label": qr.label,
+        "title": qr.title,
+        "unique_id": qr.unique_id,
+        "design": qr.design,
+        "license_plate": qr.license_plate,
+        "vehicle_image_path": qr.vehicle_image_path,
+        "created_at": qr.created_at
+    }
+
+@router.post("/qrcode/{qr_id}/upload-image")
+async def upload_vehicle_image(qr_id: int, file: UploadFile = File(...), db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
+    qr = db.query(QRCode).filter(QRCode.id == qr_id).first()
+    if not qr:
+        raise HTTPException(status_code=404, detail="QR-Code nicht gefunden")
+
+    try:
+        # Speichere Bild
+        image_path = save_vehicle_image(file, qr.unique_id)
+
+        # Update QR-Code mit Bildpfad
+        qr.vehicle_image_path = image_path
+        db.commit()
+        db.refresh(qr)
+
+        return {
+            "status": "success",
+            "vehicle_image_path": qr.vehicle_image_path,
+            "message": "Fahrzeugbild erfolgreich hochgeladen"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Fehler beim Upload: {str(e)}"
+        )
+
+@router.delete("/qrcode/{qr_id}")
+def delete_qrcode(qr_id: int, db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
+    qr = db.query(QRCode).filter(QRCode.id == qr_id).first()
+    if not qr:
+        raise HTTPException(status_code=404, detail="QR-Code nicht gefunden")
+
+    # Lösche Fahrzeugbild, falls vorhanden
+    if qr.unique_id:
+        delete_vehicle_image(qr.unique_id)
+
+    db.delete(qr)
+    db.commit()
+
+    return {"status": "success"}

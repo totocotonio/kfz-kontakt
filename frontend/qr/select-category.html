@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kategorie wählen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 20px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .categories {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .category-btn {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .category-btn:hover {
+            border-color: #667eea;
+            background: #f5f7ff;
+            transform: translateY(-2px);
+        }
+
+        .category-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .continue-btn {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .continue-btn:hover:not(:disabled) {
+            background: #5568d3;
+        }
+
+        .continue-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Um welches Thema geht es?</h1>
+        <p class="subtitle">Wähle eine Kategorie für deine Nachricht</p>
+
+        <div id="categoriesContainer" class="categories">
+            <div class="loading">Lädt Kategorien...</div>
+        </div>
+
+        <button id="continueBtn" class="continue-btn" disabled>Weiter</button>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let selectedCategoryId = null;
+
+        async function loadCategories() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const qrId = urlParams.get('qr');
+
+                const res = await fetch(`${API_BASE}/categories`);
+                const data = await res.json();
+
+                const container = document.getElementById('categoriesContainer');
+                container.innerHTML = '';
+
+                data.categories.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = 'category-btn';
+                    btn.textContent = cat.name;
+                    btn.onclick = () => selectCategory(btn, cat.id, qrId);
+                    container.appendChild(btn);
+                });
+            } catch (e) {
+                console.error('Fehler beim Laden:', e);
+            }
+        }
+
+        function selectCategory(btn, categoryId, qrId) {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCategoryId = categoryId;
+            document.getElementById('continueBtn').disabled = false;
+        }
+
+        document.getElementById('continueBtn').addEventListener('click', () => {
+            if (selectedCategoryId) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const qrId = urlParams.get('qr');
+                window.location.href = `/qr/${qrId}?category=${selectedCategoryId}`;
+            }
+        });
+
+        loadCategories();
+    </script>
+</body>
+</html>
