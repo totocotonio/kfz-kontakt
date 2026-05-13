@@ -487,15 +487,21 @@ document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
 });
 
 async function uploadVehicleImage(qrId, file) {
+    // Stelle sicher, dass Passwort gespeichert ist
+    if (!dashboardPassword) {
+        dashboardPassword = prompt('Dashboard Passwort:');
+        if (!dashboardPassword) {
+            throw new Error('Passwort erforderlich');
+        }
+    }
+
     try {
         const formData = new FormData();
         formData.append('file', file);
 
-        const password = localStorage.getItem('dashboardPassword');
-        const headers = {};
-        if (password) {
-            headers['Authorization'] = 'Basic ' + btoa(':' + password);
-        }
+        const headers = {
+            'Authorization': 'Basic ' + btoa(':' + dashboardPassword)
+        };
 
         const res = await fetch(`${API_BASE}/qrcode/${qrId}/upload-image`, {
             method: 'POST',
@@ -503,6 +509,11 @@ async function uploadVehicleImage(qrId, file) {
             body: formData,
             credentials: 'include'
         });
+
+        if (res.status === 401) {
+            dashboardPassword = null;
+            throw new Error('Passwort falsch, bitte erneut versuchen');
+        }
 
         if (!res.ok) {
             const error = await res.json();
