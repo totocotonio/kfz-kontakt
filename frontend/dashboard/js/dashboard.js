@@ -3,7 +3,7 @@ let currentMessageId = null;
 let confirmCallback = null;
 
 // Helper für API-Calls mit Basic Auth
-async function apiFetch(url, options = {}) {
+async function apiFetch(url, options = {}, _isRetry = false) {
     let password = localStorage.getItem('dashboardPassword');
     const headers = options.headers || {};
 
@@ -21,7 +21,7 @@ async function apiFetch(url, options = {}) {
         headers['Authorization'] = 'Basic ' + btoa(':' + password);
     }
 
-    console.log('apiFetch:', url, 'Auth:', headers['Authorization'] ? 'yes' : 'no');
+    console.log('apiFetch:', url, 'Auth:', headers['Authorization'] ? 'yes' : 'no', 'Retry:', _isRetry);
 
     const fetchOptions = {
         ...options,
@@ -31,12 +31,19 @@ async function apiFetch(url, options = {}) {
 
     const response = await fetch(url, fetchOptions);
 
-    // Wenn 401, zeige Fehler und lösche Passwort
-    if (response.status === 401) {
-        console.error('401 Unauthorized - Passwort ungültig');
+    // Wenn 401 und nicht schon retry: Passwort löschen und nochmal fragen
+    if (response.status === 401 && !_isRetry) {
+        console.error('401 Unauthorized - Passwort ungültig, frage erneut');
         localStorage.removeItem('dashboardPassword');
-        // Reload die Seite damit User nochmal Passwort eingeben kann
-        location.reload();
+
+        const newPassword = prompt('Passwort falsch. Bitte erneut eingeben:');
+        if (newPassword) {
+            localStorage.setItem('dashboardPassword', newPassword);
+            // Retry the request mit neuem Passwort
+            return apiFetch(url, options, true);
+        } else {
+            return response;
+        }
     }
 
     return response;

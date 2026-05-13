@@ -199,7 +199,10 @@
       "Bash(curl -s \"http://localhost:8000/qr/vehicle-landing.html?qr=5f90c66b-8b3&license_plate=HH-AB+123&vehicle_image_path=%2Fuploads%2F5f90c66b-8b3%2Fvehicle.jpg\")",
       "Bash(curl -s -X PATCH -H 'Authorization: Basic __CMDSUB_OUTPUT__')",
       "Bash(pkill -f \"python3 backend/main.py\")",
-      "Bash(python3 -m py_compile backend/main.py)"
+      "Bash(python3 -m py_compile backend/main.py)",
+      "Bash(curl -s http://192.168.178.47:8000/api/version)",
+      "Bash(ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@192.168.178.47 \"pkill -f 'python3 main.py' && sleep 2 && cd /opt/kfz-kontakt/backend && python3 main.py > /tmp/kfz.log 2>&1 &\")",
+      "Bash(curl -s -H \"Authorization: Basic $\\(echo -n ':Schmelz112')"
     ]
   }
 }
