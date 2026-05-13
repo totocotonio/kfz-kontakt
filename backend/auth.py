@@ -1,16 +1,33 @@
-from fastapi import HTTPException, status, Depends
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi import HTTPException, status, Request
 from config import settings
+import base64
 
-security = HTTPBasic()
+def verify_dashboard_auth(request: Request):
+    """Prüfe Basic Auth manuell - ohne HTTPBasic() Dependency"""
+    auth_header = request.headers.get("Authorization", "")
 
-def verify_dashboard_auth(credentials: HTTPBasicCredentials = Depends(security)):
-    # Accept any username (or empty username) with correct password
-    correct_password = credentials.password == settings.DASHBOARD_PASSWORD
-    if not correct_password:
+    if not auth_header.startswith("Basic "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Ungültiges Passwort",
-            # WICHTIG: Kein WWW-Authenticate Header - sonst zeigt Browser seinen eigenen Dialog!
+            detail="Passwort erforderlich"
         )
+
+    try:
+        # Decode: "Basic base64(username:password)" -> "username:password"
+        encoded = auth_header.replace("Basic ", "")
+        decoded = base64.b64decode(encoded).decode('utf-8')
+        username, password = decoded.split(":", 1)
+
+        # Prüfe Passwort
+        if password != settings.DASHBOARD_PASSWORD:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Passwort ungültig"
+            )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentifizierung erforderlich"
+        )
+
     return True
