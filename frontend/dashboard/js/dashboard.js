@@ -156,17 +156,8 @@ async function loadWhatsAppNumber() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const savedPassword = localStorage.getItem('dashboardPassword');
-
-    if (!savedPassword) {
-        const pw = prompt('Dashboard-Passwort:');
-        if (pw) {
-            localStorage.setItem('dashboardPassword', pw);
-        } else {
-            alert('Passwort erforderlich!');
-            return;
-        }
-    }
+    // Passwort wird nur in apiFetch abgefragt, nicht hier!
+    // Das verhindert doppelte Abfragen
 
     // Version wird SERVER-SIDE injiziert - nicht hier laden!
     setupNavigation();
