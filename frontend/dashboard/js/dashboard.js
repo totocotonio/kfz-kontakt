@@ -3,25 +3,25 @@ let currentMessageId = null;
 let confirmCallback = null;
 
 // Helper für API-Calls mit Basic Auth
-async function apiFetch(url, options = {}, _isRetry = false) {
+async function apiFetch(url, options = {}) {
     let password = localStorage.getItem('dashboardPassword');
-    const headers = options.headers || {};
 
-    // Wenn kein Password gespeichert, frage einmal ab
+    // Wenn kein Password gespeichert, frage ab
     if (!password) {
         password = prompt('Dashboard Passwort:');
         if (password) {
             localStorage.setItem('dashboardPassword', password);
         } else {
-            return { status: 401, ok: false, json: () => ({ detail: 'Passwort erforderlich' }) };
+            return { status: 401, ok: false, json: async () => ({ detail: 'Passwort erforderlich' }) };
         }
     }
+
+    // Erstelle neue headers Object - nicht referenz zu options.headers!
+    const headers = { ...options.headers };
 
     if (password) {
         headers['Authorization'] = 'Basic ' + btoa(':' + password);
     }
-
-    console.log('apiFetch:', url, 'Auth:', headers['Authorization'] ? 'yes' : 'no', 'Retry:', _isRetry);
 
     const fetchOptions = {
         ...options,
@@ -31,19 +31,11 @@ async function apiFetch(url, options = {}, _isRetry = false) {
 
     const response = await fetch(url, fetchOptions);
 
-    // Wenn 401 und nicht schon retry: Passwort löschen und nochmal fragen
-    if (response.status === 401 && !_isRetry) {
-        console.error('401 Unauthorized - Passwort ungültig, frage erneut');
+    // Bei 401: Error zeigen statt nochmal abfragen
+    if (response.status === 401) {
+        console.error('401 Unauthorized - Passwort ungültig');
         localStorage.removeItem('dashboardPassword');
-
-        const newPassword = prompt('Passwort falsch. Bitte erneut eingeben:');
-        if (newPassword) {
-            localStorage.setItem('dashboardPassword', newPassword);
-            // Retry the request mit neuem Passwort
-            return apiFetch(url, options, true);
-        } else {
-            return response;
-        }
+        alert('Passwort ungültig. Bitte Seite neu laden.');
     }
 
     return response;
