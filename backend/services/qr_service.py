@@ -64,17 +64,52 @@ class QRService:
         if label:
             draw.text((sticker_width // 2 - 60, 420), label, fill=(100, 100, 100))
 
+        # Zeichne Telefon-Icon unten (vereinfacht)
+        icon_x = sticker_width // 2 - 12
+        icon_y = 458
+        icon_color = (100, 150, 200)
+
+        # Rechteckiger Telefonrahmen
+        draw.rectangle(
+            [(icon_x, icon_y), (icon_x + 24, icon_y + 32)],
+            outline=icon_color,
+            width=2
+        )
+
+        # Kleine Antenne oben rechts
+        draw.line(
+            [(icon_x + 22, icon_y + 2), (icon_x + 28, icon_y - 4)],
+            fill=icon_color,
+            width=2
+        )
+
         return sticker
 
     @staticmethod
     def _create_minimal_sticker(qr_image: Image.Image, label: str = "") -> Image.Image:
         qr_size = 300
         qr_resized = qr_image.resize((qr_size, qr_size))
-        sticker = Image.new("RGB", (qr_size + 40, qr_size + 40), "white")
+        sticker = Image.new("RGB", (qr_size + 40, qr_size + 80), "white")
         sticker.paste(qr_resized, (20, 20))
 
         draw = ImageDraw.Draw(sticker)
-        draw.rectangle([(10, 10), (qr_size + 30, qr_size + 30)], outline=(200, 200, 200), width=1)
+        draw.rectangle([(10, 10), (qr_size + 30, qr_size + 70)], outline=(200, 200, 200), width=1)
+
+        # Telefon-Icon unten
+        icon_x = (qr_size + 40) // 2 - 12
+        icon_y = qr_size + 35
+        icon_color = (150, 150, 150)
+
+        draw.rectangle(
+            [(icon_x, icon_y), (icon_x + 24, icon_y + 32)],
+            outline=icon_color,
+            width=2
+        )
+        draw.line(
+            [(icon_x + 22, icon_y + 2), (icon_x + 28, icon_y - 4)],
+            fill=icon_color,
+            width=2
+        )
 
         return sticker
 
