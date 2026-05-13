@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -74,7 +74,7 @@ def get_dashboard_version():
         return "unknown"
 
 @app.api_route("/dashboard/", methods=["GET", "HEAD"])
-def dashboard_index(request):
+def dashboard_index(request: Request):
     """Serve dashboard HTML with injected version - MUST be before StaticFiles mount"""
     # Prüfe Auth manuell
     verify_dashboard_auth(request)
