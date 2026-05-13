@@ -74,10 +74,9 @@ def get_dashboard_version():
         return "unknown"
 
 @app.api_route("/dashboard/", methods=["GET", "HEAD"])
-def dashboard_index(request: Request):
+def dashboard_index():
     """Serve dashboard HTML with injected version - MUST be before StaticFiles mount"""
-    # Prüfe Auth manuell
-    verify_dashboard_auth(request)
+    # KEIN Auth-Check hier! Auth passiert nur bei API-Calls im JavaScript
 
     frontend_dir = Path(__file__).parent.parent / "frontend"
     index_file = frontend_dir / "dashboard" / "index.html"
