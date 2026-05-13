@@ -2,20 +2,22 @@ const API_BASE = '/api';
 let currentMessageId = null;
 let confirmCallback = null;
 
+// Globale Variable für Passwort
+let dashboardPassword = null;
+
 // Helper für API-Calls mit Basic Auth
 async function apiFetch(url, options = {}) {
-    const password = localStorage.getItem('dashboardPassword');
-
-    // Passwort MUSS vorhanden sein - wird in DOMContentLoaded abgefragt
-    if (!password) {
-        console.error('Kein Passwort in localStorage gefunden!');
-        alert('Passwort erforderlich. Bitte Seite neu laden.');
-        return { status: 401, ok: false, json: async () => ({ detail: 'Passwort erforderlich' }) };
+    // Wenn Passwort nicht gespeichert, fragen
+    if (!dashboardPassword) {
+        dashboardPassword = prompt('Dashboard Passwort:');
+        if (!dashboardPassword) {
+            alert('Passwort erforderlich!');
+            return { status: 401, ok: false, json: async () => ({ detail: 'Passwort erforderlich' }) };
+        }
     }
 
-    // Erstelle neue headers Object
     const headers = { ...options.headers };
-    headers['Authorization'] = 'Basic ' + btoa(':' + password);
+    headers['Authorization'] = 'Basic ' + btoa(':' + dashboardPassword);
 
     const fetchOptions = {
         ...options,
@@ -26,8 +28,9 @@ async function apiFetch(url, options = {}) {
     const response = await fetch(url, fetchOptions);
 
     if (response.status === 401) {
-        console.error('401 Unauthorized');
-        alert('Passwort ungültig. Bitte Seite neu laden.');
+        dashboardPassword = null; // Reset für neuen Versuch
+        alert('Passwort falsch. Bitte erneut eingeben.');
+        return apiFetch(url, options); // Retry
     }
 
     return response;
@@ -140,20 +143,7 @@ async function loadWhatsAppNumber() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // WICHTIG: Passwort ZUERST abfragen, bevor irgendwelche API-Calls kommen
-    // Das verhindert Race Conditions und doppelte Passwortabfragen
-    let password = localStorage.getItem('dashboardPassword');
-
-    if (!password) {
-        password = prompt('Dashboard Passwort:');
-        if (!password) {
-            alert('Passwort erforderlich!');
-            return;
-        }
-        localStorage.setItem('dashboardPassword', password);
-    }
-
-    // Version wird SERVER-SIDE injiziert - nicht hier laden!
+    // Passwort wird erst in apiFetch() abgefragt, wenn nötig
     setupNavigation();
     loadMessages();
     loadStats();
