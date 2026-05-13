@@ -1,0 +1,6 @@
+autoelektrik-pro/
+wohnmobil/
+neu/
+*.tmp
+__pycache__/
+*.pyc
