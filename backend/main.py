@@ -74,8 +74,11 @@ def get_dashboard_version():
         return "unknown"
 
 @app.api_route("/dashboard/", methods=["GET", "HEAD"])
-def dashboard_index(auth: bool = Depends(verify_dashboard_auth)):
+def dashboard_index(request):
     """Serve dashboard HTML with injected version - MUST be before StaticFiles mount"""
+    # Prüfe Auth manuell
+    verify_dashboard_auth(request)
+
     frontend_dir = Path(__file__).parent.parent / "frontend"
     index_file = frontend_dir / "dashboard" / "index.html"
 
