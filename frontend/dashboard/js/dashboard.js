@@ -147,15 +147,19 @@ async function loadWhatsAppNumber() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Passwort wird nur in apiFetch abgefragt, nicht hier!
     // Das verhindert doppelte Abfragen
 
     // Version wird SERVER-SIDE injiziert - nicht hier laden!
     setupNavigation();
-    loadMessages();
-    loadStats();
-    loadQRCodes();
+
+    // WICHTIG: Nacheinander mit await, nicht parallel!
+    // Sonst fragen mehrere apiFetch() gleichzeitig das Passwort ab
+    await loadMessages();
+    await loadStats();
+    await loadQRCodes();
+
     setupQRCodeGenerator();
     setupWhatsApp();
 });
