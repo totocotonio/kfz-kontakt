@@ -77,6 +77,9 @@
         <button class="nav-btn" data-tab="settings">
             ⚙️ Einstellungen
         </button>
+        <button class="nav-btn" data-tab="qrcodes">
+            📱 QR-Codes
+        </button>
         <button class="nav-btn" data-tab="stats">
             📊 Statistiken
         </button>
@@ -104,26 +107,44 @@
                     </div>
                 </div>
 
-                <!-- QR Codes Tab -->
+                <!-- Settings Tab -->
                 <div id="settings" class="tab-content">
-                    <div class="qrcodes-section">
+                    <div style="max-width: 600px; margin: 0 auto;">
                         <div class="section-header">
-                            <h2>Einstellungen & QR-Codes</h2>
+                            <h2>Einstellungen</h2>
+                        </div>
+
+                        <!-- Telefonnummer Settings -->
+                        <div style="background: var(--panel2); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 15px; color: var(--text);">📞 Telefonnummer</h3>
+                            <div class="form-group">
+                                <label>Deine Telefonnummer (z.B. +491234567890)</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="phoneNumber" placeholder="+49..." style="flex: 1;">
+                                    <button class="btn btn-primary" id="savePhoneBtn" style="width: auto;">Speichern</button>
+                                </div>
+                                <small style="color: var(--muted); margin-top: 5px; display: block;">Besucher können dich direkt anrufen</small>
+                            </div>
                         </div>
 
                         <!-- WhatsApp Settings -->
-                        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                            <h3 style="margin-bottom: 15px;">WhatsApp Kontakt</h3>
+                        <div style="background: var(--panel2); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 15px; color: var(--text);">💬 WhatsApp Kontakt</h3>
                             <div class="form-group">
                                 <label>WhatsApp Nummer (z.B. +491234567890)</label>
                                 <div style="display: flex; gap: 10px;">
                                     <input type="text" id="whatsappNumber" placeholder="+49..." style="flex: 1;">
                                     <button class="btn btn-primary" id="saveWhatsappBtn" style="width: auto;">Speichern</button>
                                 </div>
-                                <small style="color: #999; margin-top: 5px; display: block;">Besucher können dich direkt über WhatsApp kontaktieren</small>
+                                <small style="color: var(--muted); margin-top: 5px; display: block;">Besucher können dich direkt über WhatsApp kontaktieren</small>
                             </div>
                         </div>
+                    </div>
+                </div>
 
+                <!-- QR Codes Tab -->
+                <div id="qrcodes" class="tab-content">
+                    <div class="qrcodes-section">
                         <div class="section-header">
                             <h2>Meine QR-Codes</h2>
                             <button class="btn btn-primary" id="generateBtn">+ Neuer QR-Code</button>

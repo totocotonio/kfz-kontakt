@@ -11,6 +11,9 @@ class MessageUpdate(BaseModel):
     read: bool = None
     responded: bool = None
 
+class PhoneUpdate(BaseModel):
+    phone_number: str
+
 class WhatsAppUpdate(BaseModel):
     whatsapp_number: str
 
@@ -109,6 +112,25 @@ def get_categories(db: Session = Depends(get_db)):
             for cat in categories
         ]
     }
+
+@router.get("/dashboard/phone")
+def get_phone(db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
+    user = db.query(User).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User nicht gefunden")
+
+    return {"phone_number": user.phone_number or ""}
+
+@router.patch("/dashboard/phone")
+def update_phone(data: PhoneUpdate, db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
+    user = db.query(User).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User nicht gefunden")
+
+    user.phone_number = data.phone_number
+    db.commit()
+
+    return {"status": "success", "phone_number": user.phone_number}
 
 @router.get("/dashboard/whatsapp")
 def get_whatsapp(db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):

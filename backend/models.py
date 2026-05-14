@@ -10,6 +10,7 @@ class User(Base):
     name = Column(String(255), index=True)
     telegram_chat_id = Column(String(255), unique=True)
     telegram_username = Column(String(255), nullable=True)
+    phone_number = Column(String(20), nullable=True)
     whatsapp_number = Column(String(20), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 

@@ -236,7 +236,9 @@
       "Bash(/tmp/ssh_command.sh)",
       "Bash(curl -s http://192.168.178.47:8000/api/dashboard/stats)",
       "Bash(curl -s http://192.168.178.47:8000/datenschutz.html)",
-      "Bash(echo \"✅ Server aktualisiert und neu gestartet - v$\\(ssh root@192.168.178.47 'cat /opt/kfz-kontakt/version.txt'\\)\")"
+      "Bash(echo \"✅ Server aktualisiert und neu gestartet - v$\\(ssh root@192.168.178.47 'cat /opt/kfz-kontakt/version.txt'\\)\")",
+      "Bash(echo \"✅ Server v$\\(ssh root@192.168.178.47 'cat /opt/kfz-kontakt/version.txt'\\) - neu gestartet\")",
+      "Bash(ssh -o ConnectTimeout=10 root@192.168.178.47 \"cd /opt/kfz-kontakt && git pull origin main && cat version.txt\")"
     ]
   }
 }

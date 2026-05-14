@@ -134,6 +134,46 @@ document.getElementById('closeDownloadBtnBottom')?.addEventListener('click', () 
 
 document.getElementById('confirmDownloadBtn')?.addEventListener('click', downloadQRCode);
 
+function setupPhone() {
+    loadPhoneNumber();
+
+    document.getElementById('savePhoneBtn')?.addEventListener('click', async () => {
+        const number = document.getElementById('phoneNumber').value;
+        if (!number) {
+            showError('Bitte gebe eine Telefonnummer ein');
+            return;
+        }
+
+        try {
+            const res = await apiFetch(`${API_BASE}/dashboard/phone`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone_number: number })
+            });
+
+            if (res.ok) {
+                showConfirm('Erfolg', 'Telefonnummer gespeichert!', () => {});
+            } else {
+                showError('Fehler beim Speichern');
+            }
+        } catch (e) {
+            showError('Fehler: ' + e.message);
+        }
+    });
+}
+
+async function loadPhoneNumber() {
+    try {
+        const res = await apiFetch(`${API_BASE}/dashboard/phone`);
+        const data = await res.json();
+        if (data.phone_number) {
+            document.getElementById('phoneNumber').value = data.phone_number;
+        }
+    } catch (e) {
+        console.error('Fehler beim Laden der Telefonnummer:', e);
+    }
+}
+
 function setupWhatsApp() {
     loadWhatsAppNumber();
 
@@ -180,6 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize with messages tab active
     switchTab('messages');
     setupQRCodeGenerator();
+    setupPhone();
     setupWhatsApp();
 });
 
@@ -204,12 +245,13 @@ function switchTab(tabName) {
     const titles = {
         messages: 'Nachrichten',
         settings: 'Einstellungen',
+        qrcodes: 'QR-Codes',
         stats: 'Statistiken'
     };
     document.getElementById('pageTitle').textContent = titles[tabName];
 
     if (tabName === 'messages') loadMessages();
-    if (tabName === 'settings') loadQRCodes();
+    if (tabName === 'qrcodes') loadQRCodes();
     if (tabName === 'stats') loadStats();
 }
 
