@@ -114,12 +114,17 @@ class QRService:
         if icon_type != "none":
             icon_size = 40
             icon_x, icon_y = QRService._get_icon_position(sticker_width, sticker_height, icon_size, icon_position)
-            try:
-                phone_icon = Image.open(os.path.join(os.path.dirname(__file__), "..", "phone_icon.png"))
-                phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
-                sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
-            except:
-                # Fallback: Zeichne Icon basierend auf icon_type
+            # Nur für phone: versuche phone_icon.png zu laden
+            if icon_type == "phone":
+                try:
+                    phone_icon = Image.open(os.path.join(os.path.dirname(__file__), "..", "phone_icon.png"))
+                    phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
+                    sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
+                except:
+                    # Fallback: Zeichne Icon
+                    QRService._draw_icon(draw, icon_type, icon_x, icon_y, size=icon_size)
+            else:
+                # Für whatsapp, email, etc.: Zeichne Icon direkt
                 QRService._draw_icon(draw, icon_type, icon_x, icon_y, size=icon_size)
 
         return sticker
@@ -141,11 +146,16 @@ class QRService:
             width = qr_size + 40
             height = qr_size + 80
             icon_x, icon_y = QRService._get_icon_position(width, height, icon_size, icon_position)
-            try:
-                phone_icon = Image.open(os.path.join(os.path.dirname(__file__), "..", "phone_icon.png"))
-                phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
-                sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
-            except:
+            # Nur für phone: versuche phone_icon.png zu laden
+            if icon_type == "phone":
+                try:
+                    phone_icon = Image.open(os.path.join(os.path.dirname(__file__), "..", "phone_icon.png"))
+                    phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
+                    sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
+                except:
+                    QRService._draw_icon(draw, icon_type, icon_x, icon_y, size=icon_size)
+            else:
+                # Für whatsapp, email, etc.: Zeichne Icon direkt
                 QRService._draw_icon(draw, icon_type, icon_x, icon_y, size=icon_size)
 
         return sticker
@@ -218,11 +228,16 @@ class QRService:
         if icon_type != "none":
             icon_size = 60
             icon_x, icon_y = QRService._get_icon_position(size, size, icon_size, icon_position)
-            try:
-                phone_icon = Image.open("phone_icon.png")
-                phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
-                sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
-            except:
+            # Nur für phone: versuche phone_icon.png zu laden
+            if icon_type == "phone":
+                try:
+                    phone_icon = Image.open(os.path.join(os.path.dirname(__file__), "..", "phone_icon.png"))
+                    phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
+                    sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
+                except:
+                    QRService._draw_icon(draw, icon_type, icon_x, icon_y, size=icon_size)
+            else:
+                # Für whatsapp, email, etc.: Zeichne Icon direkt
                 QRService._draw_icon(draw, icon_type, icon_x, icon_y, size=icon_size)
 
         return sticker
