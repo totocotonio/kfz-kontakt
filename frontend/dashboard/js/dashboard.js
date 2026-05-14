@@ -333,9 +333,34 @@ function setupQRCodeGenerator() {
         document.getElementById('generatorModal').style.display = 'none';
     });
 
+    // Benutzerdefiniert Text Input Toggle
+    document.getElementById('qrTitle')?.addEventListener('change', function() {
+        const customInput = document.getElementById('qrTitleCustom');
+        if (this.value === '') {
+            customInput.style.display = 'block';
+            customInput.focus();
+        } else {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+    });
+
+    document.getElementById('editQRTitle')?.addEventListener('change', function() {
+        const customInput = document.getElementById('editQRTitleCustom');
+        if (this.value === '') {
+            customInput.style.display = 'block';
+            customInput.focus();
+        } else {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+    });
+
     document.getElementById('createQrBtn')?.addEventListener('click', async () => {
         const label = document.getElementById('qrLabel').value;
-        const title = document.getElementById('qrTitle').value;
+        let title = document.getElementById('qrTitle').value;
+        const customTitle = document.getElementById('qrTitleCustom').value.trim();
+        if (customTitle) title = customTitle;
         const design = document.getElementById('qrDesign').value;
         const licensePlate = document.getElementById('qrLicensePlate').value || null;
         const vehicleImageFile = document.getElementById('qrVehicleImage').files[0];
@@ -401,6 +426,8 @@ function editQRCodeClick(btn) {
 function editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath) {
     document.getElementById('editQRLabel').value = label || '';
     document.getElementById('editQRTitle').value = title || '';
+    document.getElementById('editQRTitleCustom').value = '';
+    document.getElementById('editQRTitleCustom').style.display = 'none';
     document.getElementById('editQRDesign').value = design || '';
     document.getElementById('editLicensePlate').value = licensePlate || '';
     document.getElementById('editVehicleImage').value = '';
@@ -450,7 +477,9 @@ document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
     const editModal = document.getElementById('editQRModal');
     const qrId = editModal.dataset.qrId;
     const newLabel = document.getElementById('editQRLabel').value || '';
-    const newTitle = document.getElementById('editQRTitle').value || editModal.dataset.originalTitle || '';
+    let newTitle = document.getElementById('editQRTitle').value || editModal.dataset.originalTitle || '';
+    const customTitle = document.getElementById('editQRTitleCustom').value.trim();
+    if (customTitle) newTitle = customTitle;
     const newDesign = document.getElementById('editQRDesign').value || '';
     const newLicensePlate = document.getElementById('editLicensePlate').value || '';
     const vehicleImageFile = document.getElementById('editVehicleImage').files[0];

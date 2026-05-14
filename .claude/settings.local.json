@@ -202,7 +202,22 @@
       "Bash(python3 -m py_compile backend/main.py)",
       "Bash(curl -s http://192.168.178.47:8000/api/version)",
       "Bash(ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@192.168.178.47 \"pkill -f 'python3 main.py' && sleep 2 && cd /opt/kfz-kontakt/backend && python3 main.py > /tmp/kfz.log 2>&1 &\")",
-      "Bash(curl -s -H \"Authorization: Basic $\\(echo -n ':Schmelz112')"
+      "Bash(curl -s -H \"Authorization: Basic $\\(echo -n ':Schmelz112')",
+      "Bash(ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@192.168.178.47 \"cd /opt/kfz-kontakt && git fetch origin && git reset --hard origin/main && pkill -f 'python3 main.py' && sleep 2 && cd backend && python3 main.py > /tmp/kfz.log 2>&1 &\")",
+      "Bash(ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@192.168.178.47 \"cd /opt/kfz-kontakt && git fetch origin && git reset --hard origin/main && cat version.txt && pkill -f 'python3 main.py' && sleep 2 && cd backend && python3 main.py > /tmp/kfz.log 2>&1 &\")",
+      "Bash(ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@192.168.178.47 \"cd /opt/kfz-kontakt && git fetch origin && git reset --hard origin/main && pkill -f 'python3 main.py' && sleep 1 && cd backend && python3 main.py > /tmp/kfz.log 2>&1 &\")",
+      "Bash(curl -s -i -H \"Authorization: Basic $\\(echo -n ':Schmelz112')",
+      "Bash(curl -s \"http://192.168.178.47:8000/dashboard/js/dashboard.js?v=1.0.72\")",
+      "Bash(curl -v http://192.168.178.47:8000/dashboard/)",
+      "Bash(grep -n \"HTTPBasic\\\\|from auth import\" /opt/kfz-kontakt/backend/main.py)",
+      "Bash(ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@192.168.178.47 \"cd /opt/kfz-kontakt/backend && python3 main.py 2>&1\")",
+      "Bash(curl -s http://192.168.178.47:8000/dashboard/ -H \"Authorization: Basic $\\(echo -n ':Schmelz112')",
+      "Bash(ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@192.168.178.47 \"ls -lah /opt/kfz-kontakt/uploads/ 2>/dev/null || echo 'No uploads dir' && echo '---' && curl -s -H 'Authorization: Basic $\\(echo -n :Schmelz112)",
+      "Bash(sqlite3 kfz_kontakt.db \".headers on\" \".mode column\" \"SELECT id, unique_id, label, license_plate, vehicle_image_path FROM qr_codes;\")",
+      "Bash(find \"C:\\\\Users\\\\Torst\\\\Documents\\\\CLAUDE CODE\" -iname \"*phone*\" -o -iname \"*telefon*\" 2>/dev/null | grep -v \".git\" | head -20)",
+      "Bash(find \"C:\\\\Users\\\\Torst\\\\Documents\" -maxdepth 3 -iname \"*phone*\" -o -iname \"*telefon*\" -o -iname \"*green*\" -o -iname \"*gruen*\" 2>/dev/null | head -30)",
+      "Read(//c/Users/Torst/Pictures/**)",
+      "Read(//c/Users/Torst/**)"
     ]
   }
 }
