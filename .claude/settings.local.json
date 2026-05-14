@@ -220,7 +220,16 @@
       "Read(//c/Users/Torst/**)",
       "Bash(curl -s -X POST http://192.168.178.47:8000/api/qrcode/generate -H 'Content-Type: application/json' -H 'Authorization: Basic OmJsYXV3YWxkYmE=' -d '{\"label\":\"Test\",\"title\":\"FAHRZEUG KONTAKT\",\"design\":\"default\"}')",
       "Bash(ssh -o ConnectTimeout=5 root@192.168.178.47 \"ps aux | grep uvicorn | grep -v grep\")",
-      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.178.47 \"cd /opt/kfz-kontakt && git reset --hard && git pull && find . -type d -name __pycache__ -delete && find . -name '*.pyc' -delete && echo 'Done'\")"
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.178.47 \"cd /opt/kfz-kontakt && git reset --hard && git pull && find . -type d -name __pycache__ -delete && find . -name '*.pyc' -delete && echo 'Done'\")",
+      "Bash(curl -s \"http://192.168.178.47:8000/version\")",
+      "Bash(curl -s \"http://192.168.178.47:8000/dashboard/\")",
+      "Bash(curl -s -u \"admin:admin\" \"http://192.168.178.47:8000/api/qrcodes/list\")",
+      "Bash(curl -s -H \"Authorization: Basic $\\(echo -n 'admin:admin')",
+      "Bash(curl -s http://192.168.178.47:8000/api/qrcodes/list -H \"Authorization: Basic YWRtaW46YWRtaW4=\")",
+      "Bash(curl -s -X POST http://192.168.178.47:8000/api/qrcode/generate -H 'Authorization: Basic __CMDSUB_OUTPUT__')",
+      "Bash(curl -v -X POST http://192.168.178.47:8000/api/qrcode/generate -H 'Authorization: Basic __CMDSUB_OUTPUT__')",
+      "Bash(curl -X POST http://192.168.178.47:8000/api/qrcode/generate -H 'Authorization: Basic __CMDSUB_OUTPUT__')",
+      "Bash(scp /tmp/init_db.py root@192.168.178.47:/opt/kfz-kontakt/backend/)"
     ]
   }
 }

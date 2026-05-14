@@ -30,6 +30,8 @@ class QRCode(Base):
     logo = Column(String(500), nullable=True)
     license_plate = Column(String(50), nullable=True)
     vehicle_image_path = Column(String(500), nullable=True)
+    icon_type = Column(String(50), default="phone")
+    icon_position = Column(String(50), default="bottom")
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="qr_codes")

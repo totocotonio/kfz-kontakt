@@ -330,7 +330,7 @@ async function loadQRCodes() {
                 </div>
                 <div class="qrcode-actions">
                     <button onclick="showDownloadModal(${qr.id}, 'qr_${qr.id}.png', '${qr.label}')" class="btn btn-primary">Runterladen</button>
-                    <button class="btn btn-secondary" data-qrid="${qr.id}" data-label="${qr.label}" data-title="${qr.title}" data-design="${qr.design}" data-background-color="${qr.background_color || '#f5f5f5'}" data-license-plate="${qr.license_plate || ''}" data-vehicle-image-path="${qr.vehicle_image_path || ''}" onclick="editQRCodeClick(this)">Bearbeiten</button>
+                    <button class="btn btn-secondary" data-qrid="${qr.id}" data-label="${qr.label}" data-title="${qr.title}" data-design="${qr.design}" data-background-color="${qr.background_color || '#f5f5f5'}" data-icon-type="${qr.icon_type || 'phone'}" data-icon-position="${qr.icon_position || 'bottom'}" data-license-plate="${qr.license_plate || ''}" data-vehicle-image-path="${qr.vehicle_image_path || ''}" onclick="editQRCodeClick(this)">Bearbeiten</button>
                     <button onclick="deleteQRCode(${qr.id})" class="btn btn-secondary" style="background: #ff6b6b;">Löschen</button>
                 </div>
             </div>
@@ -380,16 +380,18 @@ function setupQRCodeGenerator() {
         const title = document.getElementById('qrTitle').value;
         const design = document.getElementById('qrDesign').value;
         const backgroundColor = document.getElementById('qrBackgroundColor').value;
+        const iconType = document.getElementById('qrIconType').value;
+        const iconPosition = document.getElementById('qrIconPosition').value;
         const licensePlate = document.getElementById('qrLicensePlate').value || null;
         const vehicleImageFile = document.getElementById('qrVehicleImage').files[0];
 
-        console.log('[QR Create] Daten:', { label, title, design, background_color: backgroundColor, license_plate: licensePlate });
+        console.log('[QR Create] Daten:', { label, title, design, background_color: backgroundColor, icon_type: iconType, icon_position: iconPosition, license_plate: licensePlate });
 
         try {
             const res = await apiFetch(`${API_BASE}/qrcode/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ label, title, design, background_color: backgroundColor, license_plate: licensePlate })
+                body: JSON.stringify({ label, title, design, background_color: backgroundColor, icon_type: iconType, icon_position: iconPosition, license_plate: licensePlate })
             });
 
             console.log('[QR Create] Response Status:', res.status, res.ok);
@@ -412,6 +414,8 @@ function setupQRCodeGenerator() {
                 document.getElementById('qrLabel').value = 'Mein Auto';
                 document.getElementById('qrTitle').value = 'KONTAKT FAHRZEUGHALTER';
                 document.getElementById('qrDesign').value = 'default';
+                document.getElementById('qrIconType').value = 'phone';
+                document.getElementById('qrIconPosition').value = 'bottom';
                 document.getElementById('qrLicensePlate').value = '';
                 document.getElementById('qrVehicleImage').value = '';
                 loadQRCodes();
@@ -432,6 +436,8 @@ function editQRCodeClick(btn) {
     const title = btn.dataset.title;
     const design = btn.dataset.design;
     const backgroundColor = btn.dataset.backgroundColor;
+    const iconType = btn.dataset.iconType;
+    const iconPosition = btn.dataset.iconPosition;
     const licensePlate = btn.dataset.licensePlate;
     const vehicleImagePath = btn.dataset.vehicleImagePath;
 
@@ -439,14 +445,16 @@ function editQRCodeClick(btn) {
     document.getElementById('editQRModal').dataset.originalTitle = title;
     document.getElementById('editQRModal').dataset.qrId = qrId;
 
-    editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath, backgroundColor);
+    editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath, backgroundColor, iconType, iconPosition);
 }
 
-function editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath, backgroundColor) {
+function editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath, backgroundColor, iconType, iconPosition) {
     document.getElementById('editQRLabel').value = label || '';
     document.getElementById('editQRTitle').value = title || '';
     document.getElementById('editQRDesign').value = design || '';
     document.getElementById('editQRBackgroundColor').value = backgroundColor || '#f5f5f5';
+    document.getElementById('editQRIconType').value = iconType || 'phone';
+    document.getElementById('editQRIconPosition').value = iconPosition || 'bottom';
     document.getElementById('editLicensePlate').value = licensePlate || '';
     document.getElementById('editVehicleImage').value = '';
     document.getElementById('editQRModal').style.display = 'flex';
@@ -498,17 +506,19 @@ document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
     const newTitle = document.getElementById('editQRTitle').value || editModal.dataset.originalTitle || '';
     const newDesign = document.getElementById('editQRDesign').value || '';
     const newBackgroundColor = document.getElementById('editQRBackgroundColor').value;
+    const newIconType = document.getElementById('editQRIconType').value || 'phone';
+    const newIconPosition = document.getElementById('editQRIconPosition').value || 'bottom';
     const newLicensePlate = document.getElementById('editLicensePlate').value || '';
     const vehicleImageFile = document.getElementById('editVehicleImage').files[0];
 
-    console.log('Saving:', {qrId, newLabel, newTitle, newDesign, newBackgroundColor, newLicensePlate});
+    console.log('Saving:', {qrId, newLabel, newTitle, newDesign, newBackgroundColor, newIconType, newIconPosition, newLicensePlate});
 
     try {
         // Speichere QR-Code Metadaten
         const res = await apiFetch(`${API_BASE}/qrcode/${qrId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ label: newLabel, title: newTitle, design: newDesign, background_color: newBackgroundColor, license_plate: newLicensePlate })
+            body: JSON.stringify({ label: newLabel, title: newTitle, design: newDesign, background_color: newBackgroundColor, icon_type: newIconType, icon_position: newIconPosition, license_plate: newLicensePlate })
         });
 
         if (res.ok) {

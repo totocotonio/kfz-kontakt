@@ -21,6 +21,8 @@ class QRCodeCreate(BaseModel):
     background_color: str = "#f5f5f5"
     license_plate: Optional[str] = None
     vehicle_image_path: Optional[str] = None
+    icon_type: str = "phone"
+    icon_position: str = "bottom"
 
 @router.post("/qrcode/generate")
 def generate_qrcode(data: QRCodeCreate, db: Session = Depends(get_db), auth: bool = Depends(verify_dashboard_auth)):
@@ -37,7 +39,9 @@ def generate_qrcode(data: QRCodeCreate, db: Session = Depends(get_db), auth: boo
         design=data.design,
         background_color=data.background_color,
         license_plate=data.license_plate,
-        vehicle_image_path=data.vehicle_image_path
+        vehicle_image_path=data.vehicle_image_path,
+        icon_type=data.icon_type,
+        icon_position=data.icon_position
     )
     db.add(qr_code)
     db.commit()
@@ -93,6 +97,8 @@ def list_qrcodes(db: Session = Depends(get_db), auth: bool = Depends(verify_dash
                 "unique_id": qr.unique_id,
                 "design": qr.design,
                 "background_color": qr.background_color,
+                "icon_type": qr.icon_type,
+                "icon_position": qr.icon_position,
                 "license_plate": qr.license_plate,
                 "vehicle_image_path": qr.vehicle_image_path,
                 "created_at": qr.created_at
@@ -111,6 +117,8 @@ def update_qrcode(qr_id: int, data: QRCodeCreate, db: Session = Depends(get_db),
     qr.title = data.title
     qr.design = data.design
     qr.background_color = data.background_color
+    qr.icon_type = data.icon_type
+    qr.icon_position = data.icon_position
     if data.license_plate is not None:
         qr.license_plate = data.license_plate
     db.commit()
@@ -131,6 +139,8 @@ def get_qrcode(qr_id: int, db: Session = Depends(get_db), auth: bool = Depends(v
         "unique_id": qr.unique_id,
         "design": qr.design,
         "background_color": qr.background_color,
+        "icon_type": qr.icon_type,
+        "icon_position": qr.icon_position,
         "license_plate": qr.license_plate,
         "vehicle_image_path": qr.vehicle_image_path,
         "created_at": qr.created_at
