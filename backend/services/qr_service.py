@@ -64,8 +64,17 @@ class QRService:
         if label:
             draw.text((sticker_width // 2 - 60, 420), label, fill=(100, 100, 100))
 
-        # Zeichne grünes Telefon-Icon unten
-        QRService._draw_phone_icon(draw, sticker_width // 2 - 15, 455, size=30, color=(0, 180, 0))
+        # Füge grünes Telefon-Icon unten ein
+        try:
+            phone_icon = Image.open(os.path.join(os.path.dirname(__file__), "..", "phone_icon.png"))
+            icon_size = 40
+            phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
+            icon_x = (sticker_width - icon_size) // 2
+            icon_y = 450
+            sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
+        except:
+            # Fallback: Zeichne einfaches Icon wenn Datei nicht vorhanden
+            QRService._draw_phone_icon(draw, sticker_width // 2 - 15, 455, size=30, color=(0, 180, 0))
 
         return sticker
 
@@ -80,7 +89,15 @@ class QRService:
         draw.rectangle([(10, 10), (qr_size + 30, qr_size + 70)], outline=(200, 200, 200), width=1)
 
         # Grünes Telefon-Icon unten
-        QRService._draw_phone_icon(draw, (qr_size + 40) // 2 - 15, qr_size + 32, size=28, color=(0, 180, 0))
+        try:
+            phone_icon = Image.open(os.path.join(os.path.dirname(__file__), "..", "phone_icon.png"))
+            icon_size = 36
+            phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
+            icon_x = ((qr_size + 40) - icon_size) // 2
+            icon_y = qr_size + 28
+            sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
+        except:
+            QRService._draw_phone_icon(draw, (qr_size + 40) // 2 - 15, qr_size + 32, size=28, color=(0, 180, 0))
 
         return sticker
 
@@ -146,31 +163,31 @@ class QRService:
 
     @staticmethod
     def _draw_phone_icon(draw, x, y, size=30, color=(0, 180, 0)):
-        """Zeichnet ein schönes grünes Telefon-Icon"""
-        # Hauptkörper des Telefons (abgerundetes Rechteck)
-        margin = size // 8
+        """Zeichnet ein grünes Telefon-Icon"""
+        # Äußerer Rahmen (Telefon-Körper)
         draw.rectangle(
-            [(x + margin, y), (x + size - margin, y + size)],
+            [(x, y), (x + size, y + size)],
             fill=color,
             outline=color,
             width=1
         )
 
-        # Innerer Bereich (Bildschirm-ähnlich)
-        inner_margin = size // 5
-        screen_color = (0, 220, 0)  # Helleres Grün
+        # Heller Bildschirm-Bereich in der Mitte
+        screen_margin = 3
+        screen_color = (100, 255, 100)  # Helles Grün für Kontrast
         draw.rectangle(
-            [(x + inner_margin, y + inner_margin),
-             (x + size - inner_margin, y + size - inner_margin)],
+            [(x + screen_margin, y + screen_margin),
+             (x + size - screen_margin, y + int(size * 0.7))],
             fill=screen_color,
             outline=screen_color,
             width=1
         )
 
-        # Kleine Sprechmuschel (unten)
-        mouth_y = y + size - size // 6
+        # Kleine Sprechmuschel (unten im Telefon)
+        mouth_y = y + int(size * 0.75)
         draw.ellipse(
-            [(x + size // 3, mouth_y), (x + 2 * size // 3, mouth_y + size // 8)],
+            [(x + int(size * 0.3), mouth_y),
+             (x + int(size * 0.7), mouth_y + int(size * 0.15))],
             fill=color,
             outline=color,
             width=1
