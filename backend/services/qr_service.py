@@ -34,7 +34,7 @@ class QRService:
     ) -> Image.Image:
 
         if design == "default":
-            return QRService._create_default_sticker(qr_image, label, logo_path)
+            return QRService._create_default_sticker(qr_image, label, logo_path, title)
         elif design == "minimal":
             return QRService._create_minimal_sticker(qr_image, label)
         elif design == "professional":
@@ -43,7 +43,7 @@ class QRService:
             return qr_image
 
     @staticmethod
-    def _create_default_sticker(qr_image: Image.Image, label: str = "", logo_path: str = None) -> Image.Image:
+    def _create_default_sticker(qr_image: Image.Image, label: str = "", logo_path: str = None, title: str = "") -> Image.Image:
         qr_size = 300
         qr_resized = qr_image.resize((qr_size, qr_size))
 
@@ -58,8 +58,31 @@ class QRService:
         draw = ImageDraw.Draw(sticker)
         draw.rectangle([(10, 10), (sticker_width-10, sticker_height-10)], outline=(100, 150, 200), width=2)
 
-        text = "Kontakt via QR"
-        draw.text((sticker_width // 2 - 50, 30), text, fill="black")
+        # Verwende title parameter, fallback auf default Text
+        text = title if title else "Kontakt via QR"
+
+        # Versuche mit kleinerer Schrift zu schreiben
+        try:
+            font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 14)
+        except:
+            font_small = ImageFont.load_default()
+
+        # Teile Text in zwei Zeilen falls nötig
+        if len(text) > 25:
+            words = text.split()
+            mid = len(words) // 2
+            line1 = " ".join(words[:mid])
+            line2 = " ".join(words[mid:])
+            bbox1 = draw.textbbox((0, 0), line1, font=font_small)
+            bbox2 = draw.textbbox((0, 0), line2, font=font_small)
+            x1 = (sticker_width - (bbox1[2] - bbox1[0])) // 2
+            x2 = (sticker_width - (bbox2[2] - bbox2[0])) // 2
+            draw.text((x1, 20), line1, fill="black", font=font_small)
+            draw.text((x2, 38), line2, fill="black", font=font_small)
+        else:
+            bbox = draw.textbbox((0, 0), text, font=font_small)
+            x = (sticker_width - (bbox[2] - bbox[0])) // 2
+            draw.text((x, 22), text, fill="black", font=font_small)
 
         if label:
             draw.text((sticker_width // 2 - 60, 420), label, fill=(100, 100, 100))
