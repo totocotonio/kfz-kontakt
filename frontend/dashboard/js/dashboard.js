@@ -1,15 +1,41 @@
 const API_BASE = '/api';
 let currentMessageId = null;
 let confirmCallback = null;
+let loginResolve = null;
 
 // Globale Variable für Passwort
 let dashboardPassword = null;
+
+// Login Modal Handler
+function showLoginModal() {
+    return new Promise((resolve) => {
+        loginResolve = resolve;
+        document.getElementById('loginModal').style.display = 'flex';
+        document.getElementById('loginPassword').focus();
+    });
+}
+
+document.getElementById('loginBtn')?.addEventListener('click', async () => {
+    const password = document.getElementById('loginPassword').value;
+    document.getElementById('loginModal').style.display = 'none';
+    document.getElementById('loginPassword').value = '';
+    if (loginResolve) {
+        loginResolve(password);
+        loginResolve = null;
+    }
+});
+
+document.getElementById('loginPassword')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        document.getElementById('loginBtn').click();
+    }
+});
 
 // Helper für API-Calls mit Basic Auth
 async function apiFetch(url, options = {}) {
     // Wenn Passwort nicht gespeichert, fragen
     if (!dashboardPassword) {
-        dashboardPassword = prompt('Dashboard Passwort:');
+        dashboardPassword = await showLoginModal();
         if (!dashboardPassword) {
             alert('Passwort erforderlich!');
             return { status: 401, ok: false, json: async () => ({ detail: 'Passwort erforderlich' }) };
