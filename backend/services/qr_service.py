@@ -63,7 +63,7 @@ class QRService:
 
         # Versuche mit kleinerer Schrift zu schreiben
         try:
-            font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 14)
+            font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 11)
         except:
             font_small = ImageFont.load_default()
 
