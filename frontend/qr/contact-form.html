@@ -258,20 +258,33 @@
 
                     feedback.innerHTML = '<p class="success">✅ Nachricht erfolgreich gesendet!</p>';
 
-                    // WhatsApp Button nach Nachricht
+                    // Kontakt-Buttons nach Nachricht (Telegram, SMS, WhatsApp)
+                    feedback.innerHTML += '<div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center;">';
+
+                    // Telegram Button
+                    feedback.innerHTML += '<a href="https://t.me/kfz_kontakt_bot" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #0088cc; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background=\'#0077b5\'" onmouseout="this.style.background=\'#0088cc\'">📧 Telegram</a>';
+
                     try {
-                        const waRes = await fetch('/api/whatsapp');
-                        const waData = await waRes.json();
-                        if (waData.whatsapp_number && waData.whatsapp_number.trim()) {
-                            const waNumber = waData.whatsapp_number.replace(/[^0-9]/g, '');
-                            if (waNumber) {
-                                const waUrl = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent('Ich habe dir eine Nachricht über den QR-Code hinterlassen: ' + summary);
-                                feedback.innerHTML += '<a href="' + waUrl + '" target="_blank" class="whatsapp-button">💬 Oder direkt WhatsApp schreiben</a>';
-                            }
+                        // SMS und WhatsApp mit Handynummer
+                        const phoneRes = await fetch('/api/dashboard/phone');
+                        const phoneData = await phoneRes.json();
+                        const phoneNumber = phoneData.phone_number ? phoneData.phone_number.replace(/[^0-9+]/g, '') : null;
+
+                        if (phoneNumber) {
+                            // SMS Button
+                            const smsUrl = 'sms:' + phoneNumber + '?body=' + encodeURIComponent('Hallo, ich habe dir eine Nachricht über den QR-Code hinterlassen');
+                            feedback.innerHTML += '<a href="' + smsUrl + '" style="display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background=\'#20c463\'" onmouseout="this.style.background=\'#25D366\'">📱 SMS</a>';
+
+                            // WhatsApp Button
+                            const waNumber = phoneNumber.replace(/[^0-9]/g, '');
+                            const waUrl = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent('Ich habe dir eine Nachricht über den QR-Code hinterlassen: ' + summary);
+                            feedback.innerHTML += '<a href="' + waUrl + '" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background=\'#20c463\'" onmouseout="this.style.background=\'#25D366\'">💬 WhatsApp</a>';
                         }
                     } catch(e) {
-                        console.error('WhatsApp nach Nachricht:', e);
+                        console.error('Kontakt-Buttons Fehler:', e);
                     }
+
+                    feedback.innerHTML += '</div>';
 
                     document.getElementById('contactForm').reset();
                 } else {
