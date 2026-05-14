@@ -110,18 +110,17 @@ class QRService:
             x = (sticker_width - (bbox[2] - bbox[0])) // 2
             draw.text((x, 400), label, fill="black", font=font_label)
 
-        # Zeichne Icon basierend auf icon_type
+        # Zeichne Icon basierend auf icon_type und Position
         if icon_type != "none":
+            icon_size = 40
+            icon_x, icon_y = QRService._get_icon_position(sticker_width, sticker_height, icon_size, icon_position)
             try:
                 phone_icon = Image.open(os.path.join(os.path.dirname(__file__), "..", "phone_icon.png"))
-                icon_size = 40
                 phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
-                icon_x = (sticker_width - icon_size) // 2
-                icon_y = 455
                 sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
             except:
                 # Fallback: Zeichne Icon basierend auf icon_type
-                QRService._draw_icon(draw, icon_type, sticker_width // 2 - 15, 465, size=30)
+                QRService._draw_icon(draw, icon_type, icon_x, icon_y, size=icon_size)
 
         return sticker
 
@@ -136,17 +135,18 @@ class QRService:
         draw = ImageDraw.Draw(sticker)
         draw.rectangle([(10, 10), (qr_size + 30, qr_size + 70)], outline=(200, 200, 200), width=1)
 
-        # Icon basierend auf icon_type
+        # Icon basierend auf icon_type und Position
         if icon_type != "none":
+            icon_size = 36
+            width = qr_size + 40
+            height = qr_size + 80
+            icon_x, icon_y = QRService._get_icon_position(width, height, icon_size, icon_position)
             try:
                 phone_icon = Image.open(os.path.join(os.path.dirname(__file__), "..", "phone_icon.png"))
-                icon_size = 36
                 phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
-                icon_x = ((qr_size + 40) - icon_size) // 2
-                icon_y = qr_size + 28
                 sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
             except:
-                QRService._draw_icon(draw, icon_type, (qr_size + 40) // 2 - 14, qr_size + 32, size=28)
+                QRService._draw_icon(draw, icon_type, icon_x, icon_y, size=icon_size)
 
         return sticker
 
@@ -216,17 +216,39 @@ class QRService:
         sticker.paste(white_bg, (qr_x, qr_y))
 
         if icon_type != "none":
+            icon_size = 60
+            icon_x, icon_y = QRService._get_icon_position(size, size, icon_size, icon_position)
             try:
                 phone_icon = Image.open("phone_icon.png")
-                icon_size = 60
                 phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
-                icon_x = size - icon_size - 20
-                icon_y = size - icon_size - 20
                 sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
             except:
-                QRService._draw_icon(draw, icon_type, size - 50, size - 50, size=40)
+                QRService._draw_icon(draw, icon_type, icon_x, icon_y, size=icon_size)
 
         return sticker
+
+    @staticmethod
+    def _get_icon_position(sticker_width, sticker_height, icon_size, icon_position):
+        """Berechnet die Position des Icons basierend auf icon_position"""
+        margin = 15
+
+        if icon_position == "bottom":
+            x = (sticker_width - icon_size) // 2
+            y = sticker_height - icon_size - margin
+        elif icon_position == "bottom-right":
+            x = sticker_width - icon_size - margin
+            y = sticker_height - icon_size - margin
+        elif icon_position == "right":
+            x = sticker_width - icon_size - margin
+            y = (sticker_height - icon_size) // 2
+        elif icon_position == "top-right":
+            x = sticker_width - icon_size - margin
+            y = margin
+        else:  # default bottom
+            x = (sticker_width - icon_size) // 2
+            y = sticker_height - icon_size - margin
+
+        return x, y
 
     @staticmethod
     def _draw_icon(draw, icon_type, x, y, size=30):
