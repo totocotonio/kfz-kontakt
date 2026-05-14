@@ -85,9 +85,10 @@ def send_sms_contact(unique_id: str, data: ContactRequest, db: Session = Depends
         raise HTTPException(status_code=400, detail="Admin hat keine Telefonnummer hinterlegt")
 
     # Nachrichtentext für SMS
+    category_text = f"[{message.category.name}] " if message.category else ""
     sender_info = f" ({message.sender_name})" if message.sender_name else ""
-    contact_info = f" - Kontakt: {message.sender_contact}" if message.sender_contact else ""
-    sms_text = f"KFZ Kontakt: {message.message}{sender_info}{contact_info}"
+    contact_info = f" - {message.sender_contact}" if message.sender_contact else ""
+    sms_text = f"KFZ Kontakt: {category_text}{message.message}{sender_info}{contact_info}"
 
     # SMS versenden
     result = twilio_service.send_sms(
@@ -121,9 +122,10 @@ def send_whatsapp_contact(unique_id: str, data: ContactRequest, db: Session = De
         raise HTTPException(status_code=400, detail="Admin hat keine Telefonnummer hinterlegt")
 
     # Nachrichtentext für WhatsApp
+    category_text = f"[{message.category.name}] " if message.category else ""
     sender_info = f" ({message.sender_name})" if message.sender_name else ""
-    contact_info = f" - Kontakt: {message.sender_contact}" if message.sender_contact else ""
-    whatsapp_text = f"KFZ Kontakt: {message.message}{sender_info}{contact_info}"
+    contact_info = f" - {message.sender_contact}" if message.sender_contact else ""
+    whatsapp_text = f"KFZ Kontakt: {category_text}{message.message}{sender_info}{contact_info}"
 
     # WhatsApp versenden
     result = twilio_service.send_whatsapp(
