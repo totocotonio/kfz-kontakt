@@ -68,7 +68,9 @@ def get_qr_image(qr_id: int, request: Request, db: Session = Depends(get_db)):
         design=qr.design,
         label=qr.label,
         title=qr.title,
-        background_color=qr.background_color
+        background_color=qr.background_color,
+        icon_type=qr.icon_type,
+        icon_position=qr.icon_position
     )
 
     img_io = io.BytesIO()
