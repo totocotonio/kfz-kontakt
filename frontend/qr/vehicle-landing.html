@@ -216,17 +216,21 @@
             if (vehicleImagePath && vehicleImagePath.trim()) {
                 const img = document.getElementById('vehicleImage');
                 img.src = vehicleImagePath;
+                console.log('[Image] Lädt von:', vehicleImagePath);
                 img.onload = () => {
+                    console.log('[Image] ✅ Erfolgreich geladen');
                     img.classList.remove('loading');
                 };
                 img.onerror = () => {
-                    showError('Fahrzeugbild konnte nicht geladen werden');
+                    console.error('[Image] ❌ Fehler beim Laden:', vehicleImagePath);
+                    showError('Fahrzeugbild konnte nicht geladen werden (404 oder Zugriff verweigert)');
                 };
             } else {
                 const img = document.getElementById('vehicleImage');
                 img.classList.remove('loading');
                 img.style.background = '#f0f0f0';
                 img.style.display = 'none';
+                console.warn('[Image] ⚠️ Kein Bildpfad vorhanden');
                 showError('Kein Fahrzeugbild verfügbar');
             }
         }
