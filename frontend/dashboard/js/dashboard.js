@@ -333,34 +333,24 @@ function setupQRCodeGenerator() {
         document.getElementById('generatorModal').style.display = 'none';
     });
 
-    // Benutzerdefiniert Text Input Toggle
-    const toggleCustomInput = (selectId, inputId) => {
-        const select = document.getElementById(selectId);
-        const input = document.getElementById(inputId);
-        if (!select || !input) return;
-
-        select.addEventListener('change', function() {
-            console.log(`[Title Change] ${selectId}: "${this.value}"`);
-            if (this.value === '') {
-                input.style.display = 'block';
-                input.style.visibility = 'visible';
-                setTimeout(() => input.focus(), 100);
-            } else {
-                input.style.display = 'none';
-                input.style.visibility = 'hidden';
-                input.value = '';
-            }
+    // Title Buttons Handler
+    document.querySelectorAll('.title-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('qrTitle').value = btn.dataset.value;
         });
-    };
+    });
 
-    toggleCustomInput('qrTitle', 'qrTitleCustom');
-    toggleCustomInput('editQRTitle', 'editQRTitleCustom');
+    document.querySelectorAll('.edit-title-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('editQRTitle').value = btn.dataset.value;
+        });
+    });
 
     document.getElementById('createQrBtn')?.addEventListener('click', async () => {
         const label = document.getElementById('qrLabel').value;
-        let title = document.getElementById('qrTitle').value;
-        const customTitle = document.getElementById('qrTitleCustom').value.trim();
-        if (customTitle) title = customTitle;
+        const title = document.getElementById('qrTitle').value;
         const design = document.getElementById('qrDesign').value;
         const licensePlate = document.getElementById('qrLicensePlate').value || null;
         const vehicleImageFile = document.getElementById('qrVehicleImage').files[0];
@@ -426,8 +416,6 @@ function editQRCodeClick(btn) {
 function editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath) {
     document.getElementById('editQRLabel').value = label || '';
     document.getElementById('editQRTitle').value = title || '';
-    document.getElementById('editQRTitleCustom').value = '';
-    document.getElementById('editQRTitleCustom').style.display = 'none';
     document.getElementById('editQRDesign').value = design || '';
     document.getElementById('editLicensePlate').value = licensePlate || '';
     document.getElementById('editVehicleImage').value = '';
@@ -477,9 +465,7 @@ document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
     const editModal = document.getElementById('editQRModal');
     const qrId = editModal.dataset.qrId;
     const newLabel = document.getElementById('editQRLabel').value || '';
-    let newTitle = document.getElementById('editQRTitle').value || editModal.dataset.originalTitle || '';
-    const customTitle = document.getElementById('editQRTitleCustom').value.trim();
-    if (customTitle) newTitle = customTitle;
+    const newTitle = document.getElementById('editQRTitle').value || editModal.dataset.originalTitle || '';
     const newDesign = document.getElementById('editQRDesign').value || '';
     const newLicensePlate = document.getElementById('editLicensePlate').value || '';
     const vehicleImageFile = document.getElementById('editVehicleImage').files[0];

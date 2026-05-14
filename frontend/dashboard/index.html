@@ -79,19 +79,14 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Text auf Sticker</label>
-                                    <select id="qrTitle">
-                                        <option value="FAHRZEUG KONTAKT">FAHRZEUG KONTAKT</option>
-                                        <option value="FAHRZEUG MELDUNG">FAHRZEUG MELDUNG</option>
-                                        <option value="BESITZER KONTAKTIEREN">BESITZER KONTAKTIEREN</option>
-                                        <option value="KONTAKT BESITZER">KONTAKT BESITZER</option>
-                                        <option value="FAHRZEUG NACHRICHT">FAHRZEUG NACHRICHT</option>
-                                        <option value="SCANNEN & KONTAKT">SCANNEN & KONTAKT</option>
-                                        <option value="AUTOHALTER KONTAKT">AUTOHALTER KONTAKT</option>
-                                        <option value="FAHRZEUGBESITZER MELDUNG">FAHRZEUGBESITZER MELDUNG</option>
-                                        <option value="NACHRICHT AN BESITZER">NACHRICHT AN BESITZER</option>
-                                        <option value="">--- Benutzerdefiniert ---</option>
-                                    </select>
-                                    <input type="text" id="qrTitleCustom" placeholder="Oder eigenen Text eingeben..." style="display: none; margin-top: 10px;">
+                                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+                                        <button type="button" class="title-btn" data-value="FAHRZEUG KONTAKT" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">FK</button>
+                                        <button type="button" class="title-btn" data-value="FAHRZEUG MELDUNG" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">Meldung</button>
+                                        <button type="button" class="title-btn" data-value="BESITZER KONTAKTIEREN" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">Kontakt</button>
+                                        <button type="button" class="title-btn" data-value="FAHRZEUG NACHRICHT" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">Nachricht</button>
+                                        <button type="button" class="title-btn" data-value="SCANNEN & KONTAKT" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">Scannen</button>
+                                    </div>
+                                    <input type="text" id="qrTitle" placeholder="FAHRZEUG KONTAKT" value="FAHRZEUG KONTAKT">
                                 </div>
                                 <div class="form-group">
                                     <label>Design</label>
@@ -136,19 +131,14 @@
                             </div>
                             <div class="form-group">
                                 <label>Text auf Sticker</label>
-                                <select id="editQRTitle">
-                                    <option value="FAHRZEUG KONTAKT">FAHRZEUG KONTAKT</option>
-                                    <option value="FAHRZEUG MELDUNG">FAHRZEUG MELDUNG</option>
-                                    <option value="BESITZER KONTAKTIEREN">BESITZER KONTAKTIEREN</option>
-                                    <option value="KONTAKT BESITZER">KONTAKT BESITZER</option>
-                                    <option value="FAHRZEUG NACHRICHT">FAHRZEUG NACHRICHT</option>
-                                    <option value="SCANNEN & KONTAKT">SCANNEN & KONTAKT</option>
-                                    <option value="AUTOHALTER KONTAKT">AUTOHALTER KONTAKT</option>
-                                    <option value="FAHRZEUGBESITZER MELDUNG">FAHRZEUGBESITZER MELDUNG</option>
-                                    <option value="NACHRICHT AN BESITZER">NACHRICHT AN BESITZER</option>
-                                    <option value="">--- Benutzerdefiniert ---</option>
-                                </select>
-                                <input type="text" id="editQRTitleCustom" placeholder="Oder eigenen Text eingeben..." style="display: none; margin-top: 10px;">
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+                                    <button type="button" class="edit-title-btn" data-value="FAHRZEUG KONTAKT" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">FK</button>
+                                    <button type="button" class="edit-title-btn" data-value="FAHRZEUG MELDUNG" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">Meldung</button>
+                                    <button type="button" class="edit-title-btn" data-value="BESITZER KONTAKTIEREN" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">Kontakt</button>
+                                    <button type="button" class="edit-title-btn" data-value="FAHRZEUG NACHRICHT" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">Nachricht</button>
+                                    <button type="button" class="edit-title-btn" data-value="SCANNEN & KONTAKT" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 12px; background: #f5f5f5;">Scannen</button>
+                                </div>
+                                <input type="text" id="editQRTitle" placeholder="FAHRZEUG KONTAKT">
                             </div>
                             <div class="form-group">
                                 <label>Design</label>
