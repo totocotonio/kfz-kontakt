@@ -333,19 +333,17 @@ function setupQRCodeGenerator() {
         document.getElementById('generatorModal').style.display = 'none';
     });
 
-    // Title Buttons Handler
-    document.querySelectorAll('.title-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('qrTitle').value = btn.dataset.value;
-        });
+    // Select to Input Handler
+    document.getElementById('qrTitleSelect')?.addEventListener('change', function() {
+        if (this.value) {
+            document.getElementById('qrTitle').value = this.value;
+        }
     });
 
-    document.querySelectorAll('.edit-title-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById('editQRTitle').value = btn.dataset.value;
-        });
+    document.getElementById('editQRTitleSelect')?.addEventListener('change', function() {
+        if (this.value) {
+            document.getElementById('editQRTitle').value = this.value;
+        }
     });
 
     document.getElementById('createQrBtn')?.addEventListener('click', async () => {
