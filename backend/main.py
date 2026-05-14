@@ -141,6 +141,33 @@ def debug_auth():
         "password_starts_with": settings.DASHBOARD_PASSWORD[:1] if settings.DASHBOARD_PASSWORD else ""
     }
 
+@app.get("/debug/reload")
+def debug_reload():
+    """Reload database and models - für Development/Testing"""
+    try:
+        from models import Base
+        from database import engine
+        import importlib
+        import sys
+
+        # Reload models
+        if 'models' in sys.modules:
+            importlib.reload(sys.modules['models'])
+
+        # Recreate tables if missing
+        Base.metadata.create_all(bind=engine)
+
+        return {
+            "status": "success",
+            "message": "Models und Datenbank neu geladen",
+            "version": get_dashboard_version()
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
 @app.get("/api/version")
 def get_version():
     try:
