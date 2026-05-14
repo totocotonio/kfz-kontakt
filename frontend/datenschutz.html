@@ -30,7 +30,17 @@
 <body>
 <header>
   <span class="logo">🔐 KFZ Kontakt</span>
-  <a href="javascript:history.back()" style="cursor: pointer;">&larr; Zur App</a>
+  <a id="backLink" href="/dashboard/" style="cursor: pointer;">&larr; Zur App</a>
+  <script>
+    // Speichere URL wenn man FROM Dashboard kommt
+    if (document.referrer.includes('/dashboard')) {
+      document.getElementById('backLink').href = document.referrer;
+    } else if (sessionStorage.getItem('appOrigin')) {
+      document.getElementById('backLink').href = sessionStorage.getItem('appOrigin');
+    } else {
+      document.getElementById('backLink').href = '/dashboard/';
+    }
+  </script>
 </header>
 <main>
   <h1>Datenschutzerklärung</h1>
