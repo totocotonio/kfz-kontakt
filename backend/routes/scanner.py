@@ -7,6 +7,7 @@ from services.telegram_service import TelegramService
 from services.twilio_service import twilio_service
 import asyncio
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -217,3 +218,54 @@ def register_telegram_chat(data: TelegramChatRegister, db: Session = Depends(get
     except Exception as e:
         logger.error(f"Fehler bei Telegram-Registrierung: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Registrierungsfehler: {str(e)}")
+
+@router.post("/webhooks/telegram")
+async def telegram_webhook(request: Request, db: Session = Depends(get_db)):
+    """Webhook für Telegram Bot Updates (z.B. /start Befehl)"""
+    try:
+        data = await request.json()
+        logger.info(f"Telegram Webhook empfangen: {json.dumps(data, indent=2)}")
+
+        # Extrahiere Chat ID und Username
+        if "message" in data:
+            message = data["message"]
+            chat_id = str(message.get("chat", {}).get("id"))
+            username = message.get("chat", {}).get("username", "")
+            text = message.get("text", "")
+
+            logger.info(f"Telegram Message: chat_id={chat_id}, username={username}, text={text}")
+
+            # Wenn /start Befehl
+            if text and text.startswith("/start"):
+                logger.info(f"Registriere Chat ID automatisch: {chat_id}")
+
+                # Finde oder erstelle Admin-User
+                user = db.query(User).filter(User.name == "Admin").first()
+
+                if not user:
+                    user = User(
+                        name="Admin",
+                        telegram_chat_id=chat_id,
+                        telegram_username=username
+                    )
+                    db.add(user)
+                    logger.info(f"Neuer Admin-User erstellt mit Chat ID: {chat_id}")
+                else:
+                    user.telegram_chat_id = chat_id
+                    if username:
+                        user.telegram_username = username
+                    logger.info(f"Admin-User aktualisiert mit Chat ID: {chat_id}")
+
+                db.commit()
+
+                # Sende Bestätigungs-Nachricht zurück
+                await TelegramService.send_message(
+                    f"✅ Deine Telegram Chat ID wurde registriert!\n\nChat ID: {chat_id}\n\nDu erhältst jetzt Benachrichtigungen über neue Nachrichten vom QR-Code.",
+                    chat_id=chat_id
+                )
+
+        return {"status": "ok"}
+
+    except Exception as e:
+        logger.error(f"Fehler bei Telegram Webhook: {str(e)}")
+        return {"status": "error", "message": str(e)}
