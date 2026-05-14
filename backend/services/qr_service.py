@@ -159,7 +159,8 @@ class QRService:
         sticker = Image.new("RGB", (size, size), bg_rgb)
         draw = ImageDraw.Draw(sticker)
 
-        draw.ellipse([(0, 0), (size-1, size-1)], fill=bg_rgb, outline=(50, 50, 50), width=2)
+        # Weißer Rahmen statt schwarzem Ring
+        draw.rectangle([(10, 10), (size-10, size-10)], outline="white", width=3)
 
         try:
             font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 48)
