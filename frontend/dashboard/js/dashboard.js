@@ -3,8 +3,8 @@ let currentMessageId = null;
 let confirmCallback = null;
 let loginResolve = null;
 
-// Globale Variable für Passwort
-let dashboardPassword = null;
+// Globale Variable für Passwort - Versuche aus sessionStorage zu laden
+let dashboardPassword = sessionStorage.getItem('dashboardPassword') || null;
 
 // Login Modal Handler
 function showLoginModal() {
@@ -19,6 +19,12 @@ document.getElementById('loginBtn')?.addEventListener('click', async () => {
     const password = document.getElementById('loginPassword').value;
     document.getElementById('loginModal').style.display = 'none';
     document.getElementById('loginPassword').value = '';
+
+    // Speichere Passwort in sessionStorage für diese Session
+    if (password) {
+        sessionStorage.setItem('dashboardPassword', password);
+    }
+
     if (loginResolve) {
         loginResolve(password);
         loginResolve = null;
