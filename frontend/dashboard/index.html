@@ -53,6 +53,20 @@
     </script>
 </head>
 <body>
+    <!-- Top Header mit Logo -->
+    <header class="top-header">
+        <div class="header-left">
+            <span class="header-logo">🚗</span>
+            <div class="header-title">
+                <h1>KFZ Kontakt</h1>
+                <span class="header-subtitle">QR-Code Nachrichtensystem</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <span class="version-label">v<span id="header-version">-</span></span>
+        </div>
+    </header>
+
     <div class="dashboard">
         <sidebar class="sidebar">
             <div class="logo">🚗 KFZ Kontakt</div>
@@ -386,7 +400,7 @@
             .then(data => {
                 if (data.version) {
                     // Update both header and footer version
-                    const headerVersion = document.getElementById('version');
+                    const headerVersion = document.getElementById('header-version');
                     const footerVersion = document.getElementById('footer-version');
                     if (headerVersion) headerVersion.textContent = data.version;
                     if (footerVersion) footerVersion.textContent = data.version;
