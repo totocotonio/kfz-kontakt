@@ -68,7 +68,7 @@ class QRService:
             font_small = ImageFont.load_default()
 
         # Teile Text in zwei Zeilen falls nötig
-        if len(text) >= 15:  # Umbruch bei 15+ Zeichen
+        if len(text) >= 12:  # Umbruch bei 12+ Zeichen
             words = text.split()
             if len(words) >= 2:  # Nur wenn mindestens 2 Worte
                 mid = len(words) // 2
@@ -149,7 +149,7 @@ class QRService:
 
         if title:
             # Prüfe ob Text zu lang ist und teile auf 2 Zeilen auf
-            if len(title) > 15 and '\n' not in title:
+            if len(title) > 12 and '\n' not in title:
                 words = title.split()
                 if len(words) >= 2:
                     mid = len(words) // 2
