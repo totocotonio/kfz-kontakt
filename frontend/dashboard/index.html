@@ -63,23 +63,22 @@
             </div>
         </div>
         <div class="header-right">
-            <span class="version-label">v<span id="header-version">-</span></span>
             <button class="theme-toggle" onclick="toggleTheme()" title="Hell/Dunkel umschalten" aria-label="Theme wechseln">
                 <div class="theme-toggle-knob" id="theme-knob">🌙</div>
             </button>
         </div>
     </header>
 
-    <!-- Tab Navigation -->
-    <nav class="tab-bar">
-        <button class="tab-btn active" data-tab="messages" onclick="switchTab(event, 'messages')">
-            <span>💬</span> Nachrichten
+    <!-- Zentrierte Button-Navigation -->
+    <nav class="nav-centered">
+        <button class="nav-btn active" data-tab="messages">
+            💬 Nachrichten
         </button>
-        <button class="tab-btn" data-tab="qrcodes" onclick="switchTab(event, 'qrcodes')">
-            <span>📱</span> QR-Codes
+        <button class="nav-btn" data-tab="settings">
+            ⚙️ Einstellungen
         </button>
-        <button class="tab-btn" data-tab="stats" onclick="switchTab(event, 'stats')">
-            <span>📊</span> Statistiken
+        <button class="nav-btn" data-tab="stats">
+            📊 Statistiken
         </button>
     </nav>
 
@@ -106,7 +105,7 @@
                 </div>
 
                 <!-- QR Codes Tab -->
-                <div id="qrcodes" class="tab-content">
+                <div id="settings" class="tab-content">
                     <div class="qrcodes-section">
                         <div class="section-header">
                             <h2>Einstellungen & QR-Codes</h2>
@@ -388,7 +387,7 @@
         </div>
     </footer>
 
-    <!-- Theme Toggle & Tab Management -->
+    <!-- Theme Toggle -->
     <script>
         // Theme Toggle Function
         function toggleTheme() {
@@ -417,36 +416,6 @@
 
         // Initialize theme on page load
         initTheme();
-
-        // Tab Switching Function
-        function switchTab(event, tabName) {
-            event.preventDefault();
-
-            // Hide all tabs
-            const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => tab.classList.remove('active'));
-
-            // Deactivate all buttons
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-
-            // Show selected tab
-            const activeTab = document.getElementById(tabName);
-            if (activeTab) {
-                activeTab.classList.add('active');
-            }
-
-            // Activate button
-            event.target.closest('.tab-btn').classList.add('active');
-
-            // Update page title
-            const titles = {
-                messages: 'Nachrichten',
-                qrcodes: 'QR-Codes',
-                stats: 'Statistiken'
-            };
-            document.getElementById('pageTitle').textContent = titles[tabName] || 'Dashboard';
-        }
     </script>
 
     <script src="js/dashboard.js?v=0"></script>

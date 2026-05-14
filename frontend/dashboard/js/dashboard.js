@@ -177,9 +177,8 @@ async function loadWhatsAppNumber() {
 document.addEventListener('DOMContentLoaded', () => {
     // Passwort wird erst in apiFetch() abgefragt, wenn nötig
     setupNavigation();
-    loadMessages();
-    loadStats();
-    loadQRCodes();
+    // Initialize with messages tab active
+    switchTab('messages');
     setupQRCodeGenerator();
     setupWhatsApp();
 });
@@ -187,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Version wird SERVER-SIDE injiziert in das HTML - nicht hier laden!
 
 function setupNavigation() {
-    document.querySelectorAll('.nav-item').forEach(btn => {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
             switchTab(tab);
@@ -196,21 +195,21 @@ function setupNavigation() {
 }
 
 function switchTab(tabName) {
-    document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
 
-    event.target.closest('.nav-item').classList.add('active');
+    document.querySelector('[data-tab="' + tabName + '"]')?.classList.add('active');
     document.getElementById(tabName).classList.add('active');
 
     const titles = {
         messages: 'Nachrichten',
-        qrcodes: 'QR-Codes',
+        settings: 'Einstellungen',
         stats: 'Statistiken'
     };
     document.getElementById('pageTitle').textContent = titles[tabName];
 
     if (tabName === 'messages') loadMessages();
-    if (tabName === 'qrcodes') loadQRCodes();
+    if (tabName === 'settings') loadQRCodes();
     if (tabName === 'stats') loadStats();
 }
 
