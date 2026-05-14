@@ -324,10 +324,13 @@ async function loadQRCodes() {
                 </div>
                 <div class="qrcode-label">${qr.label}</div>
                 <div style="font-size: 12px; color: #999; margin-top: 5px; word-break: break-all;">ID: ${qr.unique_id}</div>
-                <div style="font-size: 12px; color: #999; margin-bottom: 10px;">Design: ${qr.design}</div>
+                <div style="font-size: 12px; color: #999;">Design: ${qr.design}</div>
+                <div style="font-size: 12px; color: #999; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                    Farbe: <div style="width: 20px; height: 20px; border: 1px solid #ccc; border-radius: 3px; background-color: ${qr.background_color || '#f5f5f5'}; cursor: help;" title="${qr.background_color || '#f5f5f5'}"></div>
+                </div>
                 <div class="qrcode-actions">
                     <button onclick="showDownloadModal(${qr.id}, 'qr_${qr.id}.png', '${qr.label}')" class="btn btn-primary">Runterladen</button>
-                    <button class="btn btn-secondary" data-qrid="${qr.id}" data-label="${qr.label}" data-title="${qr.title}" data-design="${qr.design}" data-license-plate="${qr.license_plate || ''}" data-vehicle-image-path="${qr.vehicle_image_path || ''}" onclick="editQRCodeClick(this)">Bearbeiten</button>
+                    <button class="btn btn-secondary" data-qrid="${qr.id}" data-label="${qr.label}" data-title="${qr.title}" data-design="${qr.design}" data-background-color="${qr.background_color || '#f5f5f5'}" data-license-plate="${qr.license_plate || ''}" data-vehicle-image-path="${qr.vehicle_image_path || ''}" onclick="editQRCodeClick(this)">Bearbeiten</button>
                     <button onclick="deleteQRCode(${qr.id})" class="btn btn-secondary" style="background: #ff6b6b;">Löschen</button>
                 </div>
             </div>
@@ -428,6 +431,7 @@ function editQRCodeClick(btn) {
     const label = btn.dataset.label;
     const title = btn.dataset.title;
     const design = btn.dataset.design;
+    const backgroundColor = btn.dataset.backgroundColor;
     const licensePlate = btn.dataset.licensePlate;
     const vehicleImagePath = btn.dataset.vehicleImagePath;
 
@@ -435,7 +439,7 @@ function editQRCodeClick(btn) {
     document.getElementById('editQRModal').dataset.originalTitle = title;
     document.getElementById('editQRModal').dataset.qrId = qrId;
 
-    editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath);
+    editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath, backgroundColor);
 }
 
 function editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath, backgroundColor) {
