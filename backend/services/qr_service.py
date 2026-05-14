@@ -25,31 +25,39 @@ class QRService:
         return qr.make_image(fill_color="black", back_color="white")
 
     @staticmethod
+    def _hex_to_rgb(hex_color: str) -> tuple:
+        """Konvertiere Hex-Farbe zu RGB Tuple"""
+        hex_color = hex_color.lstrip('#')
+        return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+    @staticmethod
     def generate_sticker_with_design(
         qr_image: Image.Image,
         design: str = "default",
         label: str = "",
         title: str = "",
-        logo_path: str = None
+        logo_path: str = None,
+        background_color: str = "#f5f5f5"
     ) -> Image.Image:
 
         if design == "default":
-            return QRService._create_default_sticker(qr_image, label, logo_path, title)
+            return QRService._create_default_sticker(qr_image, label, logo_path, title, background_color)
         elif design == "minimal":
-            return QRService._create_minimal_sticker(qr_image, label)
+            return QRService._create_minimal_sticker(qr_image, label, background_color)
         elif design == "professional":
-            return QRService._create_professional_sticker(qr_image, label, title, logo_path)
+            return QRService._create_professional_sticker(qr_image, label, title, logo_path, background_color)
         else:
             return qr_image
 
     @staticmethod
-    def _create_default_sticker(qr_image: Image.Image, label: str = "", logo_path: str = None, title: str = "") -> Image.Image:
+    def _create_default_sticker(qr_image: Image.Image, label: str = "", logo_path: str = None, title: str = "", background_color: str = "#f5f5f5") -> Image.Image:
         qr_size = 300
         qr_resized = qr_image.resize((qr_size, qr_size))
 
         sticker_width = 400
         sticker_height = 500
-        sticker = Image.new("RGB", (sticker_width, sticker_height), (245, 245, 245))
+        bg_rgb = QRService._hex_to_rgb(background_color)
+        sticker = Image.new("RGB", (sticker_width, sticker_height), bg_rgb)
 
         x_offset = (sticker_width - qr_size) // 2
         y_offset = 80
@@ -108,10 +116,11 @@ class QRService:
         return sticker
 
     @staticmethod
-    def _create_minimal_sticker(qr_image: Image.Image, label: str = "") -> Image.Image:
+    def _create_minimal_sticker(qr_image: Image.Image, label: str = "", background_color: str = "#f5f5f5") -> Image.Image:
         qr_size = 300
         qr_resized = qr_image.resize((qr_size, qr_size))
-        sticker = Image.new("RGB", (qr_size + 40, qr_size + 80), "white")
+        bg_rgb = QRService._hex_to_rgb(background_color)
+        sticker = Image.new("RGB", (qr_size + 40, qr_size + 80), bg_rgb)
         sticker.paste(qr_resized, (20, 20))
 
         draw = ImageDraw.Draw(sticker)
@@ -135,13 +144,15 @@ class QRService:
         qr_image: Image.Image,
         label: str = "",
         title: str = "",
-        logo_path: str = None
+        logo_path: str = None,
+        background_color: str = "#1e1e1e"
     ) -> Image.Image:
         size = 500
-        sticker = Image.new("RGB", (size, size), (30, 30, 30))
+        bg_rgb = QRService._hex_to_rgb(background_color)
+        sticker = Image.new("RGB", (size, size), bg_rgb)
         draw = ImageDraw.Draw(sticker)
 
-        draw.ellipse([(0, 0), (size-1, size-1)], fill=(30, 30, 30), outline=(50, 50, 50), width=2)
+        draw.ellipse([(0, 0), (size-1, size-1)], fill=bg_rgb, outline=(50, 50, 50), width=2)
 
         try:
             font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 48)

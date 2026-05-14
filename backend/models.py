@@ -26,6 +26,7 @@ class QRCode(Base):
     label = Column(String(255), nullable=True)
     title = Column(String(255), nullable=True)
     design = Column(String(50), default="default")
+    background_color = Column(String(7), default="#f5f5f5")
     logo = Column(String(500), nullable=True)
     license_plate = Column(String(50), nullable=True)
     vehicle_image_path = Column(String(500), nullable=True)

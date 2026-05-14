@@ -217,7 +217,10 @@
       "Bash(find \"C:\\\\Users\\\\Torst\\\\Documents\\\\CLAUDE CODE\" -iname \"*phone*\" -o -iname \"*telefon*\" 2>/dev/null | grep -v \".git\" | head -20)",
       "Bash(find \"C:\\\\Users\\\\Torst\\\\Documents\" -maxdepth 3 -iname \"*phone*\" -o -iname \"*telefon*\" -o -iname \"*green*\" -o -iname \"*gruen*\" 2>/dev/null | head -30)",
       "Read(//c/Users/Torst/Pictures/**)",
-      "Read(//c/Users/Torst/**)"
+      "Read(//c/Users/Torst/**)",
+      "Bash(curl -s -X POST http://192.168.178.47:8000/api/qrcode/generate -H 'Content-Type: application/json' -H 'Authorization: Basic OmJsYXV3YWxkYmE=' -d '{\"label\":\"Test\",\"title\":\"FAHRZEUG KONTAKT\",\"design\":\"default\"}')",
+      "Bash(ssh -o ConnectTimeout=5 root@192.168.178.47 \"ps aux | grep uvicorn | grep -v grep\")",
+      "Bash(ssh -o StrictHostKeyChecking=no root@192.168.178.47 \"cd /opt/kfz-kontakt && git reset --hard && git pull && find . -type d -name __pycache__ -delete && find . -name '*.pyc' -delete && echo 'Done'\")"
     ]
   }
 }
