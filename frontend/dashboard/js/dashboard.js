@@ -350,16 +350,17 @@ function setupQRCodeGenerator() {
         const label = document.getElementById('qrLabel').value;
         const title = document.getElementById('qrTitle').value;
         const design = document.getElementById('qrDesign').value;
+        const backgroundColor = document.getElementById('qrBackgroundColor').value;
         const licensePlate = document.getElementById('qrLicensePlate').value || null;
         const vehicleImageFile = document.getElementById('qrVehicleImage').files[0];
 
-        console.log('[QR Create] Daten:', { label, title, design, license_plate: licensePlate });
+        console.log('[QR Create] Daten:', { label, title, design, background_color: backgroundColor, license_plate: licensePlate });
 
         try {
             const res = await apiFetch(`${API_BASE}/qrcode/generate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ label, title, design, license_plate: licensePlate })
+                body: JSON.stringify({ label, title, design, background_color: backgroundColor, license_plate: licensePlate })
             });
 
             console.log('[QR Create] Response Status:', res.status, res.ok);
@@ -411,10 +412,11 @@ function editQRCodeClick(btn) {
     editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath);
 }
 
-function editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath) {
+function editQRCode(qrId, label, title, design, licensePlate, vehicleImagePath, backgroundColor) {
     document.getElementById('editQRLabel').value = label || '';
     document.getElementById('editQRTitle').value = title || '';
     document.getElementById('editQRDesign').value = design || '';
+    document.getElementById('editQRBackgroundColor').value = backgroundColor || '#f5f5f5';
     document.getElementById('editLicensePlate').value = licensePlate || '';
     document.getElementById('editVehicleImage').value = '';
     document.getElementById('editQRModal').style.display = 'flex';
@@ -465,17 +467,18 @@ document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
     const newLabel = document.getElementById('editQRLabel').value || '';
     const newTitle = document.getElementById('editQRTitle').value || editModal.dataset.originalTitle || '';
     const newDesign = document.getElementById('editQRDesign').value || '';
+    const newBackgroundColor = document.getElementById('editQRBackgroundColor').value;
     const newLicensePlate = document.getElementById('editLicensePlate').value || '';
     const vehicleImageFile = document.getElementById('editVehicleImage').files[0];
 
-    console.log('Saving:', {qrId, newLabel, newTitle, newDesign, newLicensePlate});
+    console.log('Saving:', {qrId, newLabel, newTitle, newDesign, newBackgroundColor, newLicensePlate});
 
     try {
         // Speichere QR-Code Metadaten
         const res = await apiFetch(`${API_BASE}/qrcode/${qrId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ label: newLabel, title: newTitle, design: newDesign, license_plate: newLicensePlate })
+            body: JSON.stringify({ label: newLabel, title: newTitle, design: newDesign, background_color: newBackgroundColor, license_plate: newLicensePlate })
         });
 
         if (res.ok) {
