@@ -334,27 +334,27 @@ function setupQRCodeGenerator() {
     });
 
     // Benutzerdefiniert Text Input Toggle
-    document.getElementById('qrTitle')?.addEventListener('change', function() {
-        const customInput = document.getElementById('qrTitleCustom');
-        if (this.value === '') {
-            customInput.style.display = 'block';
-            customInput.focus();
-        } else {
-            customInput.style.display = 'none';
-            customInput.value = '';
-        }
-    });
+    const toggleCustomInput = (selectId, inputId) => {
+        const select = document.getElementById(selectId);
+        const input = document.getElementById(inputId);
+        if (!select || !input) return;
 
-    document.getElementById('editQRTitle')?.addEventListener('change', function() {
-        const customInput = document.getElementById('editQRTitleCustom');
-        if (this.value === '') {
-            customInput.style.display = 'block';
-            customInput.focus();
-        } else {
-            customInput.style.display = 'none';
-            customInput.value = '';
-        }
-    });
+        select.addEventListener('change', function() {
+            console.log(`[Title Change] ${selectId}: "${this.value}"`);
+            if (this.value === '') {
+                input.style.display = 'block';
+                input.style.visibility = 'visible';
+                setTimeout(() => input.focus(), 100);
+            } else {
+                input.style.display = 'none';
+                input.style.visibility = 'hidden';
+                input.value = '';
+            }
+        });
+    };
+
+    toggleCustomInput('qrTitle', 'qrTitleCustom');
+    toggleCustomInput('editQRTitle', 'editQRTitleCustom');
 
     document.getElementById('createQrBtn')?.addEventListener('click', async () => {
         const label = document.getElementById('qrLabel').value;
