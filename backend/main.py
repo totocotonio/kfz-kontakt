@@ -178,6 +178,34 @@ def select_category_page():
         return FileResponse(select_cat_file, media_type="text/html")
     return {"error": "File not found"}
 
+@app.get("/datenschutz.html")
+def datenschutz_page():
+    """Serve datenschutz.html - Datenschutzerklärung"""
+    frontend_dir = Path(__file__).parent.parent / "frontend"
+    datenschutz_file = frontend_dir / "datenschutz.html"
+    if datenschutz_file.exists():
+        return FileResponse(datenschutz_file, media_type="text/html")
+    return {"error": "Datenschutzerklärung nicht gefunden"}
+
+@app.get("/datenschutz")
+def datenschutz_redirect():
+    """Redirect /datenschutz to /datenschutz.html"""
+    return RedirectResponse(url="/datenschutz.html", status_code=302)
+
+@app.get("/impressum.html")
+def impressum_page():
+    """Serve impressum.html - Impressum"""
+    frontend_dir = Path(__file__).parent.parent / "frontend"
+    impressum_file = frontend_dir / "impressum.html"
+    if impressum_file.exists():
+        return FileResponse(impressum_file, media_type="text/html")
+    return {"error": "Impressum nicht gefunden"}
+
+@app.get("/impressum")
+def impressum_redirect():
+    """Redirect /impressum to /impressum.html"""
+    return RedirectResponse(url="/impressum.html", status_code=302)
+
 @app.get("/qr/vehicle-landing.html")
 def vehicle_landing_page(qr: str = None, license_plate: str = None, vehicle_image_path: str = None):
     frontend_dir = Path(__file__).parent.parent / "frontend"
