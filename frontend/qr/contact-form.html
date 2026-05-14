@@ -251,10 +251,8 @@
                 });
 
                 if (res.ok) {
-                    const categorySelect = document.getElementById('category');
-                    const categoryText = categorySelect.options[categorySelect.selectedIndex]?.text || '';
-                    const message = payload.message;
-                    const summary = (categoryText ? categoryText + ' - ' : '') + message;
+                    const data = await res.json();
+                    const messageId = data.message_id;
 
                     feedback.innerHTML = '<p class="success">✅ Nachricht erfolgreich gesendet!</p>';
 
@@ -264,25 +262,71 @@
                     // Telegram Button
                     feedback.innerHTML += '<a href="https://t.me/kfz_kontakt_bot" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #0088cc; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background=\'#0077b5\'" onmouseout="this.style.background=\'#0088cc\'">📧 Telegram</a>';
 
+                    // SMS Button - API call statt direkter Link
+                    const smsBtn = document.createElement('button');
+                    smsBtn.type = 'button';
+                    smsBtn.style.cssText = 'display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;';
+                    smsBtn.textContent = '📱 SMS wird versendet...';
+                    smsBtn.disabled = true;
+                    smsBtn.onmouseover = function() { if(!this.disabled) this.style.background = '#20c463'; };
+                    smsBtn.onmouseout = function() { if(!this.disabled) this.style.background = '#25D366'; };
+
+                    // SMS senden
                     try {
-                        // SMS und WhatsApp mit Handynummer
-                        const phoneRes = await fetch('/api/dashboard/phone');
-                        const phoneData = await phoneRes.json();
-                        const phoneNumber = phoneData.phone_number ? phoneData.phone_number.replace(/[^0-9+]/g, '') : null;
+                        const smsRes = await fetch('/api/qr/' + uniqueId + '/contact/sms', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message_id: messageId })
+                        });
 
-                        if (phoneNumber) {
-                            // SMS Button
-                            const smsUrl = 'sms:' + phoneNumber + '?body=' + encodeURIComponent('Hallo, ich habe dir eine Nachricht über den QR-Code hinterlassen');
-                            feedback.innerHTML += '<a href="' + smsUrl + '" style="display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background=\'#20c463\'" onmouseout="this.style.background=\'#25D366\'">📱 SMS</a>';
-
-                            // WhatsApp Button
-                            const waNumber = phoneNumber.replace(/[^0-9]/g, '');
-                            const waUrl = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent('Ich habe dir eine Nachricht über den QR-Code hinterlassen: ' + summary);
-                            feedback.innerHTML += '<a href="' + waUrl + '" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background=\'#20c463\'" onmouseout="this.style.background=\'#25D366\'">💬 WhatsApp</a>';
+                        if (smsRes.ok) {
+                            smsBtn.textContent = '✅ SMS versendet';
+                        } else {
+                            smsBtn.textContent = '❌ SMS fehlgeschlagen';
+                            smsBtn.style.background = '#e74c3c';
                         }
                     } catch(e) {
-                        console.error('Kontakt-Buttons Fehler:', e);
+                        console.error('SMS Fehler:', e);
+                        smsBtn.textContent = '❌ SMS Fehler';
+                        smsBtn.style.background = '#e74c3c';
                     }
+
+                    const smsBtnContainer = document.createElement('div');
+                    smsBtnContainer.appendChild(smsBtn);
+                    feedback.querySelector('div').appendChild(smsBtnContainer);
+
+                    // WhatsApp Button - API call statt direkter Link
+                    const waBtn = document.createElement('button');
+                    waBtn.type = 'button';
+                    waBtn.style.cssText = 'display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;';
+                    waBtn.textContent = '💬 WhatsApp wird versendet...';
+                    waBtn.disabled = true;
+                    waBtn.onmouseover = function() { if(!this.disabled) this.style.background = '#20c463'; };
+                    waBtn.onmouseout = function() { if(!this.disabled) this.style.background = '#25D366'; };
+
+                    // WhatsApp senden
+                    try {
+                        const waRes = await fetch('/api/qr/' + uniqueId + '/contact/whatsapp', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message_id: messageId })
+                        });
+
+                        if (waRes.ok) {
+                            waBtn.textContent = '✅ WhatsApp versendet';
+                        } else {
+                            waBtn.textContent = '❌ WhatsApp fehlgeschlagen';
+                            waBtn.style.background = '#e74c3c';
+                        }
+                    } catch(e) {
+                        console.error('WhatsApp Fehler:', e);
+                        waBtn.textContent = '❌ WhatsApp Fehler';
+                        waBtn.style.background = '#e74c3c';
+                    }
+
+                    const waBtnContainer = document.createElement('div');
+                    waBtnContainer.appendChild(waBtn);
+                    feedback.querySelector('div').appendChild(waBtnContainer);
 
                     feedback.innerHTML += '</div>';
 

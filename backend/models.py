@@ -62,6 +62,12 @@ class Message(Base):
     message = Column(Text)
     read = Column(Boolean, default=False)
     responded = Column(Boolean, default=False)
+    contact_method = Column(String(20), default="telegram")  # "telegram", "sms", "whatsapp"
+    sms_sid = Column(String(50), nullable=True)  # Twilio SMS Tracking ID
+    sms_status = Column(String(20), default="pending")  # pending, sent, delivered, failed
+    whatsapp_sid = Column(String(50), nullable=True)  # Twilio WhatsApp Tracking ID
+    whatsapp_status = Column(String(20), default="pending")  # pending, sent, delivered, failed
+    status_updated_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     qr_code = relationship("QRCode", back_populates="messages")

@@ -17,6 +17,12 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = str(BASE_DIR.parent / "uploads")
     MAX_FILE_SIZE: int = 5 * 1024 * 1024  # 5MB
 
+    # Twilio Configuration
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    TWILIO_PHONE_NUMBER: str = ""
+    TWILIO_WHATSAPP_NUMBER: str = ""
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
