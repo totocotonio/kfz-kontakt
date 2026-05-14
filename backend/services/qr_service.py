@@ -51,16 +51,16 @@ class QRService:
 
     @staticmethod
     def _create_default_sticker(qr_image: Image.Image, label: str = "", logo_path: str = None, title: str = "", background_color: str = "#f5f5f5") -> Image.Image:
-        qr_size = 300
+        qr_size = 330
         qr_resized = qr_image.resize((qr_size, qr_size))
 
         sticker_width = 400
-        sticker_height = 500
+        sticker_height = 520
         bg_rgb = QRService._hex_to_rgb(background_color)
         sticker = Image.new("RGB", (sticker_width, sticker_height), bg_rgb)
 
         x_offset = (sticker_width - qr_size) // 2
-        y_offset = 80
+        y_offset = 55
         sticker.paste(qr_resized, (x_offset, y_offset))
 
         draw = ImageDraw.Draw(sticker)
@@ -71,7 +71,7 @@ class QRService:
 
         # Versuche mit kleinerer Schrift zu schreiben
         try:
-            font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 8)
+            font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 7)
         except:
             font_small = ImageFont.load_default()
 
@@ -91,15 +91,22 @@ class QRService:
             bbox2 = draw.textbbox((0, 0), line2, font=font_small)
             x1 = (sticker_width - (bbox1[2] - bbox1[0])) // 2
             x2 = (sticker_width - (bbox2[2] - bbox2[0])) // 2
-            draw.text((x1, 15), line1, fill="black", font=font_small)
-            draw.text((x2, 33), line2, fill="black", font=font_small)
+            draw.text((x1, 13), line1, fill="black", font=font_small)
+            draw.text((x2, 23), line2, fill="black", font=font_small)
         else:
             bbox = draw.textbbox((0, 0), text, font=font_small)
             x = (sticker_width - (bbox[2] - bbox[0])) // 2
-            draw.text((x, 22), text, fill="black", font=font_small)
+            draw.text((x, 18), text, fill="black", font=font_small)
 
+        # Label: Nur anzeigen wenn vorhanden, mit größerer Font
         if label:
-            draw.text((sticker_width // 2 - 60, 420), label, fill=(100, 100, 100))
+            try:
+                font_label = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 10)
+            except:
+                font_label = ImageFont.load_default()
+            bbox = draw.textbbox((0, 0), label, font=font_label)
+            x = (sticker_width - (bbox[2] - bbox[0])) // 2
+            draw.text((x, 400), label, fill="black", font=font_label)
 
         # Füge grünes Telefon-Icon unten ein
         try:
@@ -107,11 +114,11 @@ class QRService:
             icon_size = 40
             phone_resized = phone_icon.resize((icon_size, icon_size), Image.Resampling.LANCZOS)
             icon_x = (sticker_width - icon_size) // 2
-            icon_y = 450
+            icon_y = 455
             sticker.paste(phone_resized, (icon_x, icon_y), phone_resized)
         except:
             # Fallback: Zeichne einfaches Icon wenn Datei nicht vorhanden
-            QRService._draw_phone_icon(draw, sticker_width // 2 - 15, 455, size=30, color=(0, 180, 0))
+            QRService._draw_phone_icon(draw, sticker_width // 2 - 15, 465, size=30, color=(0, 180, 0))
 
         return sticker
 
