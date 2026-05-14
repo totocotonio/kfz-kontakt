@@ -111,19 +111,32 @@
                 <div id="settings" class="tab-content">
                     <div style="max-width: 600px; margin: 0 auto;">
                         <div class="section-header">
-                            <h2>Einstellungen</h2>
+                            <h2>Benachrichtigungen</h2>
                         </div>
 
-                        <!-- WhatsApp Settings -->
+                        <!-- Telefonnummer für SMS-Benachrichtigungen -->
                         <div style="background: var(--panel2); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
-                            <h3 style="margin-bottom: 15px; color: var(--text);">💬 WhatsApp Kontakt</h3>
+                            <h3 style="margin-bottom: 15px; color: var(--text);">📱 Deine Mobilnummer (SMS-Benachrichtigungen)</h3>
+                            <div class="form-group">
+                                <label>Mobilnummer für SMS (z.B. +491234567890)</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="text" id="phoneNumber" placeholder="+49..." style="flex: 1;">
+                                    <button class="btn btn-primary" id="savePhoneBtn" style="width: auto;">Speichern</button>
+                                </div>
+                                <small style="color: var(--muted); margin-top: 5px; display: block;">Du bekommst SMS wenn neue Nachrichten eingehen (privat, nicht öffentlich sichtbar)</small>
+                            </div>
+                        </div>
+
+                        <!-- WhatsApp für öffentlichen Kontakt -->
+                        <div style="background: var(--panel2); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
+                            <h3 style="margin-bottom: 15px; color: var(--text);">💬 WhatsApp Kontakt (Öffentlich)</h3>
                             <div class="form-group">
                                 <label>Deine WhatsApp Nummer (z.B. +491234567890)</label>
                                 <div style="display: flex; gap: 10px;">
                                     <input type="text" id="whatsappNumber" placeholder="+49..." style="flex: 1;">
                                     <button class="btn btn-primary" id="saveWhatsappBtn" style="width: auto;">Speichern</button>
                                 </div>
-                                <small style="color: var(--muted); margin-top: 5px; display: block;">Besucher können dich direkt über WhatsApp kontaktieren</small>
+                                <small style="color: var(--muted); margin-top: 5px; display: block;">Besucher können dich über WhatsApp kontaktieren</small>
                             </div>
                         </div>
                     </div>

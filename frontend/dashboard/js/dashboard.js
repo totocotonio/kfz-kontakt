@@ -220,6 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize with messages tab active
     switchTab('messages');
     setupQRCodeGenerator();
+    setupPhone();
     setupWhatsApp();
 });
 
