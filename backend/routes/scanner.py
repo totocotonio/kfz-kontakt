@@ -69,7 +69,8 @@ async def submit_message(unique_id: str, data: MessageSubmit, db: Session = Depe
 @router.post("/qr/{unique_id}/contact/sms")
 def send_sms_contact(unique_id: str, data: ContactRequest, db: Session = Depends(get_db)):
     """SMS-Versand via Twilio für anonyme Kontaktmöglichkeit"""
-    logger.info(f"SMS Request: unique_id={unique_id}, data={data}")
+    logger.info(f"SMS contact: message_id={data.message_id}")
+
     # QR-Code finden
     qr = db.query(QRCode).filter(QRCode.unique_id == unique_id).first()
     if not qr:
@@ -109,7 +110,8 @@ def send_sms_contact(unique_id: str, data: ContactRequest, db: Session = Depends
 @router.post("/qr/{unique_id}/contact/whatsapp")
 def send_whatsapp_contact(unique_id: str, data: ContactRequest, db: Session = Depends(get_db)):
     """WhatsApp-Versand via Twilio für anonyme Kontaktmöglichkeit"""
-    logger.info(f"WhatsApp Request: unique_id={unique_id}, data={data}")
+    logger.info(f"WhatsApp contact: message_id={data.message_id}")
+
     # QR-Code finden
     qr = db.query(QRCode).filter(QRCode.unique_id == unique_id).first()
     if not qr:
