@@ -73,7 +73,6 @@
             <header class="header">
                 <h1 id="pageTitle">Nachrichten</h1>
                 <div class="header-right">
-                    <div class="version-badge">v<span id="version">-</span></div>
                     <div class="stats-quick">
                         <div class="stat">
                             <span class="stat-value" id="unreadCount">0</span>
@@ -359,12 +358,45 @@
     </div>
 
     <!-- Footer -->
-    <footer style="position: fixed; bottom: 0; right: 0; padding: 12px 20px; font-size: 12px; color: #999; background: white; border-left: 1px solid #ddd; border-top: 1px solid #ddd; z-index: 100;">
-        <a href="/datenschutz.html" style="color: #999; text-decoration: none; margin-right: 15px;">Datenschutz</a>
-        <a href="/impressum.html" style="color: #999; text-decoration: none;">Impressum</a>
+    <footer style="background: #f5f7fa; border-top: 1px solid #ddd; padding: 20px; text-align: center; font-size: 13px; color: #666; margin-top: auto; clear: both;">
+        <div style="display: flex; justify-content: center; gap: 20px; align-items: center; flex-wrap: wrap;">
+            <a href="/" style="color: #667eea; text-decoration: none; font-weight: 500;">← Zurück zur App</a>
+            <span style="color: #ddd;">|</span>
+            <a href="/datenschutz.html" style="color: #666; text-decoration: none;">Datenschutz</a>
+            <span style="color: #ddd;">|</span>
+            <a href="/impressum.html" style="color: #666; text-decoration: none;">Impressum</a>
+            <span style="color: #ddd;">|</span>
+            <span>© <span id="footer-year"></span> Torsten Michaely</span>
+            <span style="color: #ddd;">|</span>
+            <span>v<span id="footer-version">-</span></span>
+        </div>
+        <div style="margin-top: 10px; font-size: 12px; color: #999;">
+            Erstellt mit ❤️ für sichere Fahrzeugkommunikation
+        </div>
     </footer>
 
     <script src="js/dashboard.js?v=0"></script>
+
+    <!-- Footer Year & Version Script -->
+    <script>
+        // Set footer year
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+        // Set footer version (will be updated when version is loaded)
+        window.addEventListener('DOMContentLoaded', () => {
+            const headerVersion = document.getElementById('version');
+            const footerVersion = document.getElementById('footer-version');
+            if (headerVersion && footerVersion) {
+                // Copy version from header when it's loaded
+                const observer = new MutationObserver(() => {
+                    if (headerVersion.textContent !== '-') {
+                        footerVersion.textContent = headerVersion.textContent;
+                    }
+                });
+                observer.observe(headerVersion, { childList: true, characterData: true, subtree: true });
+            }
+        });
+    </script>
 
     <!-- Service Worker Registration -->
     <script>

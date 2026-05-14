@@ -233,7 +233,10 @@
       "Bash(ping -c 2 192.168.178.47)",
       "Bash(net use *)",
       "Bash(chmod +x /tmp/ssh_command.sh)",
-      "Bash(/tmp/ssh_command.sh)"
+      "Bash(/tmp/ssh_command.sh)",
+      "Bash(curl -s http://192.168.178.47:8000/api/dashboard/stats)",
+      "Bash(curl -s http://192.168.178.47:8000/datenschutz.html)",
+      "Bash(echo \"✅ Server aktualisiert und neu gestartet - v$\\(ssh root@192.168.178.47 'cat /opt/kfz-kontakt/version.txt'\\)\")"
     ]
   }
 }
