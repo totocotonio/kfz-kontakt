@@ -18,6 +18,7 @@ class QRCodeCreate(BaseModel):
     label: str = "Mein Auto"
     title: str = "KONTAKT FAHRZEUGHALTER"
     design: str = "default"
+    background_color: str = "#f5f5f5"
     license_plate: Optional[str] = None
     vehicle_image_path: Optional[str] = None
 
@@ -34,6 +35,7 @@ def generate_qrcode(data: QRCodeCreate, db: Session = Depends(get_db), auth: boo
         label=data.label,
         title=data.title,
         design=data.design,
+        background_color=data.background_color,
         license_plate=data.license_plate,
         vehicle_image_path=data.vehicle_image_path
     )
@@ -61,7 +63,8 @@ def get_qr_image(qr_id: int, request: Request, db: Session = Depends(get_db)):
         qr_image,
         design=qr.design,
         label=qr.label,
-        title=qr.title
+        title=qr.title,
+        background_color=qr.background_color
     )
 
     img_io = io.BytesIO()
@@ -89,6 +92,7 @@ def list_qrcodes(db: Session = Depends(get_db), auth: bool = Depends(verify_dash
                 "title": qr.title,
                 "unique_id": qr.unique_id,
                 "design": qr.design,
+                "background_color": qr.background_color,
                 "license_plate": qr.license_plate,
                 "vehicle_image_path": qr.vehicle_image_path,
                 "created_at": qr.created_at
@@ -106,6 +110,7 @@ def update_qrcode(qr_id: int, data: QRCodeCreate, db: Session = Depends(get_db),
     qr.label = data.label
     qr.title = data.title
     qr.design = data.design
+    qr.background_color = data.background_color
     if data.license_plate is not None:
         qr.license_plate = data.license_plate
     db.commit()
@@ -125,6 +130,7 @@ def get_qrcode(qr_id: int, db: Session = Depends(get_db), auth: bool = Depends(v
         "title": qr.title,
         "unique_id": qr.unique_id,
         "design": qr.design,
+        "background_color": qr.background_color,
         "license_plate": qr.license_plate,
         "vehicle_image_path": qr.vehicle_image_path,
         "created_at": qr.created_at
