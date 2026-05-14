@@ -21,6 +21,10 @@ class MessageSubmit(BaseModel):
 class ContactRequest(BaseModel):
     message_id: int
 
+class TelegramChatRegister(BaseModel):
+    chat_id: str
+    username: str = None
+
 @router.get("/qr/{unique_id}/info")
 def get_qr_info(unique_id: str, db: Session = Depends(get_db)):
     qr = db.query(QRCode).filter(QRCode.unique_id == unique_id).first()
@@ -61,7 +65,8 @@ async def submit_message(unique_id: str, data: MessageSubmit, db: Session = Depe
         qr_label=qr.label or f"QR-{qr.id}",
         sender=data.sender_name or "Anonym",
         message=data.message,
-        category=category_name
+        category=category_name,
+        db=db
     )
 
     return {"status": "success", "message_id": message.id}
@@ -177,3 +182,38 @@ async def twilio_webhook(request: Request, db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"Fehler bei Twilio Webhook: {str(e)}")
         return {"status": "error", "message": str(e)}
+
+@router.post("/telegram/register")
+def register_telegram_chat(data: TelegramChatRegister, db: Session = Depends(get_db)):
+    """Registriere Telegram Chat ID für den Admin-Benutzer"""
+    try:
+        logger.info(f"Registriere Telegram Chat ID: {data.chat_id}")
+
+        # Finde oder erstelle Admin-User
+        user = db.query(User).filter(User.name == "Admin").first()
+
+        if not user:
+            user = User(
+                name="Admin",
+                telegram_chat_id=data.chat_id,
+                telegram_username=data.username
+            )
+            db.add(user)
+            logger.info(f"Neuer Admin-User erstellt mit Chat ID: {data.chat_id}")
+        else:
+            user.telegram_chat_id = data.chat_id
+            if data.username:
+                user.telegram_username = data.username
+            logger.info(f"Admin-User aktualisiert mit Chat ID: {data.chat_id}")
+
+        db.commit()
+        db.refresh(user)
+
+        return {
+            "status": "success",
+            "message": f"Telegram Chat ID registriert: {data.chat_id}",
+            "user_id": user.id
+        }
+    except Exception as e:
+        logger.error(f"Fehler bei Telegram-Registrierung: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Registrierungsfehler: {str(e)}")
