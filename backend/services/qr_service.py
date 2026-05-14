@@ -148,7 +148,17 @@ class QRService:
             font_large = ImageFont.load_default()
 
         if title:
-            lines = title.split('\n') if '\n' in title else [title]
+            # Prüfe ob Text zu lang ist und teile auf 2 Zeilen auf
+            if len(title) > 20 and '\n' not in title:
+                words = title.split()
+                if len(words) >= 2:
+                    mid = len(words) // 2
+                    lines = [" ".join(words[:mid]), " ".join(words[mid:])]
+                else:
+                    lines = [title]
+            else:
+                lines = title.split('\n') if '\n' in title else [title]
+
             title_y = 25
             for line in lines:
                 bbox = draw.textbbox((0, 0), line, font=font_large)
