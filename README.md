@@ -2,8 +2,8 @@
 
 Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrsteilnehmern über QR-Codes. Mit Fahrzeugfotos, Kennzeichen, persönlichen Icons und PWA-Unterstützung.
 
-**Status:** ✅ Production Ready (v1.0.124) - Auto-Deploy aktiv
-**© 2026 Torsten Michaely** – Alle Rechte vorbehalten. Mit WhatsApp-Integration für flexible Kontaktmöglichkeiten.
+**Status:** ✅ Production Ready (v1.0.161) - Auto-Deploy aktiv
+**© 2026 Torsten Michaely** – Alle Rechte vorbehalten. Mit Twilio SMS/WhatsApp-Integration für anonyme Kontaktmöglichkeiten.
 
 ## Features
 
@@ -15,8 +15,10 @@ Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrst
 ✅ **Nachrichtenformular** - Scanner können anonym Nachrichten hinterlassen  
 ✅ **Kategorien** - Nachrichten mit Kategorien (Parkplatz, Beleuchtung, Fenster, Schaden, Sonstiges)  
 ✅ **Telegram-Benachrichtigungen** - Sofortige Benachrichtigungen bei neuen Nachrichten  
-✅ **Admin-Dashboard** - Verwalte QR-Codes, Fahrzeugbilder, Nachrichten und WhatsApp-Nummer  
-✅ **Datenschutz** - Keine persönlichen Daten werden angezeigt  
+✅ **Twilio SMS/WhatsApp Integration** - Anonyme SMS und WhatsApp via Twilio ($0.008-0.005 pro Msg)  
+✅ **Admin-Dashboard** - Verwalte QR-Codes, Fahrzeugbilder, Nachrichten, Telefonnummer und Twilio-Kontakte  
+✅ **Message Tracking** - Lieferungsstatus für SMS und WhatsApp (pending/sent/delivered/failed)  
+✅ **Datenschutz** - Keine persönlichen Daten werden öffentlich angezeigt  
 ✅ **Mobile-optimiert** - Funktioniert auf allen Geräten  
 ✅ **PWA (Progressive Web App)** - Installierbar auf Mobilgeräten, offline-fähig mit Service Worker
 ✅ **Legal Pages** - Datenschutzerklärung & Impressum (DSGVO/§5 TMG konform)
@@ -59,8 +61,9 @@ Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrst
 - **Backend:** FastAPI, SQLAlchemy, SQLite
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
 - **QR-Code:** qrcode-python, Pillow
-- **Notifications:** python-telegram-bot
+- **Notifications:** python-telegram-bot, Twilio
 - **PWA:** Service Worker, Web App Manifest, Offline-Support
+- **SMS/WhatsApp:** Twilio API (v8.10.0) mit Webhook Status-Updates
 
 ## PWA Features (Progressive Web App)
 
@@ -126,8 +129,17 @@ Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrst
 
 4. **.env konfigurieren**
    ```
+   # Telegram
    TELEGRAM_BOT_TOKEN=dein_bot_token
    TELEGRAM_CHAT_ID=deine_chat_id
+   
+   # Twilio (Optional für SMS/WhatsApp)
+   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxx
+   TWILIO_AUTH_TOKEN=your_auth_token
+   TWILIO_PHONE_NUMBER=+49xxxxxxxxx
+   TWILIO_WHATSAPP_NUMBER=+14xxxxxxxxx
+   
+   # Database & Server
    DATABASE_URL=sqlite:///./kfz_kontakt.db
    HOST=0.0.0.0
    PORT=8000
@@ -153,6 +165,11 @@ Server läuft unter `http://localhost:8000`
 - Als gelesen/beantwortet markieren
 - Kategorien und Sender sehen
 - Mit Zeitstempel
+- Lieferungsstatus für SMS/WhatsApp anzeigen (pending/sent/delivered/failed)
+
+**⚙️ Einstellungen**
+- Telefonnummer eingeben (für SMS und WhatsApp Empfang)
+- Admin-Benachrichtigungen via Telegram konfigurieren
 
 **📱 QR-Codes**
 - WhatsApp-Nummer eingeben (optional)
@@ -203,6 +220,8 @@ Server läuft unter `http://localhost:8000`
 ### Scanner (Öffentlich)
 - `GET /api/qr/{unique_id}/info` - QR-Code Infos + Kategorien
 - `POST /api/qr/{unique_id}/message` - Nachricht submitten
+- `POST /api/qr/{unique_id}/contact/sms` - SMS via Twilio versenden (anonym)
+- `POST /api/qr/{unique_id}/contact/whatsapp` - WhatsApp via Twilio versenden (anonym)
 
 ### QR-Code Management
 - `POST /api/qrcode/generate` - Neuen QR-Code erstellen (mit label, title, design, background_color, icon_type, icon_position, license_plate)
@@ -214,12 +233,15 @@ Server läuft unter `http://localhost:8000`
 - `DELETE /api/qrcode/{qr_id}` - QR-Code löschen (inkl. Fahrzeugbild)
 
 ### Dashboard
-- `GET /api/dashboard/messages` - Alle Nachrichten
-- `GET /api/dashboard/messages/{id}` - Einzelne Nachricht
+- `GET /api/dashboard/messages` - Alle Nachrichten (mit SMS/WhatsApp Status)
+- `GET /api/dashboard/messages/{id}` - Einzelne Nachricht (mit Twilio-Tracking)
 - `PATCH /api/dashboard/messages/{id}` - Nachricht aktualisieren (read, responded)
 - `GET /api/dashboard/stats` - Statistiken (total_messages, unread, responded)
-- `GET /api/dashboard/whatsapp` - WhatsApp-Nummer abrufen
-- `PATCH /api/dashboard/whatsapp` - WhatsApp-Nummer aktualisieren
+- `GET /api/dashboard/phone` - Admin-Telefonnummer abrufen
+- `PATCH /api/dashboard/phone` - Admin-Telefonnummer aktualisieren (für SMS/WhatsApp Empfang)
+
+### Webhooks
+- `POST /webhooks/twilio` - Twilio Status-Updates (SMS/WhatsApp Delivery Status)
 
 ### Scanner Pages
 - `GET /qr/{unique_id}` - Landing Page (automatisch gewählt basierend auf Fahrzeugbild)
@@ -257,6 +279,54 @@ Server läuft unter `http://localhost:8000`
 6. Bot zu deiner privaten Gruppe/Chat hinzufügen
 7. In der Gruppe `/start` tippen → Chat-ID kopieren
 8. Token und Chat-ID in `.env` eintragen
+
+## Twilio Setup (für SMS & WhatsApp)
+
+### 1. Twilio-Konto erstellen
+1. https://www.twilio.com/ öffnen → Sign up
+2. Gratis mit $10 Trial-Guthaben
+3. Telefonnummer bestätigen
+4. Account aktivieren
+
+### 2. Account-Credentials
+1. **Console Dashboard** öffnen
+2. **Account SID** kopieren (sieht so aus: `ACxxxxxxxxxxxxxxxx`)
+3. **Auth Token** kopieren (sieht so aus: `your_auth_token`)
+4. Diese Werte speichern
+
+### 3. Telefonnummer kaufen
+1. Im Dashboard → **Phone Numbers** → **Buy a Number**
+2. **Country:** Deutschland (DE)
+3. **Number Type:** SMS + Voice
+4. Nächste verfügbare Nummer auswählen (~$1/Monat)
+5. **Purchase** klicken
+6. Nummer formatiert kopieren (z.B. `+49xxx`)
+
+### 4. WhatsApp Sandbox aktivieren
+1. Im Dashboard → **Messaging** → **Try it out** → **Send an SMS**
+2. Im Menü → **WhatsApp** → **Sandbox**
+3. **Join the Sandbox:** QR-Code scannen oder WhatsApp-Nummer + Text senden
+4. **Sandbox Phone Number** kopieren
+
+### 5. .env aktualisieren
+```
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_PHONE_NUMBER=+49xxxxxxxxx     # Gekaufte SMS-Nummer
+TWILIO_WHATSAPP_NUMBER=+14xxxxxxxxx  # WhatsApp Sandbox Nummer
+```
+
+### 6. Webhook-URL konfigurieren (Production nur)
+1. Im Dashboard → **Messaging** → **Settings** → **Webhook URL**
+2. **Status Callbacks:** `https://deine-domain.de/webhooks/twilio`
+3. **Method:** POST
+4. Speichern
+
+### Kosten
+- **SMS:** $0.0083 pro Nachricht (gesendet an Admin)
+- **WhatsApp:** $0.005 pro Nachricht
+- **Phone Number:** ~$1/Monat
+- **Beispiel:** 50 Nachrichten/Monat = ca. $1.50 Kosten
 
 ## Deployment auf Linux (LXC Container)
 
@@ -324,6 +394,29 @@ server {
 ```
 
 ## Changelog - Neue Features (v1.0.120+)
+
+### v1.0.161 - Twilio SMS/WhatsApp Integration
+✅ **Anonyme SMS und WhatsApp über Twilio**
+- `TwilioService` für SMS und WhatsApp Versand
+- Message-Modell erweitert mit `contact_method`, `sms_sid`, `sms_status`, `whatsapp_sid`, `whatsapp_status`, `status_updated_at`
+- API-Endpoints: `/api/qr/{unique_id}/contact/sms` und `/contact/whatsapp`
+- Webhook-Handler: `POST /webhooks/twilio` für Delivery Status Updates
+- RequestValidator für Twilio Webhook-Signatur-Validierung
+- Dashboard: Lieferungsstatus anzeigen (pending/sent/delivered/failed)
+- Kostengünstig: SMS $0.0083, WhatsApp $0.005 pro Nachricht
+- Admin-Telefonnummer bleibt privat (wird nicht öffentlich angezeigt)
+
+✅ **Erweiterte .env Konfiguration**
+- TWILIO_ACCOUNT_SID
+- TWILIO_AUTH_TOKEN
+- TWILIO_PHONE_NUMBER
+- TWILIO_WHATSAPP_NUMBER
+
+✅ **Frontend Updates**
+- SMS/WhatsApp Buttons nutzen jetzt API-Calls statt direkter Links
+- Loading-States während Versand
+- Status-Feedback nach Versand
+- Telefonnummer wird nicht in URLs angezeigt
 
 ### v1.0.124 - PWA Professionalisierung
 ✅ **Progressive Web App (PWA)**
