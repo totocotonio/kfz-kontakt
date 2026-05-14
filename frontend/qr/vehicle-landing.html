@@ -5,141 +5,259 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fahrzeug Kontakt</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             padding: 20px;
         }
+
         .container {
             background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 16px;
+            padding: 40px 20px;
             max-width: 500px;
             width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        .vehicle-image-container {
-            width: 100%;
-            margin-bottom: 30px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .vehicle-image-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-        .license-plate {
-            background: #ffcc00;
-            color: #000;
-            padding: 12px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 18px;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 2px;
-            margin-top: -4px;
-            border-radius: 0 0 8px 8px;
-        }
+
         h1 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 24px;
             text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
         }
+
+        .vehicle-section {
+            margin-bottom: 30px;
+        }
+
+        .vehicle-image-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vehicle-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .vehicle-image.loading {
+            background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .license-plate {
+            text-align: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: #333;
+            background: #fff9e6;
+            border: 2px solid #ffd700;
+            border-radius: 4px;
+            padding: 8px 12px;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+        }
+
+        .license-plate.empty {
+            background: #f0f0f0;
+            border-color: #ddd;
+            color: #999;
+            font-style: italic;
+        }
+
         .subtitle {
+            text-align: center;
             color: #666;
             margin-bottom: 30px;
-            text-align: center;
             font-size: 16px;
+            line-height: 1.5;
         }
-        .button-container {
+
+        .action-buttons {
             display: flex;
             gap: 10px;
             flex-direction: column;
         }
-        button {
+
+        .btn {
             padding: 14px;
-            background: #667eea;
-            color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #5568d3;
-        }
-        .loading {
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
             text-align: center;
-            color: #999;
-            padding: 20px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8e8;
+            border-color: #999;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #e74c3c;
+            padding: 15px;
+            background: #fadbd8;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="vehicle-image-container" id="imageContainer">
-            <img id="vehicleImage" src="" alt="Fahrzeugbild">
-            <div class="license-plate" id="licensePlate"></div>
-        </div>
-
         <h1>🚗 Fahrzeug Kontakt</h1>
-        <p class="subtitle" id="subtitle">Möchtest du den Besitzer dieses Fahrzeugs kontaktieren?</p>
 
-        <div class="button-container">
-            <button onclick="goToContactForm()">📝 Nachricht senden</button>
-            <button onclick="goBack()" style="background: #999;">← Zurück</button>
+        <div class="vehicle-section">
+            <div class="vehicle-image-wrapper">
+                <img id="vehicleImage" class="vehicle-image loading" src="" alt="Fahrzeugbild">
+            </div>
+
+            <div id="licensePlateContainer">
+                <div class="license-plate empty">Kennzeichen nicht vorhanden</div>
+            </div>
         </div>
+
+        <p class="subtitle">
+            Möchtest du den Besitzer dieses Fahrzeugs kontaktieren? Hinterlasse eine Nachricht!
+        </p>
+
+        <div id="errorContainer"></div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="messageBtn">💬 Nachricht senden</button>
+            <button class="btn btn-secondary" id="backBtn">← Zurück</button>
+        </div>
+
+        <p class="info">Deine Kontaktdaten werden direkt zum Fahrzeughalter weitergeleitet.</p>
     </div>
 
     <script>
-        // Lese Parameter aus URL-Query
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
-        }
+        // Diese Werte werden von main.py injiziert
+        const uniqueId = '';
+        const licensePlate = '';
+        const vehicleImagePath = '';
 
-        const uniqueId = getQueryParam('qr');
-        const licensePlate = getQueryParam('license_plate');
-        const vehicleImagePath = getQueryParam('vehicle_image_path');
+        function initPage() {
+            console.log('[Debug] uniqueId:', uniqueId);
+            console.log('[Debug] licensePlate:', licensePlate);
+            console.log('[Debug] vehicleImagePath:', vehicleImagePath);
 
-        function goToContactForm() {
             if (!uniqueId) {
-                alert('QR-Code ID fehlt');
+                showError('Fehler: QR-Code nicht gefunden');
                 return;
             }
-            window.location.href = `/select-category.html?qr=${encodeURIComponent(uniqueId)}`;
+
+            // Zeige Kennzeichen an
+            if (licensePlate && licensePlate.trim()) {
+                const container = document.getElementById('licensePlateContainer');
+                container.innerHTML = `<div class="license-plate">${escapeHtml(licensePlate)}</div>`;
+            }
+
+            // Lade Fahrzeugbild
+            if (vehicleImagePath && vehicleImagePath.trim()) {
+                const img = document.getElementById('vehicleImage');
+                img.src = vehicleImagePath;
+                img.onload = () => {
+                    img.classList.remove('loading');
+                };
+                img.onerror = () => {
+                    showError('Fahrzeugbild konnte nicht geladen werden');
+                };
+            } else {
+                const img = document.getElementById('vehicleImage');
+                img.classList.remove('loading');
+                img.style.background = '#f0f0f0';
+                img.style.display = 'none';
+                showError('Kein Fahrzeugbild verfügbar');
+            }
         }
 
-        function goBack() {
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showError(message) {
+            const container = document.getElementById('errorContainer');
+            container.innerHTML = `<div class="error-message">${escapeHtml(message)}</div>`;
+        }
+
+        // Button Event Listeners
+        document.getElementById('messageBtn').addEventListener('click', () => {
+            if (uniqueId) {
+                // Redirect zur Kategorie-Auswahl
+                window.location.href = `/select-category.html?qr=${encodeURIComponent(uniqueId)}`;
+            } else {
+                showError('Fehler: QR-Code nicht verfügbar');
+            }
+        });
+
+        document.getElementById('backBtn').addEventListener('click', () => {
             window.history.back();
-        }
+        });
 
-        // Setze Fahrzeugbild und Kennzeichen
-        if (vehicleImagePath) {
-            document.getElementById('vehicleImage').src = decodeURIComponent(vehicleImagePath);
-        } else {
-            // Verstecke Bildcontainer falls kein Bild vorhanden
-            document.getElementById('imageContainer').style.display = 'none';
-        }
-
-        if (licensePlate && licensePlate.trim()) {
-            document.getElementById('licensePlate').textContent = decodeURIComponent(licensePlate);
-        } else {
-            document.getElementById('licensePlate').textContent = '— FAHRZEUG —';
-        }
-
-        // Debug: Log die Parameter
-        console.log('QR:', uniqueId, 'Plate:', licensePlate, 'Image:', vehicleImagePath);
+        // Initialisiere Seite beim Laden
+        initPage();
     </script>
 </body>
 </html>
