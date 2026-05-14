@@ -255,21 +255,21 @@
                     const messageId = data.message_id;
 
                     feedback.innerHTML = '<p class="success">✅ Nachricht erfolgreich gesendet!</p>';
-
-                    // Kontakt-Buttons nach Nachricht (Telegram, SMS, WhatsApp)
                     feedback.innerHTML += '<div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center;">';
 
                     // Telegram Button
                     feedback.innerHTML += '<a href="https://t.me/kfz_kontakt_bot" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #0088cc; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background=\'#0077b5\'" onmouseout="this.style.background=\'#0088cc\'">📧 Telegram</a>';
 
-                    // SMS Button - API call statt direkter Link
-                    const smsBtn = document.createElement('button');
-                    smsBtn.type = 'button';
-                    smsBtn.style.cssText = 'display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;';
-                    smsBtn.textContent = '📱 SMS wird versendet...';
-                    smsBtn.disabled = true;
-                    smsBtn.onmouseover = function() { if(!this.disabled) this.style.background = '#20c463'; };
-                    smsBtn.onmouseout = function() { if(!this.disabled) this.style.background = '#25D366'; };
+                    // SMS Button container
+                    feedback.innerHTML += '<button id="smsBtn" type="button" style="display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; disabled: disabled;">📱 SMS wird versendet...</button>';
+
+                    // WhatsApp Button container
+                    feedback.innerHTML += '<button id="waBtn" type="button" style="display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s; disabled: disabled;">💬 WhatsApp wird versendet...</button>';
+
+                    feedback.innerHTML += '</div>';
+
+                    const smsBtn = document.getElementById('smsBtn');
+                    const waBtn = document.getElementById('waBtn');
 
                     // SMS senden
                     try {
@@ -281,28 +281,18 @@
 
                         if (smsRes.ok) {
                             smsBtn.textContent = '✅ SMS versendet';
+                            smsBtn.disabled = false;
                         } else {
                             smsBtn.textContent = '❌ SMS fehlgeschlagen';
                             smsBtn.style.background = '#e74c3c';
+                            smsBtn.disabled = false;
                         }
                     } catch(e) {
                         console.error('SMS Fehler:', e);
                         smsBtn.textContent = '❌ SMS Fehler';
                         smsBtn.style.background = '#e74c3c';
+                        smsBtn.disabled = false;
                     }
-
-                    const smsBtnContainer = document.createElement('div');
-                    smsBtnContainer.appendChild(smsBtn);
-                    feedback.querySelector('div').appendChild(smsBtnContainer);
-
-                    // WhatsApp Button - API call statt direkter Link
-                    const waBtn = document.createElement('button');
-                    waBtn.type = 'button';
-                    waBtn.style.cssText = 'display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;';
-                    waBtn.textContent = '💬 WhatsApp wird versendet...';
-                    waBtn.disabled = true;
-                    waBtn.onmouseover = function() { if(!this.disabled) this.style.background = '#20c463'; };
-                    waBtn.onmouseout = function() { if(!this.disabled) this.style.background = '#25D366'; };
 
                     // WhatsApp senden
                     try {
@@ -314,21 +304,18 @@
 
                         if (waRes.ok) {
                             waBtn.textContent = '✅ WhatsApp versendet';
+                            waBtn.disabled = false;
                         } else {
                             waBtn.textContent = '❌ WhatsApp fehlgeschlagen';
                             waBtn.style.background = '#e74c3c';
+                            waBtn.disabled = false;
                         }
                     } catch(e) {
                         console.error('WhatsApp Fehler:', e);
                         waBtn.textContent = '❌ WhatsApp Fehler';
                         waBtn.style.background = '#e74c3c';
+                        waBtn.disabled = false;
                     }
-
-                    const waBtnContainer = document.createElement('div');
-                    waBtnContainer.appendChild(waBtn);
-                    feedback.querySelector('div').appendChild(waBtnContainer);
-
-                    feedback.innerHTML += '</div>';
 
                     document.getElementById('contactForm').reset();
                 } else {
