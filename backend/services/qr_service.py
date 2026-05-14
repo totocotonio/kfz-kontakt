@@ -68,17 +68,22 @@ class QRService:
             font_small = ImageFont.load_default()
 
         # Teile Text in zwei Zeilen falls nötig
-        if len(text) > 25:
+        if len(text) >= 20:  # Niedrigere Grenze für Umbruch
             words = text.split()
-            mid = len(words) // 2
-            line1 = " ".join(words[:mid])
-            line2 = " ".join(words[mid:])
-            bbox1 = draw.textbbox((0, 0), line1, font=font_small)
-            bbox2 = draw.textbbox((0, 0), line2, font=font_small)
-            x1 = (sticker_width - (bbox1[2] - bbox1[0])) // 2
-            x2 = (sticker_width - (bbox2[2] - bbox2[0])) // 2
-            draw.text((x1, 20), line1, fill="black", font=font_small)
-            draw.text((x2, 38), line2, fill="black", font=font_small)
+            if len(words) >= 2:  # Nur wenn mindestens 2 Worte
+                mid = len(words) // 2
+                line1 = " ".join(words[:mid])
+                line2 = " ".join(words[mid:])
+                bbox1 = draw.textbbox((0, 0), line1, font=font_small)
+                bbox2 = draw.textbbox((0, 0), line2, font=font_small)
+                x1 = (sticker_width - (bbox1[2] - bbox1[0])) // 2
+                x2 = (sticker_width - (bbox2[2] - bbox2[0])) // 2
+                draw.text((x1, 15), line1, fill="black", font=font_small)
+                draw.text((x2, 33), line2, fill="black", font=font_small)
+            else:
+                bbox = draw.textbbox((0, 0), text, font=font_small)
+                x = (sticker_width - (bbox[2] - bbox[0])) // 2
+                draw.text((x, 20), text, fill="black", font=font_small)
         else:
             bbox = draw.textbbox((0, 0), text, font=font_small)
             x = (sticker_width - (bbox[2] - bbox[0])) // 2
