@@ -229,7 +229,11 @@
       "Bash(curl -s -X POST http://192.168.178.47:8000/api/qrcode/generate -H 'Authorization: Basic __CMDSUB_OUTPUT__')",
       "Bash(curl -v -X POST http://192.168.178.47:8000/api/qrcode/generate -H 'Authorization: Basic __CMDSUB_OUTPUT__')",
       "Bash(curl -X POST http://192.168.178.47:8000/api/qrcode/generate -H 'Authorization: Basic __CMDSUB_OUTPUT__')",
-      "Bash(scp /tmp/init_db.py root@192.168.178.47:/opt/kfz-kontakt/backend/)"
+      "Bash(scp /tmp/init_db.py root@192.168.178.47:/opt/kfz-kontakt/backend/)",
+      "Bash(ping -c 2 192.168.178.47)",
+      "Bash(net use *)",
+      "Bash(chmod +x /tmp/ssh_command.sh)",
+      "Bash(/tmp/ssh_command.sh)"
     ]
   }
 }

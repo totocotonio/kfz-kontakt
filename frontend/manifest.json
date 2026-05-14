@@ -1,0 +1,65 @@
+{
+  "name": "KFZ Kontakt – QR-Code Nachrichtensystem",
+  "short_name": "KFZ Kontakt",
+  "description": "Sichere Kommunikation zwischen Fahrzeughaltern über QR-Codes. Mit WhatsApp und Telegram Integration.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "lang": "de",
+  "categories": ["utilities", "productivity"],
+  "screenshots": [
+    {
+      "src": "/assets/screenshot-mobile.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/assets/screenshot-tablet.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Fahrzeug Kontakt",
+      "short_name": "Kontakt",
+      "description": "Sende eine Nachricht an einen Fahrzeughalter",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/assets/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

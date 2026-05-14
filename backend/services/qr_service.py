@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# © 2026 Torsten Michaely - KFZ Kontakt QR-Code Service
+# Mit WhatsApp-Integration für flexible Kontaktmöglichkeiten
+# All rights reserved
+
 import qrcode
 from io import BytesIO
 from PIL import Image, ImageDraw, ImageFont

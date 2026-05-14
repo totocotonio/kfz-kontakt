@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# © 2026 Torsten Michaely - KFZ Kontakt File Service
+# Mit WhatsApp-Integration für flexible Kontaktmöglichkeiten
+# All rights reserved
+
 import os
 import shutil
 from pathlib import Path

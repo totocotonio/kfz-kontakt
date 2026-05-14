@@ -1,8 +1,9 @@
 # 🚗 KFZ Kontakt - QR-Code Nachrichtensystem
 
-Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrsteilnehmern über QR-Codes. Mit Fahrzeugfotos, Kennzeichen und persönlichen Icons.
+Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrsteilnehmern über QR-Codes. Mit Fahrzeugfotos, Kennzeichen, persönlichen Icons und PWA-Unterstützung.
 
-**Status:** ✅ Production Ready (v1.0.121) - Auto-Deploy aktiv
+**Status:** ✅ Production Ready (v1.0.124) - Auto-Deploy aktiv
+**© 2026 Torsten Michaely** – Alle Rechte vorbehalten. Mit WhatsApp-Integration für flexible Kontaktmöglichkeiten.
 
 ## Features
 
@@ -17,6 +18,9 @@ Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrst
 ✅ **Admin-Dashboard** - Verwalte QR-Codes, Fahrzeugbilder, Nachrichten und WhatsApp-Nummer  
 ✅ **Datenschutz** - Keine persönlichen Daten werden angezeigt  
 ✅ **Mobile-optimiert** - Funktioniert auf allen Geräten  
+✅ **PWA (Progressive Web App)** - Installierbar auf Mobilgeräten, offline-fähig mit Service Worker
+✅ **Legal Pages** - Datenschutzerklärung & Impressum (DSGVO/§5 TMG konform)
+✅ **Copyright-Schutz** - Professionelle Code-Header in allen Dateien  
 
 ## QR-Code Designs
 
@@ -56,6 +60,45 @@ Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrst
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript
 - **QR-Code:** qrcode-python, Pillow
 - **Notifications:** python-telegram-bot
+- **PWA:** Service Worker, Web App Manifest, Offline-Support
+
+## PWA Features (Progressive Web App)
+
+✅ **Installierbar** - "Zum Home-Bildschirm hinzufügen" auf Mobilgeräten  
+✅ **Offline-Unterstützung** - Service Worker cacht wichtige Ressourcen  
+✅ **App-Manifest** - `manifest.json` mit App-Metadaten, Icons und Konfiguration  
+✅ **Auto-Update** - Service Worker prüft regelmäßig auf Updates  
+✅ **Responsive** - Optimiert für alle Bildschirmgrößen (Mobile, Tablet, Desktop)  
+
+### PWA Installation
+1. **Auf Mobilgerät:** Browser → KFZ Kontakt öffnen → Menü → "Zum Home-Bildschirm hinzufügen"
+2. **Auf Desktop:** Chrome/Edge → Adressleiste → "App installieren"
+3. App erscheint dann wie eine native App (Vollbild, offline verfügbar)
+
+### Offline-Funktionalität
+- Alle HTML-Seiten und Assets werden gecacht
+- Navigation funktioniert offline (mit cached Pages)
+- API-Anfragen zeigen offline.html wenn Verbindung fehlt
+- Nachrichten können erst gesendet werden, wenn Verbindung vorhanden ist
+
+## Legal Pages
+
+✅ **Datenschutzerklärung** - DSGVO-konform (`/datenschutz.html`)
+- Verantwortlicher & Kontakt
+- Datenverarbeitung & Speicherung
+- WhatsApp & Telegram Integration
+- Benutzerrechte (DSGVO Art. 15-22)
+
+✅ **Impressum** - §5 TMG (`/impressum.html`)
+- Anbieterangaben
+- Haftungsausschluss
+- Urheberrecht & Lizenzierung
+
+✅ **Copyright-Schutz**
+- HTML-Comments mit © 2026 Torsten Michaely in allen Dateien
+- Meta-Tags für Copyright, Author, Application-Name
+- Schema.org JSON-LD für Strukturierte Daten
+- Dynamisches Footer-Jahr (wird automatisch aktualisiert)
 
 ## Installation
 
@@ -281,6 +324,44 @@ server {
 ```
 
 ## Changelog - Neue Features (v1.0.120+)
+
+### v1.0.124 - PWA Professionalisierung
+✅ **Progressive Web App (PWA)**
+- Service Worker (`sw.js`) für Caching und Offline-Support
+- Web App Manifest (`manifest.json`) mit Icons und App-Konfiguration
+- Offline Fallback Page (`offline.html`)
+- Auto-Update Mechanismus alle 60 Sekunden
+
+✅ **Legal Pages**
+- `datenschutz.html`: DSGVO-konforme Datenschutzerklärung
+- `impressum.html`: §5 TMG Impressum mit Kontaktdaten
+- Responsive Design mit Purple-Gradient-Theme
+
+✅ **Copyright & Meta-Tags**
+- Professionelle Copyright-Header in allen Python-Dateien (qr_service.py, file_service.py)
+- Meta-Tags in allen HTML-Seiten (copyright, author, application-name, description, keywords, robots)
+- Schema.org JSON-LD Structured Data für SEO
+- Open Graph Tags für Social Media Sharing
+
+✅ **CSS Root-Variablen**
+- Zentrale CSS-Variablendefinition (:root) für konsistentes Design
+- Farben: primary, secondary, success, danger, warning, info, whatsapp, telegram
+- Fonts: font-sans, font-mono
+- Shadows: shadow, shadow-lg
+
+✅ **Asset-Optimierung**
+- SVG Favicon (`/assets/favicon.svg`)
+- Favicon-Links in allen HTML-Dateien
+- Reduzierte Icon-Pfade (SVG statt PNG)
+
+✅ **Service Worker Registration**
+- Automatische Registration in allen Seiten
+- Regelmäßige Update-Checks (60 Sekunden)
+- Fehlerbehandlung & Logging
+
+✅ **Footer-Update**
+- Dynamisches Copyright-Jahr in Datenschutz & Impressum
+- Links zu Legal Pages in Footer
 
 ### v1.0.120
 ✅ **Fahrzeugbild + Kennzeichen Landing Page**

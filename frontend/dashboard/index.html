@@ -1,10 +1,56 @@
+<!--
+╔════════════════════════════════════════════════════════════════╗
+║              KFZ Kontakt – QR-Code Kontaktsystem              ║
+║                  © 2026 Torsten Michaely                       ║
+║              Alle Rechte vorbehalten / All rights reserved     ║
+║                                                                ║
+║  Dieses Werk ist urheberrechtlich geschützt. Die Vervielfältigung
+║  Verbreitung oder Bearbeitung ohne ausdrückliche Genehmigung  ║
+║  des Urhebers ist untersagt und wird strafrechtlich verfolgt. ║
+║  WhatsApp-Integration für flexible Kontaktmöglichkeiten.      ║
+╚════════════════════════════════════════════════════════════════╝
+-->
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KFZ Kontakt Dashboard</title>
+    <meta name="copyright" content="© 2026 Torsten Michaely – Alle Rechte vorbehalten. WhatsApp-Integration für Kontaktmöglichkeiten.">
+    <meta name="author" content="Torsten Michaely">
+    <meta name="application-name" content="KFZ Kontakt">
+    <meta name="description" content="QR-Code Nachrichtensystem für Fahrzeughalter – Dashboard zur Verwaltung">
+    <meta name="keywords" content="KFZ, QR-Code, Kontakt, Fahrzeug, Nachricht, Telegram, WhatsApp">
+    <meta name="robots" content="index, follow">
+    <link rel="manifest" href="../manifest.json">
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../assets/favicon.svg" sizes="any">
+    <meta name="theme-color" content="#667eea">
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "KFZ Kontakt",
+      "url": "https://kfz-kontakt.michaely.de",
+      "description": "Sichere QR-Code Kommunikation zwischen Fahrzeughaltern",
+      "author": {
+        "@type": "Person",
+        "name": "Torsten Michaely"
+      },
+      "version": "1.0.124",
+      "copyrightYear": 2026,
+      "copyrightHolder": "Torsten Michaely",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      }
+    }
+    </script>
 </head>
 <body>
     <div class="dashboard">
@@ -313,5 +359,32 @@
     </div>
 
     <script src="js/dashboard.js?v=0"></script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((reg) => {
+                        console.log('[Service Worker] Registriert:', reg);
+                        // Überprüfe auf Updates
+                        setInterval(() => {
+                            reg.update();
+                        }, 60000); // Alle 60 Sekunden prüfen
+                    })
+                    .catch((err) => {
+                        console.warn('[Service Worker] Fehler:', err);
+                    });
+            });
+
+            // Höre auf Nachrichten vom Service Worker
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+                    console.log('[Service Worker] Update verfügbar');
+                    // Optionale Update-Benachrichtigung für Benutzer
+                }
+            });
+        }
+    </script>
 </body>
 </html>
