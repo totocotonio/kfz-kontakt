@@ -59,30 +59,31 @@
             <span class="header-logo">🚗</span>
             <div class="header-title">
                 <h1>KFZ Kontakt</h1>
-                <span class="header-subtitle">QR-Code Nachrichtensystem</span>
+                <span class="header-subtitle">QR-Code System</span>
             </div>
         </div>
         <div class="header-right">
             <span class="version-label">v<span id="header-version">-</span></span>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Hell/Dunkel umschalten" aria-label="Theme wechseln">
+                <div class="theme-toggle-knob" id="theme-knob">🌙</div>
+            </button>
         </div>
     </header>
 
-    <div class="dashboard">
-        <sidebar class="sidebar">
-            <div class="logo">🚗 KFZ Kontakt</div>
-            <nav class="nav">
-                <button class="nav-item active" data-tab="messages">
-                    <span class="icon">💬</span> Nachrichten
-                </button>
-                <button class="nav-item" data-tab="qrcodes">
-                    <span class="icon">📱</span> QR-Codes
-                </button>
-                <button class="nav-item" data-tab="stats">
-                    <span class="icon">📊</span> Statistiken
-                </button>
-            </nav>
-        </sidebar>
+    <!-- Tab Navigation -->
+    <nav class="tab-bar">
+        <button class="tab-btn active" data-tab="messages" onclick="switchTab(event, 'messages')">
+            <span>💬</span> Nachrichten
+        </button>
+        <button class="tab-btn" data-tab="qrcodes" onclick="switchTab(event, 'qrcodes')">
+            <span>📱</span> QR-Codes
+        </button>
+        <button class="tab-btn" data-tab="stats" onclick="switchTab(event, 'stats')">
+            <span>📊</span> Statistiken
+        </button>
+    </nav>
 
+    <div class="dashboard">
         <main class="main-content">
             <header class="header">
                 <h1 id="pageTitle">Nachrichten</h1>
@@ -386,6 +387,67 @@
             Erstellt mit ❤️ für sichere Fahrzeugkommunikation
         </div>
     </footer>
+
+    <!-- Theme Toggle & Tab Management -->
+    <script>
+        // Theme Toggle Function
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = !html.classList.contains('light');
+
+            if (isDark) {
+                html.classList.add('light');
+                localStorage.setItem('theme', 'light');
+                document.getElementById('theme-knob').textContent = '☀️';
+            } else {
+                html.classList.remove('light');
+                localStorage.setItem('theme', 'dark');
+                document.getElementById('theme-knob').textContent = '🌙';
+            }
+        }
+
+        // Load saved theme
+        function initTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'light') {
+                document.documentElement.classList.add('light');
+                document.getElementById('theme-knob').textContent = '☀️';
+            }
+        }
+
+        // Initialize theme on page load
+        initTheme();
+
+        // Tab Switching Function
+        function switchTab(event, tabName) {
+            event.preventDefault();
+
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Deactivate all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            const activeTab = document.getElementById(tabName);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+
+            // Activate button
+            event.target.closest('.tab-btn').classList.add('active');
+
+            // Update page title
+            const titles = {
+                messages: 'Nachrichten',
+                qrcodes: 'QR-Codes',
+                stats: 'Statistiken'
+            };
+            document.getElementById('pageTitle').textContent = titles[tabName] || 'Dashboard';
+        }
+    </script>
 
     <script src="js/dashboard.js?v=0"></script>
 
