@@ -382,20 +382,20 @@
         // Set footer year
         document.getElementById('footer-year').textContent = new Date().getFullYear();
 
-        // Set footer version (will be updated when version is loaded)
-        window.addEventListener('DOMContentLoaded', () => {
-            const headerVersion = document.getElementById('version');
-            const footerVersion = document.getElementById('footer-version');
-            if (headerVersion && footerVersion) {
-                // Copy version from header when it's loaded
-                const observer = new MutationObserver(() => {
-                    if (headerVersion.textContent !== '-') {
-                        footerVersion.textContent = headerVersion.textContent;
-                    }
-                });
-                observer.observe(headerVersion, { childList: true, characterData: true, subtree: true });
-            }
-        });
+        // Load version from API
+        fetch('/api/version')
+            .then(res => res.json())
+            .then(data => {
+                if (data.version) {
+                    // Update both header and footer version
+                    const headerVersion = document.getElementById('version');
+                    const footerVersion = document.getElementById('footer-version');
+                    if (headerVersion) headerVersion.textContent = data.version;
+                    if (footerVersion) footerVersion.textContent = data.version;
+                    console.log('[Version] Geladen:', data.version);
+                }
+            })
+            .catch(err => console.warn('[Version] Fehler beim Laden:', err));
     </script>
 
     <!-- Service Worker Registration -->
