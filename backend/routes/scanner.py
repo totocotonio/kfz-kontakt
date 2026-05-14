@@ -142,9 +142,21 @@ def send_whatsapp_contact(unique_id: str, data: ContactRequest, db: Session = De
 async def twilio_webhook(request: Request, db: Session = Depends(get_db)):
     """Webhook für Twilio Status-Updates (SMS/WhatsApp Delivery)"""
     try:
+        # Request-Daten lesen
         form_data = await request.form()
         sms_sid = form_data.get("MessageSid")
         status = form_data.get("MessageStatus")
+        signature = request.headers.get("X-Twilio-Signature", "")
+
+        # Webhook-Signatur validieren (optional in DEV, empfohlen in PROD)
+        if not twilio_service.validate_webhook_signature(
+            str(request.url), dict(form_data), signature
+        ):
+            logger.warning(f"Ungültige Twilio Webhook-Signatur von {request.client.host}")
+            # In Production sollte man hier HTTPException(401) werfen
+            # Im DEV-Modus wird es nur geloggt
+            if not settings.DEBUG:
+                raise HTTPException(status_code=401, detail="Ungültige Signatur")
 
         if sms_sid and status:
             twilio_service.handle_webhook(sms_sid, status, db)

@@ -8,6 +8,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
+from twilio.request_validator import RequestValidator
 from datetime import datetime
 from config import settings
 from models import Message
@@ -138,6 +139,29 @@ class TwilioService:
                 "status": "error",
                 "message": "Unerwarteter Fehler beim WhatsApp-Versand"
             }
+
+    def validate_webhook_signature(self, url: str, params: dict, signature: str) -> bool:
+        """
+        Validiert Twilio Webhook-Signatur
+
+        Args:
+            url: Webhook URL
+            params: Request-Parameter
+            signature: X-Twilio-Signature Header
+
+        Returns:
+            True wenn Signatur valid ist
+        """
+        if not self.auth_token:
+            logger.warning("Auth Token nicht gesetzt, Skip Webhook-Validierung")
+            return True
+
+        try:
+            validator = RequestValidator(self.auth_token)
+            return validator.validate(url, params, signature)
+        except Exception as e:
+            logger.error(f"Fehler bei Webhook-Validierung: {str(e)}")
+            return False
 
     def handle_webhook(self, sms_sid: str, status: str, db: Session) -> None:
         """
