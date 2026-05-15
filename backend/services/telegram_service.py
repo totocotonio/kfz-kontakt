@@ -4,10 +4,50 @@ from config import settings
 import logging
 import base64
 import os
+from io import BytesIO
+
+try:
+    from PIL import Image
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
 
 logger = logging.getLogger(__name__)
 
 class TelegramService:
+    @staticmethod
+    def compress_image(image_data: bytes, max_width: int = 400, quality: int = 70) -> bytes:
+        """Komprimiere und verkleinere ein Bild für Telegram"""
+        if not HAS_PIL:
+            logger.warning("PIL not available, returning original image")
+            return image_data
+
+        try:
+            # Öffne Bild aus Bytes
+            img = Image.open(BytesIO(image_data))
+
+            # Konvertiere zu RGB falls RGBA
+            if img.mode in ('RGBA', 'LA'):
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                img = background
+
+            # Verkleiner Bild wenn nötig
+            if img.width > max_width:
+                ratio = max_width / img.width
+                new_height = int(img.height * ratio)
+                img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
+
+            # Speichere mit Kompression
+            output = BytesIO()
+            img.save(output, format='JPEG', quality=quality, optimize=True)
+            compressed = output.getvalue()
+
+            logger.info(f"Image compressed: {len(image_data)} -> {len(compressed)} bytes")
+            return compressed
+        except Exception as e:
+            logger.warning(f"Error compressing image: {e}, using original")
+            return image_data
     @staticmethod
     async def send_message(message: str, chat_id: str = None, db=None):
         logger.info(f"🔵 TelegramService.send_message called - chat_id={chat_id}")
@@ -93,9 +133,12 @@ class TelegramService:
 
         try:
             logger.info(f"Sending Telegram photo to {target_chat_id}...")
-            # Sende Bild als Datei-Upload mit Base64-Daten
+            # Komprimiere Bild
+            compressed_data = TelegramService.compress_image(photo_data, max_width=400, quality=70)
+            logger.info(f"Photo size: {len(photo_data)} -> {len(compressed_data)} bytes")
+            # Sende Bild als Datei-Upload
             files = {
-                'photo': ('vehicle.jpg', photo_data, 'image/jpeg')
+                'photo': ('vehicle.jpg', compressed_data, 'image/jpeg')
             }
             data = {
                 'chat_id': target_chat_id,
@@ -116,6 +159,7 @@ class TelegramService:
 
     @staticmethod
     async def send_new_message_notification(qr_label: str, sender: str, message: str, category: str = None, sender_contact: str = None, vehicle_image_path: str = None, db=None):
+        logger.error(f"🔔 NOTIFICATION START: qr_label={qr_label}, sender={sender}, has_image={bool(vehicle_image_path)}")
         logger.info(f"🔔 send_new_message_notification: qr_label={qr_label}, sender={sender}, contact={sender_contact}, category={category}")
 
         text = f"""

@@ -61,15 +61,22 @@ async def submit_message(unique_id: str, data: MessageSubmit, db: Session = Depe
     db.refresh(message)
 
     category_name = category.name if category else "Allgemein"
-    await TelegramService.send_new_message_notification(
-        qr_label=qr.label or f"QR-{qr.id}",
-        sender=data.sender_name or "Anonym",
-        sender_contact=data.sender_contact,
-        message=data.message,
-        category=category_name,
-        vehicle_image_path=qr.vehicle_image_path,
-        db=db
-    )
+
+    # Telegram-Benachrichtigung im Hintergrund senden
+    try:
+        logger.info(f"Sending Telegram notification for message {message.id}...")
+        await TelegramService.send_new_message_notification(
+            qr_label=qr.label or f"QR-{qr.id}",
+            sender=data.sender_name or "Anonym",
+            sender_contact=data.sender_contact,
+            message=data.message,
+            category=category_name,
+            vehicle_image_path=qr.vehicle_image_path,
+            db=db
+        )
+        logger.info(f"Telegram notification sent for message {message.id}")
+    except Exception as e:
+        logger.error(f"Error sending Telegram notification: {str(e)}", exc_info=True)
 
     return {"status": "success", "message_id": message.id}
 
