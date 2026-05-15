@@ -294,12 +294,15 @@ async function openMessage(msgId) {
         const detail = document.getElementById('messageDetail');
         detail.innerHTML = `
             <div class="message-detail-header">
-                <h2>${msg.sender_name}</h2>
-                <div class="message-detail-meta">
-                    <span>📌 ${msg.qr_label}</span>
-                    <span>📅 ${new Date(msg.created_at).toLocaleDateString('de-DE')}</span>
-                    ${msg.category ? `<span>🏷️ ${msg.category}</span>` : ''}
+                <div>
+                    <h2>${msg.sender_name}</h2>
+                    <div class="message-detail-meta">
+                        <span>📌 ${msg.qr_label}</span>
+                        <span>📅 ${new Date(msg.created_at).toLocaleDateString('de-DE')}</span>
+                        ${msg.category ? `<span>🏷️ ${msg.category}</span>` : ''}
+                    </div>
                 </div>
+                <button onclick="deleteMessage(${msgId}, true)" class="btn btn-danger" title="Nachricht löschen">🗑️ Löschen</button>
             </div>
             ${msg.sender_contact ? `<div><strong>Kontakt:</strong> ${msg.sender_contact}</div>` : ''}
             <div class="message-detail-body">${msg.message}</div>
@@ -336,6 +339,28 @@ async function updateMessage(msgId, data) {
         });
     } catch (e) {
         console.error('Fehler beim Aktualisieren:', e);
+    }
+}
+
+async function deleteMessage(msgId, closeModal = false) {
+    if (!confirm('Nachricht wirklich löschen?')) return;
+
+    try {
+        const res = await apiFetch(`${API_BASE}/message/${msgId}`, {
+            method: 'DELETE'
+        });
+
+        if (res.ok) {
+            if (closeModal) {
+                document.getElementById('messageModal').style.display = 'none';
+            }
+            loadMessages();
+        } else {
+            showError('Fehler beim Löschen der Nachricht');
+        }
+    } catch (e) {
+        console.error('Fehler beim Löschen:', e);
+        showError('Fehler: ' + e.message);
     }
 }
 
