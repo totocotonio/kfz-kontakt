@@ -80,6 +80,24 @@ async def submit_message(unique_id: str, data: MessageSubmit, db: Session = Depe
 
     return {"status": "success", "message_id": message.id}
 
+@router.delete("/api/message/{message_id}")
+def delete_message(message_id: int, db: Session = Depends(get_db)):
+    """Lösche eine Nachricht aus der Datenbank"""
+    logger.info(f"Delete message: message_id={message_id}")
+
+    message = db.query(Message).filter(Message.id == message_id).first()
+    if not message:
+        raise HTTPException(status_code=404, detail="Nachricht nicht gefunden")
+
+    try:
+        db.delete(message)
+        db.commit()
+        logger.info(f"Message {message_id} deleted successfully")
+        return {"status": "success", "message": f"Nachricht {message_id} gelöscht"}
+    except Exception as e:
+        logger.error(f"Error deleting message: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Fehler beim Löschen: {str(e)}")
+
 @router.post("/qr/{unique_id}/contact/sms")
 def send_sms_contact(unique_id: str, data: ContactRequest, db: Session = Depends(get_db)):
     """SMS-Versand via Twilio für anonyme Kontaktmöglichkeit"""
