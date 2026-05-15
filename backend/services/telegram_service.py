@@ -2,6 +2,8 @@ import aiohttp
 import requests
 from config import settings
 import logging
+import base64
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +62,8 @@ class TelegramService:
             return False
 
     @staticmethod
-    async def send_photo(photo_url: str, caption: str, chat_id: str = None, db=None):
-        logger.info(f"📸 TelegramService.send_photo called - chat_id={chat_id}")
+    async def send_photo(photo_data: bytes, caption: str, chat_id: str = None, db=None):
+        logger.info(f"📸 TelegramService.send_photo called - chat_id={chat_id}, data_size={len(photo_data) if photo_data else 0}")
 
         if not settings.TELEGRAM_BOT_TOKEN:
             logger.warning("⚠️ Telegram Bot Token nicht konfiguriert")
@@ -88,16 +90,19 @@ class TelegramService:
             return False
 
         url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendPhoto"
-        payload = {
-            "chat_id": target_chat_id,
-            "photo": photo_url,
-            "caption": caption,
-            "parse_mode": "HTML"
-        }
 
         try:
             logger.info(f"Sending Telegram photo to {target_chat_id}...")
-            response = requests.post(url, json=payload, timeout=15)
+            # Sende Bild als Datei-Upload mit Base64-Daten
+            files = {
+                'photo': ('vehicle.jpg', photo_data, 'image/jpeg')
+            }
+            data = {
+                'chat_id': target_chat_id,
+                'caption': caption,
+                'parse_mode': 'HTML'
+            }
+            response = requests.post(url, files=files, data=data, timeout=15)
             logger.info(f"Telegram photo response status: {response.status_code}")
             if response.status_code == 200:
                 logger.info(f"Telegram photo sent successfully to {target_chat_id}")
@@ -133,13 +138,27 @@ class TelegramService:
 
         # Wenn Fahrzeugbild vorhanden, versuche als Foto zu senden
         if vehicle_image_path:
-            # Konstruiere öffentliche URL zum Bild
-            photo_url = f"https://kfz-kontakt.michaely.de{vehicle_image_path}"
-            logger.info(f"Sending notification with photo: {photo_url}")
-            result = await TelegramService.send_photo(photo_url, text, db=db)
-            # Wenn Foto-Versand fehlschlägt, fallback auf Text
-            if not result:
-                logger.info("Photo sending failed, falling back to text message")
+            try:
+                # Konstruiere lokalen Pfad zur Bilddatei
+                from pathlib import Path
+                from config import settings
+                image_full_path = Path(settings.UPLOAD_DIR) / vehicle_image_path.lstrip('/')
+
+                logger.info(f"Reading image from: {image_full_path}")
+                if image_full_path.exists():
+                    with open(image_full_path, 'rb') as f:
+                        photo_data = f.read()
+                    logger.info(f"Image loaded, size: {len(photo_data)} bytes")
+                    result = await TelegramService.send_photo(photo_data, text, db=db)
+                    # Wenn Foto-Versand fehlschlägt, fallback auf Text
+                    if not result:
+                        logger.info("Photo sending failed, falling back to text message")
+                        result = await TelegramService.send_message(text, db=db)
+                else:
+                    logger.warning(f"Image file not found: {image_full_path}")
+                    result = await TelegramService.send_message(text, db=db)
+            except Exception as e:
+                logger.error(f"Error reading image: {e}")
                 result = await TelegramService.send_message(text, db=db)
         else:
             # Fallback: nur Text-Nachricht
