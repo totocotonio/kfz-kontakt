@@ -80,7 +80,7 @@ async def submit_message(unique_id: str, data: MessageSubmit, db: Session = Depe
 
     return {"status": "success", "message_id": message.id}
 
-@router.delete("/api/message/{message_id}")
+@router.delete("/message/{message_id}")
 def delete_message(message_id: int, db: Session = Depends(get_db)):
     """Lösche eine Nachricht aus der Datenbank"""
     logger.info(f"Delete message: message_id={message_id}")
