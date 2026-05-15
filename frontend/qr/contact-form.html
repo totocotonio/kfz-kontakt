@@ -123,20 +123,6 @@
         .loading {
             display: none;
         }
-        .whatsapp-button {
-            display: block;
-            padding: 12px;
-            background: #25D366;
-            color: white;
-            text-align: center;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        .whatsapp-button:hover {
-            background: #20ba58;
-        }
     </style>
 </head>
 <body>
@@ -172,8 +158,6 @@
                 <textarea id="message" name="message" placeholder="Beschreibe dein Anliegen..." required></textarea>
             </div>
 
-            <div id="whatsappSection" class="form-group"></div>
-
             <button type="submit">Nachricht senden</button>
             <div class="loading" id="loading">Wird gesendet...</div>
             <div id="feedback"></div>
@@ -195,36 +179,6 @@
                 const catId = String(selectedCategory);
                 select.value = catId;
                 console.log(`[Category] Pre-selected: ${catId}`);
-            }
-        }
-
-        async function loadWhatsAppButton() {
-            try {
-                const res = await fetch('/api/whatsapp');
-                const data = await res.json();
-                console.log('[WhatsApp] Response:', data);
-                const section = document.getElementById('whatsappSection');
-                console.log('[WhatsApp] Section:', section);
-
-                if (data.whatsapp_number && data.whatsapp_number.trim()) {
-                    console.log('[WhatsApp] Nummer gefunden:', data.whatsapp_number);
-                    const waNumber = data.whatsapp_number.replace(/[^0-9]/g, '');
-                    console.log('[WhatsApp] Nur Zahlen:', waNumber);
-                    if (waNumber) {
-                        const waUrl = 'https://wa.me/' + waNumber + '?text=Hallo, ich habe dir eine Nachricht über den QR-Code hinterlassen.';
-                        const link = document.createElement('a');
-                        link.href = waUrl;
-                        link.target = '_blank';
-                        link.className = 'whatsapp-button';
-                        link.textContent = '💬 Oder direkt WhatsApp schreiben';
-                        section.appendChild(link);
-                        console.log('[WhatsApp] Button hinzugefügt');
-                    }
-                } else {
-                    console.log('[WhatsApp] Keine Nummer gefunden');
-                }
-            } catch(e) {
-                console.error('WhatsApp laden fehlgeschlagen:', e);
             }
         }
 
@@ -257,67 +211,6 @@
                     console.log('Message ID:', messageId);
 
                     feedback.innerHTML = '<p class="success">✅ Nachricht erfolgreich gesendet!</p>';
-                    feedback.innerHTML += '<div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center;">';
-
-                    // Telegram Button
-                    feedback.innerHTML += '<a href="https://t.me/kfz_kontakt_bot" target="_blank" style="display: flex; align-items: center; gap: 8px; background: #0088cc; color: white; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: background 0.2s;" onmouseover="this.style.background=\'#0077b5\'" onmouseout="this.style.background=\'#0088cc\'">📧 Telegram</a>';
-
-                    // SMS Button container
-                    feedback.innerHTML += '<button id="smsBtn" type="button" style="display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;" disabled>📱 SMS wird versendet...</button>';
-
-                    // WhatsApp Button container
-                    feedback.innerHTML += '<button id="waBtn" type="button" style="display: flex; align-items: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;" disabled>💬 WhatsApp wird versendet...</button>';
-
-                    feedback.innerHTML += '</div>';
-
-                    const smsBtn = document.getElementById('smsBtn');
-                    const waBtn = document.getElementById('waBtn');
-
-                    // SMS senden
-                    try {
-                        const smsRes = await fetch('/api/qr/' + uniqueId + '/contact/sms', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ message_id: messageId })
-                        });
-
-                        if (smsRes.ok) {
-                            smsBtn.textContent = '✅ SMS versendet';
-                            smsBtn.disabled = false;
-                        } else {
-                            smsBtn.textContent = '❌ SMS fehlgeschlagen';
-                            smsBtn.style.background = '#e74c3c';
-                            smsBtn.disabled = false;
-                        }
-                    } catch(e) {
-                        console.error('SMS Fehler:', e);
-                        smsBtn.textContent = '❌ SMS Fehler';
-                        smsBtn.style.background = '#e74c3c';
-                        smsBtn.disabled = false;
-                    }
-
-                    // WhatsApp senden
-                    try {
-                        const waRes = await fetch('/api/qr/' + uniqueId + '/contact/whatsapp', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ message_id: messageId })
-                        });
-
-                        if (waRes.ok) {
-                            waBtn.textContent = '✅ WhatsApp versendet';
-                            waBtn.disabled = false;
-                        } else {
-                            waBtn.textContent = '❌ WhatsApp fehlgeschlagen';
-                            waBtn.style.background = '#e74c3c';
-                            waBtn.disabled = false;
-                        }
-                    } catch(e) {
-                        console.error('WhatsApp Fehler:', e);
-                        waBtn.textContent = '❌ WhatsApp Fehler';
-                        waBtn.style.background = '#e74c3c';
-                        waBtn.disabled = false;
-                    }
 
                     document.getElementById('contactForm').reset();
                 } else {
@@ -330,7 +223,6 @@
         });
 
         loadCategories();
-        loadWhatsAppButton();
     </script>
 
     <!-- Service Worker Registration -->

@@ -1,11 +1,17 @@
 import aiohttp
+import requests
 from config import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TelegramService:
     @staticmethod
     async def send_message(message: str, chat_id: str = None, db=None):
+        logger.info(f"🔵 TelegramService.send_message called - chat_id={chat_id}")
+
         if not settings.TELEGRAM_BOT_TOKEN:
-            print("⚠️ Telegram Bot Token nicht konfiguriert")
+            logger.warning("⚠️ Telegram Bot Token nicht konfiguriert")
             return False
 
         target_chat_id = chat_id
@@ -15,17 +21,20 @@ class TelegramService:
             try:
                 from models import User
                 user = db.query(User).filter(User.name == "Admin").first()
+                logger.info(f"Admin user from DB: {user}")
                 if user and user.telegram_chat_id and user.telegram_chat_id != "0":
                     target_chat_id = user.telegram_chat_id
-            except:
-                pass
+                    logger.info(f"Got chat_id from DB: {target_chat_id}")
+            except Exception as e:
+                logger.warning(f"Failed to get chat_id from DB: {e}")
 
         # Fallback auf Config-Variable (deprecated)
         if not target_chat_id:
             target_chat_id = settings.TELEGRAM_CHAT_ID
+            logger.info(f"Using TELEGRAM_CHAT_ID from config: {target_chat_id}")
 
         if not target_chat_id or target_chat_id == "0":
-            print("⚠️ Telegram Chat ID nicht konfiguriert")
+            logger.warning("⚠️ Telegram Chat ID nicht konfiguriert")
             return False
 
         url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -36,15 +45,24 @@ class TelegramService:
         }
 
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=payload, timeout=aiohttp.ClientTimeout(total=10)) as resp:
-                    return resp.status == 200
+            logger.info(f"Sending Telegram message to {target_chat_id}...")
+            # Use requests instead of aiohttp for better reliability
+            response = requests.post(url, json=payload, timeout=15)
+            logger.info(f"Telegram response status: {response.status_code}")
+            if response.status_code == 200:
+                logger.info(f"Telegram message sent successfully to {target_chat_id}")
+                return True
+            else:
+                logger.warning(f"Telegram error: status {response.status_code} - {response.text}")
+                return False
         except Exception as e:
-            print(f"❌ Telegram Error: {e}")
+            logger.error(f"Telegram Error: {e}")
             return False
 
     @staticmethod
     async def send_new_message_notification(qr_label: str, sender: str, message: str, category: str = None, db=None):
+        logger.info(f"🔔 send_new_message_notification: qr_label={qr_label}, sender={sender}, category={category}")
+
         text = f"""
 <b>🚗 Neue Nachricht über QR-Code: {qr_label}</b>
 
@@ -59,4 +77,6 @@ class TelegramService:
 
 <b>Antworte:</b> Rufe den Sender an oder antworte per WhatsApp/Telegram
         """
-        return await TelegramService.send_message(text, db=db)
+        result = await TelegramService.send_message(text, db=db)
+        logger.info(f"Notification send result: {result}")
+        return result
