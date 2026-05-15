@@ -140,9 +140,10 @@ class TelegramService:
         if vehicle_image_path:
             try:
                 # Konstruiere lokalen Pfad zur Bilddatei
+                # vehicle_image_path ist bereits relativ wie: "/uploads/975488b6-ed6/vehicle.jpg"
+                # Verwende absoluten Pfad direkt statt UPLOAD_DIR
                 from pathlib import Path
-                from config import settings
-                image_full_path = Path(settings.UPLOAD_DIR) / vehicle_image_path.lstrip('/')
+                image_full_path = Path("/opt/kfz-kontakt") / vehicle_image_path.lstrip('/')
 
                 logger.info(f"Reading image from: {image_full_path}")
                 if image_full_path.exists():
