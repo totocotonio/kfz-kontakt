@@ -310,7 +310,14 @@
       "Bash(python3 /tmp/test_full_flow.py)",
       "Bash(python3 /tmp/find_qr_db.py)",
       "Bash(python3 /tmp/check_db_schema.py)",
-      "Bash(python3 /tmp/final_telegram_test.py)"
+      "Bash(python3 /tmp/final_telegram_test.py)",
+      "Bash(python3 update_kfz_deploy.py)",
+      "Bash(curl -s \"http://192.168.178.47:8000/qr/975488b6-ed6\")",
+      "Bash(curl -s \"http://192.168.178.47:8000/qr/975488b6-ed6?category=4\")",
+      "Bash(ssh kfz@192.168.178.47 \"tail -30 /tmp/service.log\")",
+      "Bash(curl -s \"http://192.168.178.47:8000/api/version\")",
+      "Bash(curl -v \"http://192.168.178.47:8000/qr/975488b6-ed6?category=4\")",
+      "Bash(python3 restart_kfz_service.py)"
     ]
   }
 }

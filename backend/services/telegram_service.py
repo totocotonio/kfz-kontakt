@@ -60,14 +60,17 @@ class TelegramService:
             return False
 
     @staticmethod
-    async def send_new_message_notification(qr_label: str, sender: str, message: str, category: str = None, db=None):
-        logger.info(f"🔔 send_new_message_notification: qr_label={qr_label}, sender={sender}, category={category}")
+    async def send_new_message_notification(qr_label: str, sender: str, message: str, category: str = None, sender_contact: str = None, db=None):
+        logger.info(f"🔔 send_new_message_notification: qr_label={qr_label}, sender={sender}, contact={sender_contact}, category={category}")
 
         text = f"""
 <b>🚗 Neue Nachricht über QR-Code: {qr_label}</b>
 
 <b>Von:</b> {sender}
 """
+        if sender_contact:
+            text += f"<b>Kontakt:</b> {sender_contact}\n"
+
         if category:
             text += f"<b>Kategorie:</b> {category}\n"
 

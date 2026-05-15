@@ -64,6 +64,7 @@ async def submit_message(unique_id: str, data: MessageSubmit, db: Session = Depe
     await TelegramService.send_new_message_notification(
         qr_label=qr.label or f"QR-{qr.id}",
         sender=data.sender_name or "Anonym",
+        sender_contact=data.sender_contact,
         message=data.message,
         category=category_name,
         db=db
