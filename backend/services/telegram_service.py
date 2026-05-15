@@ -131,12 +131,16 @@ class TelegramService:
 <b>Antworte:</b> Rufe den Sender an oder antworte per WhatsApp/Telegram
         """
 
-        # Wenn Fahrzeugbild vorhanden, sende als Foto mit Caption
+        # Wenn Fahrzeugbild vorhanden, versuche als Foto zu senden
         if vehicle_image_path:
             # Konstruiere öffentliche URL zum Bild
             photo_url = f"https://kfz-kontakt.michaely.de{vehicle_image_path}"
             logger.info(f"Sending notification with photo: {photo_url}")
             result = await TelegramService.send_photo(photo_url, text, db=db)
+            # Wenn Foto-Versand fehlschlägt, fallback auf Text
+            if not result:
+                logger.info("Photo sending failed, falling back to text message")
+                result = await TelegramService.send_message(text, db=db)
         else:
             # Fallback: nur Text-Nachricht
             result = await TelegramService.send_message(text, db=db)
