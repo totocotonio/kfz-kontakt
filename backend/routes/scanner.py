@@ -67,6 +67,7 @@ async def submit_message(unique_id: str, data: MessageSubmit, db: Session = Depe
         sender_contact=data.sender_contact,
         message=data.message,
         category=category_name,
+        vehicle_image_path=qr.vehicle_image_path,
         db=db
     )
 
