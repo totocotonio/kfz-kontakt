@@ -4,7 +4,6 @@ from models import QRCode, Message, Category, User
 from database import get_db
 from pydantic import BaseModel
 from services.telegram_service import TelegramService
-from services.twilio_service import twilio_service
 import asyncio
 import logging
 import json

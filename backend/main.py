@@ -129,6 +129,96 @@ if not UPLOADS_DIR.exists():
     UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
+@app.get("/favicon.ico")
+def favicon():
+    """Serve favicon"""
+    favicon_path = FRONTEND_DIR / "favicon.ico"
+    if favicon_path.exists():
+        return FileResponse(favicon_path)
+    return {"error": "favicon not found"}
+
+@app.get("/favicon.png")
+def favicon_png():
+    """Serve favicon PNG"""
+    favicon_path = FRONTEND_DIR / "favicon.png"
+    if favicon_path.exists():
+        return FileResponse(favicon_path)
+    return {"error": "favicon not found"}
+
+@app.get("/select-category.html")
+def select_category_page(qr: str = None):
+    """Serve category selection page"""
+    if not qr:
+        return {"error": "QR code not provided"}
+
+    category_path = FRONTEND_DIR / "qr" / "select-category.html"
+    if not category_path.exists():
+        return {"error": "select-category.html not found"}
+
+    with open(category_path, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    # Inject QR ID
+    html = html.replace(
+        "const uniqueId = '';",
+        f"const uniqueId = '{qr}';"
+    )
+
+    return HTMLResponse(content=html)
+
+@app.get("/qr/{unique_id}")
+def qr_page(unique_id: str, category: int = None, db: Session = Depends(get_db)):
+    """Serve QR page - either landing page or contact form"""
+    # Verify QR code exists
+    qr = db.query(QRCode).filter(QRCode.unique_id == unique_id).first()
+    if not qr:
+        return FileResponse("404.html", status_code=404)
+
+    # If category is selected, show contact form
+    if category is not None:
+        contact_form_path = FRONTEND_DIR / "qr" / "contact-form.html"
+        if not contact_form_path.exists():
+            return {"error": "contact-form.html not found"}
+
+        with open(contact_form_path, "r", encoding="utf-8") as f:
+            html = f.read()
+
+        # Inject data
+        html = html.replace(
+            "const uniqueId = '';",
+            f"const uniqueId = '{unique_id}';"
+        )
+        html = html.replace(
+            "const selectedCategory = '';",
+            f"const selectedCategory = '{category}';"
+        )
+
+        return HTMLResponse(content=html)
+
+    # Otherwise show vehicle landing page
+    landing_path = FRONTEND_DIR / "qr" / "vehicle-landing.html"
+    if not landing_path.exists():
+        return {"error": "vehicle-landing.html not found"}
+
+    with open(landing_path, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    # Inject data into JavaScript
+    html = html.replace(
+        "const uniqueId = '';",
+        f"const uniqueId = '{unique_id}';"
+    )
+    html = html.replace(
+        "const licensePlate = '';",
+        f"const licensePlate = '{qr.license_plate or ''}';"
+    )
+    html = html.replace(
+        "const vehicleImagePath = '';",
+        f"const vehicleImagePath = '{qr.vehicle_image_path or ''}';"
+    )
+
+    return HTMLResponse(content=html)
+
 @app.get("/")
 def read_root():
     return {"message": "KFZ Kontakt QR API läuft"}
