@@ -109,35 +109,31 @@
 
                 <!-- Settings Tab -->
                 <div id="settings" class="tab-content">
-                    <div style="max-width: 600px; margin: 0 auto;">
+                    <div class="settings-section">
                         <div class="section-header">
                             <h2>Benachrichtigungen</h2>
                         </div>
 
-                        <!-- Telefonnummer für SMS-Benachrichtigungen -->
-                        <div style="background: var(--panel2); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
-                            <h3 style="margin-bottom: 15px; color: var(--text);">📱 Deine Mobilnummer (SMS-Benachrichtigungen)</h3>
-                            <div class="form-group">
-                                <label>Mobilnummer für SMS (z.B. +491234567890)</label>
-                                <div style="display: flex; gap: 10px;">
-                                    <input type="text" id="phoneNumber" placeholder="+49..." style="flex: 1;">
-                                    <button class="btn btn-primary" id="savePhoneBtn" style="width: auto;">Speichern</button>
-                                </div>
-                                <small style="color: var(--muted); margin-top: 5px; display: block;">Du bekommst SMS wenn neue Nachrichten eingehen (privat, nicht öffentlich sichtbar)</small>
+                        <!-- SMS Settings -->
+                        <div class="settings-card">
+                            <h3>📱 SMS-Benachrichtigungen</h3>
+                            <label class="settings-label">Mobilnummer für SMS</label>
+                            <div class="settings-input-group">
+                                <input type="text" id="phoneNumber" placeholder="+491234567890">
+                                <button class="btn btn-primary" id="savePhoneBtn">Speichern</button>
                             </div>
+                            <small class="settings-helper">Du bekommst SMS wenn neue Nachrichten eingehen (privat, nicht öffentlich sichtbar)</small>
                         </div>
 
-                        <!-- WhatsApp für öffentlichen Kontakt -->
-                        <div style="background: var(--panel2); padding: 20px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
-                            <h3 style="margin-bottom: 15px; color: var(--text);">💬 WhatsApp Kontakt (Öffentlich)</h3>
-                            <div class="form-group">
-                                <label>Deine WhatsApp Nummer (z.B. +491234567890)</label>
-                                <div style="display: flex; gap: 10px;">
-                                    <input type="text" id="whatsappNumber" placeholder="+49..." style="flex: 1;">
-                                    <button class="btn btn-primary" id="saveWhatsappBtn" style="width: auto;">Speichern</button>
-                                </div>
-                                <small style="color: var(--muted); margin-top: 5px; display: block;">Besucher können dich über WhatsApp kontaktieren</small>
+                        <!-- WhatsApp Settings -->
+                        <div class="settings-card">
+                            <h3>💬 WhatsApp Kontakt</h3>
+                            <label class="settings-label">Deine WhatsApp Nummer</label>
+                            <div class="settings-input-group">
+                                <input type="text" id="whatsappNumber" placeholder="+491234567890">
+                                <button class="btn btn-primary" id="saveWhatsappBtn">Speichern</button>
                             </div>
+                            <small class="settings-helper">Besucher können dich über WhatsApp kontaktieren (öffentlich sichtbar)</small>
                         </div>
                     </div>
                 </div>

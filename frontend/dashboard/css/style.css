@@ -511,6 +511,91 @@ input:focus, textarea:focus, select:focus {
   min-width: 60px;
 }
 
+/* ====== SETTINGS ====== */
+.settings-section {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.settings-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  margin-bottom: var(--space-5);
+  transition: all var(--transition-base);
+}
+
+.settings-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.settings-card h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.settings-card input[type="text"],
+.settings-card input[type="email"],
+.settings-card input[type="password"] {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--space-3);
+  transition: all var(--transition-base);
+}
+
+.settings-card input[type="text"]:focus,
+.settings-card input[type="email"]:focus,
+.settings-card input[type="password"]:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-bg-main);
+  box-shadow: var(--shadow-focus);
+}
+
+.settings-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.settings-helper {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+  line-height: 1.4;
+}
+
+.settings-input-group {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+
+.settings-input-group input {
+  flex: 1;
+}
+
+.settings-input-group .btn {
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+
 /* ====== STATISTICS ====== */
 .stats-grid {
   display: grid;
