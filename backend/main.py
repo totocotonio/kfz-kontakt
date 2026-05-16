@@ -208,7 +208,7 @@ def qr_page(unique_id: str, category: int = None, db: Session = Depends(get_db))
     # Verify QR code exists
     qr = db.query(QRCode).filter(QRCode.unique_id == unique_id).first()
     if not qr:
-        return FileResponse("404.html", status_code=404)
+        return {"error": "QR code not found"}, 404
 
     # If category is selected, show contact form
     if category is not None:
