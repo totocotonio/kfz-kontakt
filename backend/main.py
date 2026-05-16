@@ -30,6 +30,23 @@ Base.metadata.create_all(bind=engine)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    # Run database migrations
+    try:
+        from sqlalchemy import text
+        with engine.begin() as conn:
+            # Check and add missing columns
+            result = conn.execute(text("PRAGMA table_info(users)"))
+            columns = {row[1] for row in result}
+
+            if "enable_telegram" not in columns:
+                conn.execute(text("ALTER TABLE users ADD COLUMN enable_telegram BOOLEAN DEFAULT 1"))
+            if "enable_sms" not in columns:
+                conn.execute(text("ALTER TABLE users ADD COLUMN enable_sms BOOLEAN DEFAULT 0"))
+            if "enable_whatsapp" not in columns:
+                conn.execute(text("ALTER TABLE users ADD COLUMN enable_whatsapp BOOLEAN DEFAULT 0"))
+    except Exception as e:
+        print(f"Migration warning: {e}")
+
     db = SessionLocal()
     try:
         from models import User, Category
