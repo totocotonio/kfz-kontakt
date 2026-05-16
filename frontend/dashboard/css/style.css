@@ -441,8 +441,8 @@ input:focus, textarea:focus, select:focus {
 /* ====== QR CODES ====== */
 .qrcodes-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: var(--space-1);
 }
 
 .qrcode-card {
