@@ -440,7 +440,7 @@ input:focus, textarea:focus, select:focus {
 /* ====== QR CODES ====== */
 .qrcodes-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+  grid-template-columns: repeat(6, 1fr);
   gap: var(--space-1);
   flex: 1;
   overflow-y: auto;
