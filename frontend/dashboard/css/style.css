@@ -117,6 +117,12 @@ html, body {
   font-size: var(--font-size-base);
   line-height: 1.6;
   transition: background-color var(--transition-base), color var(--transition-base);
+  overflow: hidden;
+}
+
+/* Verstecke Footer und Modals */
+footer {
+  display: none !important;
 }
 
 /* ====== HEADER ====== */
