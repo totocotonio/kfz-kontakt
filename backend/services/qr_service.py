@@ -76,14 +76,14 @@ class QRService:
         # Verwende title parameter, fallback auf default Text
         text = title if title else "Kontakt via QR"
 
-        # Versuche mit kleinerer Schrift zu schreiben
+        # Title Font - größer und lesbar
         try:
-            font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 7)
+            font_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 12)
         except:
-            font_small = ImageFont.load_default()
+            font_title = ImageFont.load_default()
 
         # Teile Text in zwei Zeilen falls nötig
-        if len(text) > 12:  # Umbruch bei > 12 Zeichen
+        if len(text) > 15:  # Umbruch bei > 15 Zeichen
             words = text.split()
             if len(words) >= 2:  # Wenn mindestens 2 Worte: nach Wort-Grenze brechen
                 mid = len(words) // 2
@@ -94,26 +94,26 @@ class QRService:
                 line1 = text[:mid]
                 line2 = text[mid:]
 
-            bbox1 = draw.textbbox((0, 0), line1, font=font_small)
-            bbox2 = draw.textbbox((0, 0), line2, font=font_small)
+            bbox1 = draw.textbbox((0, 0), line1, font=font_title)
+            bbox2 = draw.textbbox((0, 0), line2, font=font_title)
             x1 = (sticker_width - (bbox1[2] - bbox1[0])) // 2
             x2 = (sticker_width - (bbox2[2] - bbox2[0])) // 2
-            draw.text((x1, 13), line1, fill="black", font=font_small)
-            draw.text((x2, 23), line2, fill="black", font=font_small)
+            draw.text((x1, 10), line1, fill="black", font=font_title)
+            draw.text((x2, 26), line2, fill="black", font=font_title)
         else:
-            bbox = draw.textbbox((0, 0), text, font=font_small)
+            bbox = draw.textbbox((0, 0), text, font=font_title)
             x = (sticker_width - (bbox[2] - bbox[0])) // 2
-            draw.text((x, 18), text, fill="black", font=font_small)
+            draw.text((x, 16), text, fill="black", font=font_title)
 
-        # Label: Nur anzeigen wenn vorhanden, mit größerer Font
+        # Label: Nur anzeigen wenn vorhanden, mit lesbare Font
         if label:
             try:
-                font_label = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 10)
+                font_label = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 14)
             except:
                 font_label = ImageFont.load_default()
             bbox = draw.textbbox((0, 0), label, font=font_label)
             x = (sticker_width - (bbox[2] - bbox[0])) // 2
-            draw.text((x, 400), label, fill="black", font=font_label)
+            draw.text((x, 420), label, fill="black", font=font_label)
 
         # Zeichne Icon basierend auf icon_type und Position
         if icon_type != "none":
