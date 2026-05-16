@@ -4,9 +4,13 @@ from models import QRCode, Message, Category, User
 from database import get_db
 from pydantic import BaseModel
 from services.telegram_service import TelegramService
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 import asyncio
 import logging
 import json
+
+limiter = Limiter(key_func=get_remote_address)
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +43,8 @@ def get_qr_info(unique_id: str, db: Session = Depends(get_db)):
     }
 
 @router.post("/qr/{unique_id}/message")
-async def submit_message(unique_id: str, data: MessageSubmit, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+async def submit_message(unique_id: str, data: MessageSubmit, request: Request, db: Session = Depends(get_db)):
     qr = db.query(QRCode).filter(QRCode.unique_id == unique_id).first()
     if not qr:
         raise HTTPException(status_code=404, detail="QR-Code nicht gefunden")

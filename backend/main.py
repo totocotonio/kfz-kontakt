@@ -15,9 +15,15 @@ from routes import scanner, qrcode, dashboard
 from config import settings
 from auth import verify_dashboard_auth
 from sqlalchemy.orm import Session
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 import os
 import io
 import re
+from html import escape
+import json
+
+limiter = Limiter(key_func=get_remote_address)
 
 Base.metadata.create_all(bind=engine)
 
@@ -55,13 +61,35 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="KFZ Kontakt QR", version="1.0.32", lifespan=lifespan)
 
+# Rate Limiting
+app.state.limiter = limiter
+app.add_exception_handler(Exception, lambda request, exc: {"error": "Rate limit exceeded"})
+
+# Parse allowed origins from settings
+allowed_origins = [settings.BASE_URL]
+if "," in settings.ALLOWED_ORIGINS:
+    allowed_origins = [o.strip() for o in settings.ALLOWED_ORIGINS.split(",")]
+else:
+    allowed_origins = [settings.ALLOWED_ORIGINS]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allow_headers=["Content-Type"],
 )
+
+# Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+    response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+    return response
 
 app.include_router(scanner.router)
 app.include_router(qrcode.router)
@@ -158,10 +186,10 @@ def select_category_page(qr: str = None):
     with open(category_path, "r", encoding="utf-8") as f:
         html = f.read()
 
-    # Inject QR ID
+    # Inject QR ID (escaped to prevent XSS)
     html = html.replace(
         "const uniqueId = '';",
-        f"const uniqueId = '{qr}';"
+        f"const uniqueId = {json.dumps(qr)};"
     )
 
     return HTMLResponse(content=html)
@@ -183,14 +211,14 @@ def qr_page(unique_id: str, category: int = None, db: Session = Depends(get_db))
         with open(contact_form_path, "r", encoding="utf-8") as f:
             html = f.read()
 
-        # Inject data
+        # Inject data (escaped to prevent XSS)
         html = html.replace(
             "const uniqueId = '';",
-            f"const uniqueId = '{unique_id}';"
+            f"const uniqueId = {json.dumps(unique_id)};"
         )
         html = html.replace(
             "const selectedCategory = '';",
-            f"const selectedCategory = '{category}';"
+            f"const selectedCategory = {json.dumps(str(category)) if category else 'null'};"
         )
 
         return HTMLResponse(content=html)
@@ -203,18 +231,18 @@ def qr_page(unique_id: str, category: int = None, db: Session = Depends(get_db))
     with open(landing_path, "r", encoding="utf-8") as f:
         html = f.read()
 
-    # Inject data into JavaScript
+    # Inject data into JavaScript (escaped to prevent XSS)
     html = html.replace(
         "const uniqueId = '';",
-        f"const uniqueId = '{unique_id}';"
+        f"const uniqueId = {json.dumps(unique_id)};"
     )
     html = html.replace(
         "const licensePlate = '';",
-        f"const licensePlate = '{qr.license_plate or ''}';"
+        f"const licensePlate = {json.dumps(qr.license_plate or '')};"
     )
     html = html.replace(
         "const vehicleImagePath = '';",
-        f"const vehicleImagePath = '{qr.vehicle_image_path or ''}';"
+        f"const vehicleImagePath = {json.dumps(qr.vehicle_image_path or '')};"
     )
 
     return HTMLResponse(content=html)
@@ -224,15 +252,14 @@ def read_root():
     return {"message": "KFZ Kontakt QR API läuft"}
 
 @app.get("/debug/auth")
-def debug_auth():
+def debug_auth(password: str = Depends(verify_dashboard_auth)):
     return {
         "dashboard_password_set": bool(settings.DASHBOARD_PASSWORD),
-        "password_length": len(settings.DASHBOARD_PASSWORD) if settings.DASHBOARD_PASSWORD else 0,
-        "password_starts_with": settings.DASHBOARD_PASSWORD[:1] if settings.DASHBOARD_PASSWORD else ""
+        "message": "Debug info nur für authentifizierte Admins verfügbar"
     }
 
 @app.get("/debug/reload")
-def debug_reload():
+def debug_reload(password: str = Depends(verify_dashboard_auth)):
     """Reload database and models - für Development/Testing"""
     try:
         from models import Base
