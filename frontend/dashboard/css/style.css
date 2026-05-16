@@ -465,7 +465,7 @@ input:focus, textarea:focus, select:focus {
 
 .qrcode-preview {
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 1 / 1.1;
   background: var(--color-bg-secondary);
   display: flex;
   align-items: center;
@@ -482,11 +482,11 @@ input:focus, textarea:focus, select:focus {
 }
 
 .qrcode-info {
-  padding: var(--space-1);
+  padding: 2px;
 }
 
 .qrcode-label {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
   color: var(--color-text-primary);
   margin-bottom: var(--space-1);
