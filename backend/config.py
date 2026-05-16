@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
     HOST: str = "0.0.0.0"
     PORT: int = 8000
-    BASE_URL: str = "https://kfz-kontakt.michaely.de"
+    BASE_URL: str = os.getenv("BASE_URL", "http://192.168.178.47:8000")
     DASHBOARD_PASSWORD: str = ""  # MUST be set via DASHBOARD_PASSWORD env var
     ALLOWED_ORIGINS: str = "https://kfz-kontakt.michaely.de"
     UPLOAD_DIR: str = str(BASE_DIR.parent / "uploads")
