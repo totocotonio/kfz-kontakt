@@ -440,7 +440,7 @@ input:focus, textarea:focus, select:focus {
 /* ====== QR CODES ====== */
 .qrcodes-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: var(--space-2);
   width: 100%;
   flex: 1;
@@ -502,11 +502,10 @@ input:focus, textarea:focus, select:focus {
 }
 
 .qrcode-actions .btn {
-  flex: 0;
+  flex: 1;
   padding: 2px 4px;
-  font-size: 8px;
-  min-width: 0;
-  width: auto;
+  font-size: 11px;
+  min-width: 40px;
 }
 
 /* ====== MODALS ====== */
