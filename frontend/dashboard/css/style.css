@@ -495,9 +495,7 @@ input:focus, textarea:focus, select:focus {
 }
 
 .qrcode-actions {
-  display: flex;
-  gap: var(--space-1);
-  margin-top: var(--space-2);
+  display: none;
 }
 
 .qrcode-actions .btn {
