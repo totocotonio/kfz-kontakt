@@ -220,7 +220,8 @@ html, body {
 /* ====== DASHBOARD MAIN ====== */
 .dashboard {
   display: flex;
-  min-height: calc(100vh - 120px);
+  height: calc(100vh - 180px);
+  overflow: hidden;
   background: var(--color-bg-main);
 }
 
