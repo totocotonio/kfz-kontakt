@@ -193,7 +193,7 @@ html, body {
 }
 
 .nav-btn {
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-2) var(--space-4);
   background: transparent;
   border: 2px solid var(--color-border);
   border-radius: var(--radius-lg);
