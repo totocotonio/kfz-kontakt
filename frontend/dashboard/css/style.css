@@ -439,13 +439,16 @@ input:focus, textarea:focus, select:focus {
 
 /* ====== QR CODES ====== */
 .qrcodes-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
   width: 100%;
   flex: 1;
   overflow-y: auto;
-  align-content: flex-start;
+}
+
+.qrcode-card {
+  width: calc(50% - 4px);
 }
 
 .qrcode-card {
