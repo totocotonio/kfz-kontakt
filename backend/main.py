@@ -93,7 +93,9 @@ async def add_security_headers(request: Request, call_next):
     # HSTS - enforce HTTPS
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
     # Content Security Policy - prevent inline scripts
-    response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+    response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;"
+    # Permissions Policy - minimize tracking
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     return response
 
 app.include_router(scanner.router)
