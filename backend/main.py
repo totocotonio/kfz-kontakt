@@ -173,6 +173,14 @@ def favicon_png():
         return FileResponse(favicon_path)
     return {"error": "favicon not found"}
 
+@app.get("/manifest.json")
+def manifest():
+    """Serve manifest.json for PWA"""
+    manifest_path = FRONTEND_DIR / "manifest.json"
+    if manifest_path.exists():
+        return FileResponse(manifest_path, media_type="application/manifest+json")
+    return {"error": "manifest.json not found"}
+
 @app.get("/select-category.html")
 def select_category_page(qr: str = None):
     """Serve category selection page"""
