@@ -6,14 +6,15 @@ BASE_DIR = Path(__file__).parent
 
 class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./kfz_kontakt.db"
-    SECRET_KEY: str = "kfz-kontakt-secret-key-change-in-production"
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "change-me-in-production")
     TELEGRAM_BOT_TOKEN: str = ""
     TELEGRAM_CHAT_ID: str = ""
-    DEBUG: bool = True
+    DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     BASE_URL: str = "https://kfz-kontakt.michaely.de"
-    DASHBOARD_PASSWORD: str = "Schmelz112"
+    DASHBOARD_PASSWORD: str = ""  # MUST be set via DASHBOARD_PASSWORD env var
+    ALLOWED_ORIGINS: str = "https://kfz-kontakt.michaely.de"
     UPLOAD_DIR: str = str(BASE_DIR.parent / "uploads")
     MAX_FILE_SIZE: int = 5 * 1024 * 1024  # 5MB
 
