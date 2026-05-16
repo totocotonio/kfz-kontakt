@@ -252,15 +252,17 @@ def read_root():
     return {"message": "KFZ Kontakt QR API läuft"}
 
 @app.get("/debug/auth")
-def debug_auth(password: str = Depends(verify_dashboard_auth)):
+def debug_auth(request: Request):
+    verify_dashboard_auth(request)
     return {
         "dashboard_password_set": bool(settings.DASHBOARD_PASSWORD),
         "message": "Debug info nur für authentifizierte Admins verfügbar"
     }
 
 @app.get("/debug/reload")
-def debug_reload(password: str = Depends(verify_dashboard_auth)):
+def debug_reload(request: Request):
     """Reload database and models - für Development/Testing"""
+    verify_dashboard_auth(request)
     try:
         from models import Base
         from database import engine
