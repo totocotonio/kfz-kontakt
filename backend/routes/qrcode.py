@@ -65,7 +65,9 @@ def get_qr_image(qr_id: int, request: Request, db: Session = Depends(get_db)):
     if not qr:
         raise HTTPException(status_code=404, detail="QR-Code nicht gefunden")
 
-    qr_data = f"{settings.BASE_URL}/qr/{qr.unique_id}"
+    # Use request origin dynamically - works for both .de domain and IP
+    base_url = str(request.base_url).rstrip('/')
+    qr_data = f"{base_url}/qr/{qr.unique_id}"
 
     qr_image = QRService.generate_qr_code(qr_data)
     sticker = QRService.generate_sticker_with_design(
