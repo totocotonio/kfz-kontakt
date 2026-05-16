@@ -444,8 +444,9 @@ input:focus, textarea:focus, select:focus {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   gap: var(--space-1);
-  max-height: calc(100vh - 350px);
+  flex: 1;
   overflow-y: auto;
+  align-content: flex-start;
 }
 
 .qrcode-card {
@@ -682,7 +683,9 @@ input:focus, textarea:focus, select:focus {
 }
 
 .tab-content.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 @keyframes fadeIn {
