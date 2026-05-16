@@ -20,10 +20,10 @@ import io
 router = APIRouter(prefix="/api", tags=["qrcode"])
 
 class QRCodeCreate(BaseModel):
-    label: str = "Mein Auto"
+    label: str = ""  # Benutzer definiert (z.B. Auto-Marke)
     title: str = "KONTAKT FAHRZEUGHALTER"
-    design: str = "default"
-    background_color: str = "#f5f5f5"
+    design: str = "professional"  # Professional Design mit grüner Farbe
+    background_color: str = "#1b7a4a"  # Professionelles Grün
     license_plate: Optional[str] = None
     vehicle_image_path: Optional[str] = None
     icon_type: str = "phone"
