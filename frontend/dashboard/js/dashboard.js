@@ -96,7 +96,8 @@ document.getElementById('errorOk')?.addEventListener('click', () => {
 });
 
 function showDownloadModal(qrId, filename, label) {
-    document.getElementById('downloadPreview').src = `${API_BASE}/qrcode/${qrId}/image`;
+    // Cache-busting mit Timestamp um neueste QR-Code Version zu laden
+    document.getElementById('downloadPreview').src = `${API_BASE}/qrcode/${qrId}/image?t=${Date.now()}`;
     document.getElementById('downloadLabel').textContent = label;
     document.getElementById('downloadModal').dataset.qrId = qrId;
     document.getElementById('downloadModal').dataset.filename = filename;
