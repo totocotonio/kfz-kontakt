@@ -80,14 +80,19 @@ app.add_middleware(
     allow_headers=["Content-Type"],
 )
 
-# Security Headers Middleware
+# Security Headers Middleware - CRITICAL for security
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
+    # Prevent MIME type sniffing
     response.headers["X-Content-Type-Options"] = "nosniff"
+    # Prevent clickjacking
     response.headers["X-Frame-Options"] = "DENY"
+    # Legacy XSS protection
     response.headers["X-XSS-Protection"] = "1; mode=block"
+    # HSTS - enforce HTTPS
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+    # Content Security Policy - prevent inline scripts
     response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
     return response
 
