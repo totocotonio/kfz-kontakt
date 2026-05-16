@@ -506,9 +506,9 @@ input:focus, textarea:focus, select:focus {
 
 .qrcode-actions .btn {
   flex: 1;
-  padding: 2px 4px;
-  font-size: 11px;
-  min-width: 40px;
+  padding: 8px 12px;
+  font-size: 14px;
+  min-width: 60px;
 }
 
 /* ====== MODALS ====== */
