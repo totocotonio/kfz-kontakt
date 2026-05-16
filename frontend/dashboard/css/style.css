@@ -117,12 +117,6 @@ html, body {
   font-size: var(--font-size-base);
   line-height: 1.6;
   transition: background-color var(--transition-base), color var(--transition-base);
-  overflow: hidden;
-}
-
-/* Verstecke Footer und Modals */
-footer {
-  display: none !important;
 }
 
 /* ====== HEADER ====== */
@@ -234,7 +228,7 @@ footer {
 .main-content {
   flex: 1;
   padding: var(--space-2);
-  overflow: hidden;
+  overflow-y: auto;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -450,8 +444,6 @@ input:focus, textarea:focus, select:focus {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   gap: var(--space-1);
-  overflow-y: auto;
-  max-height: 100%;
 }
 
 .qrcode-card {
