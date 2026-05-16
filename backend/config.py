@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     BASE_URL: str = os.getenv("BASE_URL", "http://192.168.178.47:8000")
+    EXTERNAL_URL: str = os.getenv("EXTERNAL_URL", "https://kfz-kontakt.michaely.de")  # Für QR-Codes
     DASHBOARD_PASSWORD: str = ""  # MUST be set via DASHBOARD_PASSWORD env var
     ALLOWED_ORIGINS: str = "https://kfz-kontakt.michaely.de"
     UPLOAD_DIR: str = str(BASE_DIR.parent / "uploads")
