@@ -457,6 +457,10 @@ input:focus, textarea:focus, select:focus {
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: all var(--transition-base);
+  width: calc(50% - 4px) !important;
+  display: inline-block !important;
+  vertical-align: top;
+  box-sizing: border-box;
 }
 
 .qrcode-card:hover {
