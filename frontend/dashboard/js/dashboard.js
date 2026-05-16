@@ -135,10 +135,10 @@ document.getElementById('closeDownloadBtnBottom')?.addEventListener('click', () 
 
 document.getElementById('confirmDownloadBtn')?.addEventListener('click', downloadQRCode);
 
-function setupPhone() {
-    loadPhoneNumber();
+function setupContactSettings() {
+    loadContactSettings();
 
-    document.getElementById('savePhoneBtn')?.addEventListener('click', async () => {
+    document.getElementById('saveContactBtn')?.addEventListener('click', async () => {
         const number = document.getElementById('phoneNumber').value;
         if (!number) {
             showError('Bitte gebe eine Telefonnummer ein');
@@ -146,7 +146,7 @@ function setupPhone() {
         }
 
         try {
-            const res = await apiFetch(`${API_BASE}/dashboard/phone`, {
+            const res = await apiFetch(`${API_BASE}/dashboard/contact`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phone_number: number })
@@ -161,39 +161,23 @@ function setupPhone() {
             showError('Fehler: ' + e.message);
         }
     });
-}
 
-async function loadPhoneNumber() {
-    try {
-        const res = await apiFetch(`${API_BASE}/dashboard/phone`);
-        const data = await res.json();
-        if (data.phone_number) {
-            document.getElementById('phoneNumber').value = data.phone_number;
-        }
-    } catch (e) {
-        console.error('Fehler beim Laden der Telefonnummer:', e);
-    }
-}
-
-function setupWhatsApp() {
-    loadWhatsAppNumber();
-
-    document.getElementById('saveWhatsappBtn')?.addEventListener('click', async () => {
-        const number = document.getElementById('whatsappNumber').value;
-        if (!number) {
-            showError('Bitte gebe eine WhatsApp-Nummer ein');
-            return;
-        }
+    document.getElementById('saveMethodsBtn')?.addEventListener('click', async () => {
+        const methods = {
+            enable_telegram: document.getElementById('enableTelegram').checked,
+            enable_sms: document.getElementById('enableSMS').checked,
+            enable_whatsapp: document.getElementById('enableWhatsApp').checked
+        };
 
         try {
-            const res = await apiFetch(`${API_BASE}/dashboard/whatsapp`, {
+            const res = await apiFetch(`${API_BASE}/dashboard/contact-methods`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ whatsapp_number: number })
+                body: JSON.stringify(methods)
             });
 
             if (res.ok) {
-                showConfirm('Erfolg', 'WhatsApp-Nummer gespeichert!', () => {});
+                showConfirm('Erfolg', 'Kontaktmethoden gespeichert!', () => {});
             } else {
                 showError('Fehler beim Speichern');
             }
@@ -203,15 +187,22 @@ function setupWhatsApp() {
     });
 }
 
-async function loadWhatsAppNumber() {
+async function loadContactSettings() {
     try {
-        const res = await apiFetch(`${API_BASE}/dashboard/whatsapp`);
+        const res = await apiFetch(`${API_BASE}/dashboard/contact`);
         const data = await res.json();
-        if (data.whatsapp_number) {
-            document.getElementById('whatsappNumber').value = data.whatsapp_number;
+
+        if (data.phone_number) {
+            document.getElementById('phoneNumber').value = data.phone_number;
+        }
+
+        if (document.getElementById('enableTelegram')) {
+            document.getElementById('enableTelegram').checked = data.enable_telegram || false;
+            document.getElementById('enableSMS').checked = data.enable_sms || false;
+            document.getElementById('enableWhatsApp').checked = data.enable_whatsapp || false;
         }
     } catch (e) {
-        console.error('Fehler beim Laden der WhatsApp-Nummer:', e);
+        console.error('Fehler beim Laden der Kontakteinstellungen:', e);
     }
 }
 
@@ -221,8 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize with messages tab active
     switchTab('messages');
     setupQRCodeGenerator();
-    setupPhone();
-    setupWhatsApp();
+    setupContactSettings();
 });
 
 // Version wird SERVER-SIDE injiziert in das HTML - nicht hier laden!

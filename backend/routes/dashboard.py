@@ -10,11 +10,13 @@ class MessageUpdate(BaseModel):
     read: bool = None
     responded: bool = None
 
-class PhoneUpdate(BaseModel):
+class ContactUpdate(BaseModel):
     phone_number: str
 
-class WhatsAppUpdate(BaseModel):
-    whatsapp_number: str
+class ContactMethodsUpdate(BaseModel):
+    enable_telegram: bool = True
+    enable_sms: bool = False
+    enable_whatsapp: bool = False
 
 @router.get("/dashboard/messages")
 def get_messages(db: Session = Depends(get_db)):
@@ -112,16 +114,21 @@ def get_categories(db: Session = Depends(get_db)):
         ]
     }
 
-@router.get("/dashboard/phone")
-def get_phone(db: Session = Depends(get_db)):
+@router.get("/dashboard/contact")
+def get_contact(db: Session = Depends(get_db)):
     user = db.query(User).first()
     if not user:
         raise HTTPException(status_code=404, detail="User nicht gefunden")
 
-    return {"phone_number": user.phone_number or ""}
+    return {
+        "phone_number": user.phone_number or "",
+        "enable_telegram": user.enable_telegram,
+        "enable_sms": user.enable_sms,
+        "enable_whatsapp": user.enable_whatsapp
+    }
 
-@router.patch("/dashboard/phone")
-def update_phone(data: PhoneUpdate, db: Session = Depends(get_db)):
+@router.patch("/dashboard/contact")
+def update_contact(data: ContactUpdate, db: Session = Depends(get_db)):
     user = db.query(User).first()
     if not user:
         raise HTTPException(status_code=404, detail="User nicht gefunden")
@@ -131,24 +138,18 @@ def update_phone(data: PhoneUpdate, db: Session = Depends(get_db)):
 
     return {"status": "success", "phone_number": user.phone_number}
 
-@router.get("/dashboard/whatsapp")
-def get_whatsapp(db: Session = Depends(get_db)):
+@router.patch("/dashboard/contact-methods")
+def update_contact_methods(data: ContactMethodsUpdate, db: Session = Depends(get_db)):
     user = db.query(User).first()
     if not user:
         raise HTTPException(status_code=404, detail="User nicht gefunden")
 
-    return {"whatsapp_number": user.whatsapp_number or ""}
-
-@router.patch("/dashboard/whatsapp")
-def update_whatsapp(data: WhatsAppUpdate, db: Session = Depends(get_db)):
-    user = db.query(User).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User nicht gefunden")
-
-    user.whatsapp_number = data.whatsapp_number
+    user.enable_telegram = data.enable_telegram
+    user.enable_sms = data.enable_sms
+    user.enable_whatsapp = data.enable_whatsapp
     db.commit()
 
-    return {"status": "success", "whatsapp_number": user.whatsapp_number}
+    return {"status": "success"}
 
 @router.get("/whatsapp")
 def get_whatsapp_public(db: Session = Depends(get_db)):

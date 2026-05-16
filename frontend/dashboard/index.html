@@ -111,29 +111,38 @@
                 <div id="settings" class="tab-content">
                     <div class="settings-section">
                         <div class="section-header">
-                            <h2>Benachrichtigungen</h2>
+                            <h2>Kontaktmethoden</h2>
                         </div>
 
-                        <!-- SMS Settings -->
+                        <!-- Contact Settings -->
                         <div class="settings-card">
-                            <h3>📱 SMS-Benachrichtigungen</h3>
-                            <label class="settings-label">Mobilnummer für SMS</label>
+                            <h3>📱 Deine Telefonnummer</h3>
+                            <label class="settings-label">Mobilnummer (z.B. +491234567890)</label>
                             <div class="settings-input-group">
                                 <input type="text" id="phoneNumber" placeholder="+491234567890">
-                                <button class="btn btn-primary" id="savePhoneBtn">Speichern</button>
+                                <button class="btn btn-primary" id="saveContactBtn">Speichern</button>
                             </div>
-                            <small class="settings-helper">Du bekommst SMS wenn neue Nachrichten eingehen (privat, nicht öffentlich sichtbar)</small>
+                            <small class="settings-helper">Diese Nummer wird für SMS und WhatsApp verwendet</small>
                         </div>
 
-                        <!-- WhatsApp Settings -->
+                        <!-- Contact Methods -->
                         <div class="settings-card">
-                            <h3>💬 WhatsApp Kontakt</h3>
-                            <label class="settings-label">Deine WhatsApp Nummer</label>
-                            <div class="settings-input-group">
-                                <input type="text" id="whatsappNumber" placeholder="+491234567890">
-                                <button class="btn btn-primary" id="saveWhatsappBtn">Speichern</button>
+                            <h3>🔧 Verfügbare Kontaktmethoden</h3>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="enableTelegram" style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span>📱 Telegram</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="enableSMS" style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span>💬 SMS</span>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="enableWhatsApp" style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span>📲 WhatsApp</span>
+                                </label>
                             </div>
-                            <small class="settings-helper">Besucher können dich über WhatsApp kontaktieren (öffentlich sichtbar)</small>
+                            <button class="btn btn-primary" id="saveMethodsBtn" style="margin-top: 16px; width: 100%;">Speichern</button>
                         </div>
                     </div>
                 </div>

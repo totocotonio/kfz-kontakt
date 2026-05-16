@@ -12,6 +12,9 @@ class User(Base):
     telegram_username = Column(String(255), nullable=True)
     phone_number = Column(String(20), nullable=True)
     whatsapp_number = Column(String(20), nullable=True)
+    enable_telegram = Column(Boolean, default=True)
+    enable_sms = Column(Boolean, default=False)
+    enable_whatsapp = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     qr_codes = relationship("QRCode", back_populates="user")
