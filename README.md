@@ -2,8 +2,8 @@
 
 Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrsteilnehmern über QR-Codes. Mit Fahrzeugfotos, Kennzeichen, persönlichen Icons und PWA-Unterstützung.
 
-**Status:** ✅ Production Ready (v1.0.271) - Auto-Deploy aktiv
-**© 2026 Torsten Michaely** – Alle Rechte vorbehalten. Mit professionellem Dashboard & auswählbaren Kontaktmethoden.
+**Status:** ✅ Production Ready (v1.0.293) - Auto-Deploy aktiv  
+**© 2026 Torsten Michaely** – Alle Rechte vorbehalten. Mit professionellem Dashboard, QR-Code Tracking & Analytics.
 
 ## Features
 
@@ -17,9 +17,13 @@ Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrst
 ✅ **Telegram-Benachrichtigungen** - Sofortige Benachrichtigungen bei neuen Nachrichten  
 ✅ **Admin-Dashboard** - Premium-Design mit Nachrichten, QR-Codes, Einstellungen & Statistiken
 ✅ **Auswählbare Kontaktmethoden** - Eine Telefonnummer mit Toggle für Telegram, SMS, WhatsApp
-✅ **QR-Code Scan Tracking** - Automatische Erfassung von Besucher-Metriken (Standort, Device, Browser)
-✅ **Analytics & Statistiken** - Pro-QR-Code Scan-Statistiken, Conversion-Rate, geografische Verteilung
-✅ **Statistiken-Seite** - Übersicht: Gesamtnachrichten, Ungelesen, Beantwortet, Scans, Conversion
+✅ **QR-Code Scan Tracking** - Automatische Erfassung von Besucher-Metriken (Geolocation, Device, Browser)
+✅ **Browser-Geolocation** - Mit User-Zustimmung + IP-Fallback für genaue Standorterfassung
+✅ **Analytics-Tab** - Detaillierte Scan-Statistiken pro QR-Code (Device, Browser, Länder-Verteilung)
+✅ **Scan-Location bei Nachrichten** - Zeige Standort, Device & Browser des Scanners in Nachrichtendetails
+✅ **Telegram-Location** - Sende Scan-Standort (Koordinaten clickable zu Google Maps) mit Benachrichtigung
+✅ **Conversion-Rate Tracking** - Vergleich: Scans vs. Nachrichten (zeigt Effektivität des QR-Codes)
+✅ **Statistiken-Seite** - Übersicht: Gesamtnachrichten, Ungelesen, Beantwortet, Scans, Conversion-Rate
 ✅ **Responsive Layout** - Kein Scrollen nötig, alle Inhalte auf einer Bildschirmseite
 ✅ **Message Tracking** - Lieferungsstatus für SMS und WhatsApp (pending/sent/delivered/failed)  
 ✅ **Datenschutz** - Keine persönlichen Daten werden öffentlich angezeigt  
@@ -398,6 +402,35 @@ server {
 ```
 
 ## Changelog - Neue Features (v1.0.120+)
+
+### v1.0.293 - QR-Code Tracking Finalisierung & Analytics Verbesserungen
+✅ **Analytics Dashboard**
+- Neue Analytics-Tab im Dashboard
+- QR-Code Auswahl mit automatisch populiertem Dropdown
+- Detaillierte Scan-Statistiken pro QR-Code (Device, Browser, Land)
+- Conversion-Rate begrenzt auf maximal 100% (Bugfix für alte Nachrichten)
+
+✅ **Geolocation in Nachrichten**
+- Zeige Scan-Standort in Nachrichtendetails (Land, City, Koordinaten)
+- Koordinaten sind clickable Google Maps Links
+- Nur Scans unmittelbar VOR Nachricht (max. 15 Min) werden berücksichtigt
+- Filtert alte Test-Scans automatisch weg
+
+✅ **Telegram-Benachrichtigungen mit Location**
+- Scan-Standort wird mit Telegram-Benachrichtigung gesendet
+- Zeigt: Land, Stadt, GPS-Koordinaten (mit Google Maps Link)
+- Device-Type und Browser-Info
+- Nur wenn Scan-Daten vorhanden
+
+✅ **UI Verbesserungen**
+- Uhrzeit + Datum in Nachrichtenübersicht (vorher nur Datum)
+- Zeitzonen-Konvertierung: UTC → CEST/CET (Europe/Berlin)
+- Frontend nutzt toLocaleString('de-DE') für lokale Zeit
+
+✅ **Bugfixes**
+- Zeitliche Differenz-Berechnung für Scans: Python statt SQL
+- Zeitzonen-Konvertierung im Backend (nicht im Browser)
+- QR-Code Dropdown populiert sich korrekt bei Analytics-Tab-Zugriff
 
 ### v1.0.271 - QR-Code Tracking & Analytics
 ✅ **QR-Code Scan-Tracking**
