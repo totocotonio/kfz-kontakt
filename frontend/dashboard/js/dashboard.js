@@ -237,13 +237,15 @@ function switchTab(tabName) {
         messages: 'Nachrichten',
         settings: 'Einstellungen',
         qrcodes: 'QR-Codes',
-        stats: 'Statistiken'
+        stats: 'Statistiken',
+        analytics: 'Analytics'
     };
     document.getElementById('pageTitle').textContent = titles[tabName];
 
     if (tabName === 'messages') loadMessages();
     if (tabName === 'qrcodes') loadQRCodes();
     if (tabName === 'stats') loadStats();
+    if (tabName === 'analytics') loadAnalytics();
 }
 
 async function loadMessages() {
@@ -381,11 +383,11 @@ async function loadQRCodes() {
 
         const timestamp = new Date().getTime();
         grid.innerHTML = data.qrcodes.map(qr => `
-            <div class="qrcode-card">
+            <div class="qrcode-card" data-qr-id="${qr.id}">
                 <div class="qrcode-preview">
                     <img src="${API_BASE}/qrcode/${qr.id}/image?t=${timestamp}" alt="${qr.label}">
                 </div>
-                <div class="qrcode-label">${qr.label}</div>
+                <div class="qrcode-label qr-label">${qr.label}</div>
                 <div style="font-size: 12px; color: #999; margin-top: 5px; word-break: break-all;">ID: ${qr.unique_id}</div>
                 <div style="font-size: 12px; color: #999;">Design: ${qr.design}</div>
                 <div style="font-size: 12px; color: #999; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
@@ -398,6 +400,9 @@ async function loadQRCodes() {
                 </div>
             </div>
         `).join('');
+
+        // Populate QR Code Select für Analytics
+        populateQRCodeSelect();
     } catch (e) {
         console.error('Fehler beim Laden der QR-Codes:', e);
     }
@@ -707,3 +712,137 @@ window.addEventListener('click', (e) => {
         editModal.style.display = 'none';
     }
 });
+
+// ===== ANALYTICS TAB =====
+async function loadAnalytics() {
+    try {
+        const res = await apiFetch(`${API_BASE}/dashboard/stats`);
+        if (res.ok) {
+            const data = await res.json();
+            document.getElementById('totalScans').textContent = data.total_scans || 0;
+            document.getElementById('conversionRate').textContent = (data.conversion_rate || 0) + '%';
+        }
+    } catch (e) {
+        console.error('Error loading analytics:', e);
+    }
+}
+
+// QR-Code Selection für Analytics
+document.getElementById('qrCodeSelect')?.addEventListener('change', async (e) => {
+    const qrId = e.target.value;
+    const content = document.getElementById('analyticsContent');
+    const noQR = document.getElementById('noQRSelected');
+
+    if (!qrId) {
+        content.style.display = 'none';
+        noQR.style.display = 'block';
+        return;
+    }
+
+    content.style.display = 'block';
+    noQR.style.display = 'none';
+
+    try {
+        const res = await apiFetch(`${API_BASE}/dashboard/qr-stats/${qrId}`);
+        if (res.ok) {
+            const stats = await res.json();
+
+            // Update stat cards
+            document.getElementById('qrTotalScans').textContent = stats.total_scans || 0;
+            document.getElementById('qrMessages').textContent = stats.messages_count || 0;
+            document.getElementById('qrConversion').textContent = (stats.conversion_rate || 0) + '%';
+
+            // Device Breakdown
+            const deviceDiv = document.getElementById('deviceBreakdown');
+            deviceDiv.innerHTML = '';
+            Object.entries(stats.scans_by_device || {}).forEach(([device, count]) => {
+                const bar = document.createElement('div');
+                bar.className = 'breakdown-item';
+                const percentage = ((count / stats.total_scans) * 100).toFixed(1);
+                bar.innerHTML = `
+                    <div class="breakdown-label">${device} <span class="breakdown-count">${count}</span></div>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    <div class="breakdown-percent">${percentage}%</div>
+                `;
+                deviceDiv.appendChild(bar);
+            });
+
+            // Browser Breakdown
+            const browserDiv = document.getElementById('browserBreakdown');
+            browserDiv.innerHTML = '';
+            Object.entries(stats.scans_by_browser || {}).forEach(([browser, count]) => {
+                const bar = document.createElement('div');
+                bar.className = 'breakdown-item';
+                const percentage = ((count / stats.total_scans) * 100).toFixed(1);
+                bar.innerHTML = `
+                    <div class="breakdown-label">${browser} <span class="breakdown-count">${count}</span></div>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    <div class="breakdown-percent">${percentage}%</div>
+                `;
+                browserDiv.appendChild(bar);
+            });
+
+            // Country Breakdown
+            const countryDiv = document.getElementById('countryBreakdown');
+            countryDiv.innerHTML = '';
+            Object.entries(stats.scans_by_country || {}).forEach(([country, count]) => {
+                const bar = document.createElement('div');
+                bar.className = 'breakdown-item';
+                const percentage = ((count / stats.total_scans) * 100).toFixed(1);
+                bar.innerHTML = `
+                    <div class="breakdown-label">${country || 'Unknown'} <span class="breakdown-count">${count}</span></div>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    <div class="breakdown-percent">${percentage}%</div>
+                `;
+                countryDiv.appendChild(bar);
+            });
+
+            // Latest Scans
+            const scansDiv = document.getElementById('latestScans');
+            scansDiv.innerHTML = '';
+            (stats.latest_scans || []).forEach(scan => {
+                const scanEl = document.createElement('div');
+                scanEl.className = 'scan-item';
+                const date = new Date(scan.created_at).toLocaleString('de-DE');
+                const geo = scan.latitude && scan.longitude ?
+                    `📍 ${scan.latitude.toFixed(4)}, ${scan.longitude.toFixed(4)}` :
+                    '📍 IP-based';
+                scanEl.innerHTML = `
+                    <div class="scan-info">
+                        <div class="scan-device">${scan.device_type} • ${scan.browser_name}</div>
+                        <div class="scan-country">${scan.country || 'Unknown'}</div>
+                        <div class="scan-geo">${geo}</div>
+                        <div class="scan-time">${date}</div>
+                    </div>
+                `;
+                scansDiv.appendChild(scanEl);
+            });
+        }
+    } catch (e) {
+        showError('Fehler beim Laden von Analytics: ' + e.message);
+    }
+}
+
+// Populate QR Code Select on QR Codes load
+function populateQRCodeSelect() {
+    const select = document.getElementById('qrCodeSelect');
+    const qrGrid = document.getElementById('qrcodesGrid');
+
+    const qrCards = qrGrid.querySelectorAll('[data-qr-id]');
+    select.innerHTML = '<option value="">-- QR-Code wählen --</option>';
+
+    qrCards.forEach(card => {
+        const qrId = card.dataset.qrId;
+        const label = card.querySelector('.qr-label')?.textContent || `QR ${qrId}`;
+        const option = document.createElement('option');
+        option.value = qrId;
+        option.textContent = label;
+        select.appendChild(option);
+    });
+}

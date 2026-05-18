@@ -881,3 +881,126 @@ input:focus, textarea:focus, select:focus {
 .mb-4 {
   margin-bottom: var(--space-1);
 }
+
+/* ===== ANALYTICS STYLES ===== */
+.analytics-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.analytics-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.analytics-section h3 {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.breakdown-item {
+  display: grid;
+  grid-template-columns: 120px 1fr 60px;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.breakdown-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.breakdown-count {
+  background: var(--color-primary);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.breakdown-bar {
+  height: 24px;
+  background: var(--color-bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.breakdown-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.breakdown-percent {
+  text-align: right;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.scans-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.scan-item {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.scan-item:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-primary);
+}
+
+.scan-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scan-device {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.scan-country {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.scan-geo {
+  font-size: var(--font-size-xs);
+  color: var(--color-primary-light);
+  font-family: var(--font-mono);
+}
+
+.scan-time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}

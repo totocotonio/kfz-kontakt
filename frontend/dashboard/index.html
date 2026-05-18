@@ -83,6 +83,9 @@
         <button class="nav-btn" data-tab="stats">
             📊 Statistiken
         </button>
+        <button class="nav-btn" data-tab="analytics">
+            🗺️ Analytics
+        </button>
     </nav>
 
     <div class="dashboard">
@@ -325,6 +328,72 @@
                         <div class="stat-card">
                             <div class="stat-card-title">Beantwortet</div>
                             <div class="stat-card-value" id="statsResponded">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-title">Gesamt Scans</div>
+                            <div class="stat-card-value" id="totalScans">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-title">Conversion Rate</div>
+                            <div class="stat-card-value" id="conversionRate">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="analytics" class="tab-content">
+                    <div class="analytics-container">
+                        <div class="section-header">
+                            <h2>QR-Code Analytics</h2>
+                            <select id="qrCodeSelect" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                                <option value="">-- QR-Code wählen --</option>
+                            </select>
+                        </div>
+
+                        <div id="analyticsContent" style="display: none;">
+                            <!-- QR Code Stats -->
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-card-title">📊 Scans gesamt</div>
+                                    <div class="stat-card-value" id="qrTotalScans">0</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card-title">💬 Nachrichten</div>
+                                    <div class="stat-card-value" id="qrMessages">0</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card-title">📈 Conversion</div>
+                                    <div class="stat-card-value" id="qrConversion">0%</div>
+                                </div>
+                            </div>
+
+                            <!-- Device Breakdown -->
+                            <div class="analytics-section">
+                                <h3>📱 Device-Typ Verteilung</h3>
+                                <div id="deviceBreakdown" class="breakdown-list"></div>
+                            </div>
+
+                            <!-- Browser Breakdown -->
+                            <div class="analytics-section">
+                                <h3>🌐 Browser Verteilung</h3>
+                                <div id="browserBreakdown" class="breakdown-list"></div>
+                            </div>
+
+                            <!-- Country Breakdown -->
+                            <div class="analytics-section">
+                                <h3>🗺️ Länder-Verteilung</h3>
+                                <div id="countryBreakdown" class="breakdown-list"></div>
+                            </div>
+
+                            <!-- Latest Scans -->
+                            <div class="analytics-section">
+                                <h3>🔍 Neueste Scans</h3>
+                                <div id="latestScans" class="scans-list"></div>
+                            </div>
+                        </div>
+
+                        <div id="noQRSelected" style="text-align: center; padding: 40px; color: #999;">
+                            <p>Wähle oben einen QR-Code aus, um Analytics zu sehen</p>
                         </div>
                     </div>
                 </div>
