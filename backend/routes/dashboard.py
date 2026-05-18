@@ -52,26 +52,29 @@ def get_message(message_id: int, db: Session = Depends(get_db)):
     message.read = True
     db.commit()
 
-    # Hole Scan-Daten für diesen QR-Code
-    scans = []
+    # Hole den zeitlich nächsten Scan zu dieser Nachricht
+    scan = None
     if message.qr_code_id:
-        scans_list = db.query(QRCodeScan)\
-            .filter(QRCodeScan.qr_code_id == message.qr_code_id)\
-            .order_by(QRCodeScan.created_at.desc())\
-            .limit(10)\
-            .all()
+        # Suche den Scan mit der geringsten zeitlichen Differenz zur Nachricht
+        from sqlalchemy import func, and_
 
-        scans = [{
-            "id": s.id,
-            "latitude": s.latitude,
-            "longitude": s.longitude,
-            "country": s.country,
-            "city": s.city,
-            "device_type": s.device_type,
-            "browser_name": s.browser_name,
-            "created_at": s.created_at.isoformat(),
-            "accuracy": s.accuracy
-        } for s in scans_list]
+        closest_scan = db.query(QRCodeScan)\
+            .filter(QRCodeScan.qr_code_id == message.qr_code_id)\
+            .order_by(func.abs(func.strftime('%s', QRCodeScan.created_at) - func.strftime('%s', message.created_at)))\
+            .first()
+
+        if closest_scan:
+            scan = {
+                "id": closest_scan.id,
+                "latitude": closest_scan.latitude,
+                "longitude": closest_scan.longitude,
+                "country": closest_scan.country,
+                "city": closest_scan.city,
+                "device_type": closest_scan.device_type,
+                "browser_name": closest_scan.browser_name,
+                "created_at": closest_scan.created_at.isoformat(),
+                "accuracy": closest_scan.accuracy
+            }
 
     return {
         "id": message.id,
@@ -83,7 +86,7 @@ def get_message(message_id: int, db: Session = Depends(get_db)):
         "read": message.read,
         "responded": message.responded,
         "created_at": message.created_at.isoformat(),
-        "scans": scans
+        "scan": scan
     }
 
 @router.patch("/dashboard/messages/{message_id}")
