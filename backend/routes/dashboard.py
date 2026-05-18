@@ -52,6 +52,27 @@ def get_message(message_id: int, db: Session = Depends(get_db)):
     message.read = True
     db.commit()
 
+    # Hole Scan-Daten für diesen QR-Code
+    scans = []
+    if message.qr_code_id:
+        scans_list = db.query(QRCodeScan)\
+            .filter(QRCodeScan.qr_code_id == message.qr_code_id)\
+            .order_by(QRCodeScan.created_at.desc())\
+            .limit(10)\
+            .all()
+
+        scans = [{
+            "id": s.id,
+            "latitude": s.latitude,
+            "longitude": s.longitude,
+            "country": s.country,
+            "city": s.city,
+            "device_type": s.device_type,
+            "browser_name": s.browser_name,
+            "created_at": s.created_at.isoformat(),
+            "accuracy": s.accuracy
+        } for s in scans_list]
+
     return {
         "id": message.id,
         "qr_label": message.qr_code.label if message.qr_code else "N/A",
@@ -61,7 +82,8 @@ def get_message(message_id: int, db: Session = Depends(get_db)):
         "message": message.message,
         "read": message.read,
         "responded": message.responded,
-        "created_at": message.created_at.isoformat()
+        "created_at": message.created_at.isoformat(),
+        "scans": scans
     }
 
 @router.patch("/dashboard/messages/{message_id}")

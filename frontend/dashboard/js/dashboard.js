@@ -284,6 +284,34 @@ async function openMessage(msgId) {
         const msg = await res.json();
         currentMessageId = msgId;
 
+        // Baue Scan-HTML
+        let scansHtml = '';
+        if (msg.scans && msg.scans.length > 0) {
+            scansHtml = `<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
+                <h4 style="margin-top: 0; margin-bottom: 12px;">📍 Scans des QR-Codes (top 10, neueste zuerst)</h4>
+                <div style="display: flex; flex-direction: column; gap: 8px;">`;
+
+            msg.scans.forEach(scan => {
+                const date = new Date(scan.created_at).toLocaleString('de-DE');
+                let geoHtml = '📍 IP-based';
+                if (scan.latitude && scan.longitude) {
+                    const lat = scan.latitude.toFixed(4);
+                    const lon = scan.longitude.toFixed(4);
+                    const mapsUrl = `https://maps.google.com/?q=${lat},${lon}`;
+                    geoHtml = `📍 <a href="${mapsUrl}" target="_blank" style="color: #3b82f6; text-decoration: underline; cursor: pointer;">${lat}, ${lon}</a>`;
+                }
+
+                scansHtml += `<div style="padding: 10px; background: #f9f9f9; border-radius: 6px; font-size: 13px; border-left: 3px solid #667eea;">
+                    <div style="font-weight: 500;">${scan.device_type} • ${scan.browser_name}</div>
+                    <div style="color: #666; font-size: 12px;">${scan.country || 'Unknown'}${scan.city ? ', ' + scan.city : ''}</div>
+                    <div style="margin: 4px 0;">${geoHtml}</div>
+                    <div style="color: #999; font-size: 11px;">${date}</div>
+                </div>`;
+            });
+
+            scansHtml += `</div></div>`;
+        }
+
         const detail = document.getElementById('messageDetail');
         detail.innerHTML = `
             <div class="message-detail-header">
@@ -299,6 +327,7 @@ async function openMessage(msgId) {
             </div>
             ${msg.sender_contact ? `<div><strong>Kontakt:</strong> ${msg.sender_contact}</div>` : ''}
             <div class="message-detail-body">${msg.message}</div>
+            ${scansHtml}
         `;
 
         document.getElementById('messageModal').style.display = 'flex';
