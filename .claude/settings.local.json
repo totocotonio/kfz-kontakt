@@ -317,7 +317,19 @@
       "Bash(ssh kfz@192.168.178.47 \"tail -30 /tmp/service.log\")",
       "Bash(curl -s \"http://192.168.178.47:8000/api/version\")",
       "Bash(curl -v \"http://192.168.178.47:8000/qr/975488b6-ed6?category=4\")",
-      "Bash(python3 restart_kfz_service.py)"
+      "Bash(python3 restart_kfz_service.py)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Torst\\\\Documents\\\\CLAUDE CODE\\\\kontakt über QR-Code\\\\.claude\\\\worktrees\\\\naughty-elion-e53519\" -Recurse -File)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(git status *)",
+      "Bash(mount)",
+      "Bash(export SSHPASS=\"Schmelz112\")",
+      "Bash(sshpass -e ssh -o StrictHostKeyChecking=no kfz@192.168.178.47 \"cd /opt/kfz-kontakt && git pull origin main && echo '1.0.197' > version.txt && systemctl restart kfz-kontakt\")",
+      "Bash(apt-get update *)",
+      "Bash(ssh kfz@192.168.178.47 \"systemctl status kfz-kontakt\")",
+      "Bash(ssh kfz@192.168.178.47 \"python3 /tmp/test_kfz.py\")",
+      "Bash(ssh kfz@192.168.178.47 'python3 -c '\\\\'' *)",
+      "Bash(ssh kfz@192.168.178.47 *)",
+      "Bash(ssh kfz@212.178.47 'python3 -c \" *)"
     ]
   }
 }

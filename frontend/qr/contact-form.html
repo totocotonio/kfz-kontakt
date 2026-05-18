@@ -359,6 +359,22 @@
             <button type="submit">Nachricht senden</button>
             <div class="loading" id="loading">Wird gesendet...</div>
             <div id="feedback"></div>
+
+            <!-- Contact method buttons (shown after successful submission) -->
+            <div id="contactMethodsContainer" style="display: none; margin-top: var(--spacing-xl);">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--spacing-lg); font-size: 14px;">
+                    Admin über weitere Kanäle kontaktieren (optional):
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
+                    <button type="button" id="smsBtn" style="background: linear-gradient(135deg, #34d399 0%, #10b981 100%); margin-top: 0;">
+                        📱 SMS
+                    </button>
+                    <button type="button" id="whatsappBtn" style="background: linear-gradient(135deg, #25D366 0%, #20BA58 100%); margin-top: 0;">
+                        💬 WhatsApp
+                    </button>
+                </div>
+                <div id="contactFeedback"></div>
+            </div>
         </form>
     </div>
 
@@ -366,6 +382,7 @@
         // Diese Werte werden von main.py injiziert
         const uniqueId = '';
         const selectedCategory = '';
+        let currentMessageId = null;
 
         console.log(`[Debug] uniqueId: "${uniqueId}", selectedCategory: "${selectedCategory}"`);
 
@@ -384,6 +401,7 @@
             e.preventDefault();
             const feedback = document.getElementById('feedback');
             const loading = document.getElementById('loading');
+            const contactMethodsContainer = document.getElementById('contactMethodsContainer');
 
             const payload = {
                 sender_name: document.getElementById('name').value || 'Anonym',
@@ -394,6 +412,7 @@
 
             loading.style.display = 'block';
             feedback.innerHTML = '';
+            contactMethodsContainer.style.display = 'none';
 
             try {
                 const res = await fetch('/api/qr/' + uniqueId + '/message', {
@@ -404,11 +423,14 @@
 
                 if (res.ok) {
                     const data = await res.json();
-                    const messageId = data.message_id;
+                    currentMessageId = data.message_id;
                     console.log('Nachricht gesendet:', data);
-                    console.log('Message ID:', messageId);
+                    console.log('Message ID:', currentMessageId);
 
                     feedback.innerHTML = '<p class="success">✅ Nachricht erfolgreich gesendet!</p>';
+
+                    // Show contact method buttons
+                    contactMethodsContainer.style.display = 'block';
 
                     document.getElementById('contactForm').reset();
                 } else {
@@ -418,6 +440,78 @@
                 feedback.innerHTML = '<p class="error">❌ Fehler: ' + e.message + '</p>';
             }
             loading.style.display = 'none';
+        });
+
+        // SMS Button Handler
+        document.getElementById('smsBtn').addEventListener('click', async () => {
+            if (!currentMessageId) return;
+
+            const btn = document.getElementById('smsBtn');
+            const contactFeedback = document.getElementById('contactFeedback');
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Wird versendet...';
+            contactFeedback.innerHTML = '';
+
+            try {
+                const res = await fetch('/api/qr/' + uniqueId + '/contact/sms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message_id: currentMessageId })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    contactFeedback.innerHTML = '<p class="success">✅ SMS wird an Admin versendet!</p>';
+                    btn.innerHTML = '✅ SMS versendet';
+                } else {
+                    const error = await res.json();
+                    contactFeedback.innerHTML = '<p class="error">❌ ' + (error.detail || 'SMS konnte nicht versendet werden') + '</p>';
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch(e) {
+                contactFeedback.innerHTML = '<p class="error">❌ Fehler: ' + e.message + '</p>';
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // WhatsApp Button Handler
+        document.getElementById('whatsappBtn').addEventListener('click', async () => {
+            if (!currentMessageId) return;
+
+            const btn = document.getElementById('whatsappBtn');
+            const contactFeedback = document.getElementById('contactFeedback');
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Wird versendet...';
+            contactFeedback.innerHTML = '';
+
+            try {
+                const res = await fetch('/api/qr/' + uniqueId + '/contact/whatsapp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message_id: currentMessageId })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    contactFeedback.innerHTML = '<p class="success">✅ WhatsApp wird an Admin versendet!</p>';
+                    btn.innerHTML = '✅ WhatsApp versendet';
+                } else {
+                    const error = await res.json();
+                    contactFeedback.innerHTML = '<p class="error">❌ ' + (error.detail || 'WhatsApp konnte nicht versendet werden') + '</p>';
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch(e) {
+                contactFeedback.innerHTML = '<p class="error">❌ Fehler: ' + e.message + '</p>';
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         });
 
         loadCategories();

@@ -4,6 +4,8 @@ from models import QRCode, Message, Category, User
 from database import get_db
 from pydantic import BaseModel
 from services.telegram_service import TelegramService
+from services.twilio_service import twilio_service
+from config import settings
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 import asyncio
@@ -184,36 +186,6 @@ def send_whatsapp_contact(unique_id: str, data: ContactRequest, db: Session = De
         raise HTTPException(status_code=500, detail=result["message"])
 
     return result
-
-@router.post("/webhooks/twilio")
-async def twilio_webhook(request: Request, db: Session = Depends(get_db)):
-    """Webhook für Twilio Status-Updates (SMS/WhatsApp Delivery)"""
-    try:
-        # Request-Daten lesen
-        form_data = await request.form()
-        sms_sid = form_data.get("MessageSid")
-        status = form_data.get("MessageStatus")
-        signature = request.headers.get("X-Twilio-Signature", "")
-
-        # Webhook-Signatur validieren (optional in DEV, empfohlen in PROD)
-        if not twilio_service.validate_webhook_signature(
-            str(request.url), dict(form_data), signature
-        ):
-            logger.warning(f"Ungültige Twilio Webhook-Signatur von {request.client.host}")
-            # In Production sollte man hier HTTPException(401) werfen
-            # Im DEV-Modus wird es nur geloggt
-            if not settings.DEBUG:
-                raise HTTPException(status_code=401, detail="Ungültige Signatur")
-
-        if sms_sid and status:
-            twilio_service.handle_webhook(sms_sid, status, db)
-            logger.info(f"Twilio Webhook: {sms_sid} → {status}")
-
-        return {"status": "ok"}
-
-    except Exception as e:
-        logger.error(f"Fehler bei Twilio Webhook: {str(e)}")
-        return {"status": "error", "message": str(e)}
 
 @router.post("/telegram/register")
 def register_telegram_chat(data: TelegramChatRegister, db: Session = Depends(get_db)):
