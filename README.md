@@ -2,7 +2,7 @@
 
 Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrsteilnehmern über QR-Codes. Mit Fahrzeugfotos, Kennzeichen, persönlichen Icons und PWA-Unterstützung.
 
-**Status:** ✅ Production Ready (v1.0.257) - Auto-Deploy aktiv
+**Status:** ✅ Production Ready (v1.0.271) - Auto-Deploy aktiv
 **© 2026 Torsten Michaely** – Alle Rechte vorbehalten. Mit professionellem Dashboard & auswählbaren Kontaktmethoden.
 
 ## Features
@@ -17,7 +17,9 @@ Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrst
 ✅ **Telegram-Benachrichtigungen** - Sofortige Benachrichtigungen bei neuen Nachrichten  
 ✅ **Admin-Dashboard** - Premium-Design mit Nachrichten, QR-Codes, Einstellungen & Statistiken
 ✅ **Auswählbare Kontaktmethoden** - Eine Telefonnummer mit Toggle für Telegram, SMS, WhatsApp
-✅ **Statistiken-Seite** - Übersicht: Gesamtnachrichten, Ungelesen, Beantwortet
+✅ **QR-Code Scan Tracking** - Automatische Erfassung von Besucher-Metriken (Standort, Device, Browser)
+✅ **Analytics & Statistiken** - Pro-QR-Code Scan-Statistiken, Conversion-Rate, geografische Verteilung
+✅ **Statistiken-Seite** - Übersicht: Gesamtnachrichten, Ungelesen, Beantwortet, Scans, Conversion
 ✅ **Responsive Layout** - Kein Scrollen nötig, alle Inhalte auf einer Bildschirmseite
 ✅ **Message Tracking** - Lieferungsstatus für SMS und WhatsApp (pending/sent/delivered/failed)  
 ✅ **Datenschutz** - Keine persönlichen Daten werden öffentlich angezeigt  
@@ -396,6 +398,38 @@ server {
 ```
 
 ## Changelog - Neue Features (v1.0.120+)
+
+### v1.0.271 - QR-Code Tracking & Analytics
+✅ **QR-Code Scan-Tracking**
+- Jeder QR-Code Scan wird automatisch geloggt
+- Browser-Geolocation + IP-Fallback für Standort-Erfassung
+- Device-Type Detection (Mobile, Tablet, Desktop)
+- Browser-Identifikation (Chrome, Safari, Firefox, etc.)
+- Automatische Datenbankmigrationen beim Start
+
+✅ **Scan Analytics & Statistiken**
+- Dashboard zeigt Total-Scans über alle QR-Codes
+- Per-QR-Code Statistiken mit neuer `/dashboard/qr-stats/{qr_id}` API
+- Scan-Breakdown nach Land, Device-Type, Browser
+- Conversion-Rate: Messages/Scans Verhältnis
+- Neueste Scans mit Geolocation-Daten
+
+✅ **Security Updates**
+- Permissions-Policy Header: `geolocation=(self)` - nur Same-Origin Zugriff
+- Geolocation-Requests mit User-Zustimmung (Browser-Popup)
+- IP-Address Extraction mit X-Forwarded-For Support (Proxy-kompatibel)
+
+✅ **Backend Infrastructure**
+- Neue `QRCodeScan` Datenbankmodell für Scan-Tracking
+- `TrackingService` mit User-Agent Parsing (user-agents library)
+- POST /api/qr/{unique_id}/track Endpoint für Frontend
+- GET /api/dashboard/qr-stats/{qr_id} für Analytics-Daten
+
+✅ **Frontend Tracking**
+- Automatisches Tracking auf QR-Landing Page (/qr/{unique_id})
+- JavaScript nutzt Browser Geolocation API mit Fallback
+- Unobtrusive - blockiert nicht die User Experience
+- Console-Logs für Debugging
 
 ### v1.0.260 - Twilio Integration UI & Webhook Fixes
 ✅ **Kontakt-Formular mit SMS/WhatsApp Buttons**

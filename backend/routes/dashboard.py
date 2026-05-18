@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models import Message, QRCode, User, Category
+from models import Message, QRCode, User, Category, QRCodeScan
 from database import get_db
 from pydantic import BaseModel
+from services.tracking_service import tracking_service
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
 
@@ -93,10 +94,24 @@ def get_stats(db: Session = Depends(get_db)):
         Message.responded == True
     ).count()
 
+    # Zähle Total Scans über alle QR-Codes
+    user_qr_codes = db.query(QRCode).filter(QRCode.user_id == user.id).all()
+    total_scans = 0
+    for qr in user_qr_codes:
+        scans = db.query(QRCodeScan).filter(QRCodeScan.qr_code_id == qr.id).count()
+        total_scans += scans
+
+    # Conversion Rate: Messages / Scans
+    conversion_rate = 0
+    if total_scans > 0:
+        conversion_rate = round((total_messages / total_scans) * 100, 2)
+
     return {
         "total_messages": total_messages,
         "unread_messages": unread_messages,
-        "responded_messages": responded_messages
+        "responded_messages": responded_messages,
+        "total_scans": total_scans,
+        "conversion_rate": conversion_rate
     }
 
 @router.get("/dashboard/categories")
@@ -150,6 +165,31 @@ def update_contact_methods(data: ContactMethodsUpdate, db: Session = Depends(get
     db.commit()
 
     return {"status": "success"}
+
+@router.get("/dashboard/qr-stats/{qr_id}")
+def get_qr_stats(qr_id: int, db: Session = Depends(get_db)):
+    """Hole Scan-Statistiken für einen spezifischen QR-Code"""
+    qr = db.query(QRCode).filter(QRCode.id == qr_id).first()
+    if not qr:
+        raise HTTPException(status_code=404, detail="QR-Code nicht gefunden")
+
+    # Hole Scan-Statistiken vom TrackingService
+    stats = tracking_service.get_scan_stats(db, qr_id)
+
+    # Zähle Messages für diesen QR-Code
+    messages_count = db.query(Message).filter(Message.qr_code_id == qr_id).count()
+
+    # Conversion Rate: Messages / Scans
+    conversion_rate = 0
+    if stats["total_scans"] > 0:
+        conversion_rate = round((messages_count / stats["total_scans"]) * 100, 2)
+
+    return {
+        **stats,  # Include all tracking stats
+        "qr_label": qr.label,
+        "messages_count": messages_count,
+        "conversion_rate": conversion_rate
+    }
 
 @router.get("/whatsapp")
 def get_whatsapp_public(db: Session = Depends(get_db)):

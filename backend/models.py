@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Float
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
@@ -40,6 +40,7 @@ class QRCode(Base):
 
     user = relationship("User", back_populates="qr_codes")
     messages = relationship("Message", back_populates="qr_code")
+    scans = relationship("QRCodeScan", back_populates="qr_code")
 
 
 class Category(Base):
@@ -76,3 +77,31 @@ class Message(Base):
     qr_code = relationship("QRCode", back_populates="messages")
     user = relationship("User", back_populates="messages")
     category = relationship("Category", back_populates="messages")
+
+
+class QRCodeScan(Base):
+    __tablename__ = "qr_code_scans"
+
+    id = Column(Integer, primary_key=True, index=True)
+    qr_code_id = Column(Integer, ForeignKey("qr_codes.id"), index=True)
+
+    # Location Data
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    accuracy = Column(Float, nullable=True)
+    ip_address = Column(String(50), nullable=True)
+    country = Column(String(50), nullable=True)
+    city = Column(String(100), nullable=True)
+
+    # Device/Browser
+    user_agent = Column(String(500), nullable=True)
+    device_type = Column(String(50), default="unknown")
+    browser_name = Column(String(100), nullable=True)
+    referrer = Column(String(500), nullable=True)
+
+    # Metadata
+    is_returning_visitor = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+    # Relationships
+    qr_code = relationship("QRCode", back_populates="scans")

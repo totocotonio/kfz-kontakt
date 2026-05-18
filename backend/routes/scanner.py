@@ -5,6 +5,7 @@ from database import get_db
 from pydantic import BaseModel
 from services.telegram_service import TelegramService
 from services.twilio_service import twilio_service
+from services.tracking_service import tracking_service
 from config import settings
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -31,6 +32,11 @@ class TelegramChatRegister(BaseModel):
     chat_id: str
     username: str = None
 
+class ScanTrackingData(BaseModel):
+    latitude: float = None
+    longitude: float = None
+    accuracy: float = None
+
 @router.get("/qr/{unique_id}/info")
 def get_qr_info(unique_id: str, db: Session = Depends(get_db)):
     qr = db.query(QRCode).filter(QRCode.unique_id == unique_id).first()
@@ -43,6 +49,56 @@ def get_qr_info(unique_id: str, db: Session = Depends(get_db)):
         "label": qr.label,
         "categories": [{"id": c.id, "name": c.name} for c in categories]
     }
+
+@router.post("/qr/{unique_id}/track")
+def track_qr_scan(unique_id: str, data: ScanTrackingData, request: Request, db: Session = Depends(get_db)):
+    """
+    Registriere QR-Code Scan mit Geolocation und Device-Informationen
+    """
+    try:
+        # Verifiziere QR-Code existiert
+        qr = db.query(QRCode).filter(QRCode.unique_id == unique_id).first()
+        if not qr:
+            logger.warning(f"Track: QR-Code {unique_id} nicht gefunden")
+            return {"status": "error", "message": "QR-Code nicht gefunden"}
+
+        # Extrahiere User-Agent und IP
+        user_agent = request.headers.get("user-agent", "")
+        ip_address = tracking_service.extract_ip_from_request(request)
+
+        # Parse User-Agent
+        device_type, browser_name = tracking_service.parse_user_agent(user_agent)
+
+        # Extrahiere Geolocation aus Request Header (X-Geoip Fallback)
+        country = request.headers.get("CF-IPCountry")  # Cloudflare Geolocation
+        city = None
+
+        # Erstelle Scan-Record
+        scan = tracking_service.create_scan_record(
+            db=db,
+            qr_code_id=qr.id,
+            latitude=data.latitude,
+            longitude=data.longitude,
+            accuracy=data.accuracy,
+            ip_address=ip_address,
+            country=country,
+            city=city,
+            user_agent=user_agent,
+            device_type=device_type,
+            browser_name=browser_name,
+            referrer=request.headers.get("referer"),
+            is_returning_visitor=False  # TODO: Implementiere Cookie-basierte Returning Visitor Detection
+        )
+
+        if not scan:
+            return {"status": "error", "message": "Fehler beim Speichern des Scans"}
+
+        logger.info(f"QR Scan tracked: {unique_id} from {device_type}/{browser_name}/{country}")
+        return {"status": "success", "scan_id": scan.id}
+
+    except Exception as e:
+        logger.error(f"Error tracking scan: {str(e)}", exc_info=True)
+        return {"status": "error", "message": str(e)}
 
 @router.post("/qr/{unique_id}/message")
 @limiter.limit("5/minute")
