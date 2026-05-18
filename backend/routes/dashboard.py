@@ -55,13 +55,22 @@ def get_message(message_id: int, db: Session = Depends(get_db)):
     # Hole den zeitlich nächsten Scan zu dieser Nachricht
     scan = None
     if message.qr_code_id:
-        # Suche den Scan mit der geringsten zeitlichen Differenz zur Nachricht
-        from sqlalchemy import func, and_
+        from datetime import timedelta
 
-        closest_scan = db.query(QRCodeScan)\
+        # Hole alle Scans für diesen QR-Code
+        all_scans = db.query(QRCodeScan)\
             .filter(QRCodeScan.qr_code_id == message.qr_code_id)\
-            .order_by(func.abs(func.strftime('%s', QRCodeScan.created_at) - func.strftime('%s', message.created_at)))\
-            .first()
+            .all()
+
+        # Finde den Scan mit der kleinsten zeitlichen Differenz
+        closest_scan = None
+        min_diff = timedelta.max
+
+        for s in all_scans:
+            diff = abs((s.created_at - message.created_at).total_seconds())
+            if diff < min_diff.total_seconds():
+                min_diff = timedelta(seconds=diff)
+                closest_scan = s
 
         if closest_scan:
             scan = {
