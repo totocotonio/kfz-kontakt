@@ -397,6 +397,25 @@ server {
 
 ## Changelog - Neue Features (v1.0.120+)
 
+### v1.0.260 - Twilio Integration UI & Webhook Fixes
+✅ **Kontakt-Formular mit SMS/WhatsApp Buttons**
+- Nach Nachrichtenversand: SMS und WhatsApp Buttons anzeigen
+- Besucher können Admin zusätzlich via SMS/WhatsApp kontaktieren
+- Loading-States während Versand
+- Erfolgs- und Fehlermeldungen
+- Anonyme Kontaktmöglichkeit bleibt gewahrt
+
+✅ **Webhook-Infrastruktur**
+- Separater `/webhooks/twilio` Endpoint (nicht unter `/api` Prefix)
+- Twilio kann Status-Updates senden ohne API-Auth
+- RequestValidator für Webhook-Signatur-Authentifizierung
+- Error-Handling für fehlgeschlagene SMS/WhatsApp
+
+✅ **Dokumentation & Environment**
+- .env.example mit Twilio-Variablen aktualisiert
+- README mit Twilio Setup dokumentiert
+- Requirements.txt mit twilio==8.10.0
+
 ### v1.0.257 - Dashboard Redesign & Kontaktmethoden
 ✅ **Professionelles Admin-Dashboard**
 - Card-basiertes Design mit Hover-Effekten
