@@ -21,8 +21,15 @@
 - Selbst gehostetes Ticketsystem, zusammen mit Claude entwickelt
 - Stack: **Python, FastAPI, SQLAlchemy, Jinja2, uvicorn**
 - Features: User-Auth, Tickets, Kommentare, Anhänge, E-Mail-Benachrichtigungen, Admin-Tasks
+- GitHub: **https://github.com/totocotonio/ticketsystem**
 - Versionierung als ZIP-Dateien lokal (`C:\Users\Torst\Documents\CLAUDE CODE\ticketsystem\`)
 - Aktuell: **v1.7.71**
+
+### Wohnmobil Pro
+- Wohnmobil-Management und Planung Tool, zusammen mit Claude entwickelt
+- Stack: **Python, FastAPI, SQLAlchemy, HTML, CSS, JavaScript**
+- GitHub: **https://github.com/totocotonio/wohnmobil-pro**
+- Lokaler Pfad: `C:\Users\Torst\Documents\CLAUDE CODE\wohnmobil-pro\`
 
 ### AutoElektrik Pro
 - KFZ Elektrik Rechner & Wohnmobil-Tools, zusammen mit Claude entwickelt
@@ -45,11 +52,28 @@
 - Fonts: lokal gehostet (kein Google CDN), DSGVO-konform
 - Service Worker mit automatischem Update-Banner
 
+### KFZ Kontakt QR-Code System
+- Anonyme Fahrzeugkontakt-Nachrichten via QR-Code, zusammen mit Claude entwickelt
+- Stack: **Python, FastAPI, SQLAlchemy, SQLite, HTML, CSS, JavaScript**
+- GitHub: **https://github.com/totocotonio/kfz-kontakt**
+- Live-Server: **https://kfz-kontakt.michaely.de**
+- Lokaler Pfad: `C:\Users\Torst\Documents\CLAUDE CODE\kontakt über QR-Code\`
+- Aktuell: **v1.0.265+**
+- Features: QR-Code Generator, Fahrzeugbilder, Telegram/SMS/WhatsApp Benachrichtigungen, Admin-Dashboard, PWA
+- Deployment: Auto-Deploy bei Git Push
+
 ### porsche-standard.de
 - WordPress-Seite über Porsche-Traktoren
 - WordPress-Banner für AutoElektrik Pro gebaut
 - Banner-Datei: `C:\Users\Torst\Documents\CLAUDE CODE\autoelektrik-pro\wordpress-banner\banner.html`
 - Einbinden via Plugin „WPCode" → Header Scripts
+
+## ⚠️ WICHTIG: Separate GitHub Repos
+- **Ticketsystem**: https://github.com/totocotonio/ticketsystem
+- **Wohnmobil Pro**: https://github.com/totocotonio/wohnmobil-pro
+- **AutoElektrik Pro**: https://github.com/totocotonio/autoelektrik-pro
+- **KFZ Kontakt**: https://github.com/totocotonio/kfz-kontakt
+- Jedes Repo separat behandeln, **NIEMALS durcheinander bringen**!
 
 ## Wie ich Antworten möchte
 - **Immer auf Deutsch**
