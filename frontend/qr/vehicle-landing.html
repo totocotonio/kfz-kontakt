@@ -441,72 +441,77 @@
         initPage();
 
         // ===== QR-CODE SCAN TRACKING =====
-        // Tracking wird automatisch beim Seitenaufruf gestartet
-        async function trackQRScan() {
-            try {
-                // 1. Versuche Browser-Geolocation zu bekommen
-                let latitude = null;
-                let longitude = null;
-                let accuracy = null;
+        // Tracking wird nicht-blockierend im Hintergrund gestartet
+        function trackQRScan() {
+            // Starte Tracking asynchron ohne zu warten
+            setTimeout(() => {
+                try {
+                    let latitude = null;
+                    let longitude = null;
+                    let accuracy = null;
 
-                if ('geolocation' in navigator) {
-                    await new Promise((resolve) => {
+                    // Versuche Browser-Geolocation zu bekommen (nicht-blockierend)
+                    if ('geolocation' in navigator) {
                         navigator.geolocation.getCurrentPosition(
                             (position) => {
                                 latitude = position.coords.latitude;
                                 longitude = position.coords.longitude;
                                 accuracy = position.coords.accuracy;
                                 console.log('[Geolocation] ✅ Browser-Geo:', { latitude, longitude, accuracy });
-                                resolve();
+                                sendTrackingData(latitude, longitude, accuracy);
                             },
                             (error) => {
                                 console.warn('[Geolocation] ⚠️ Keine Browser-Geo:', error.message);
-                                // Fallback auf IP-basierte Geolocation (Server macht das)
-                                resolve();
+                                // Sende Tracking ohne Geo-Daten
+                                sendTrackingData(null, null, null);
                             },
-                            { timeout: 5000, enableHighAccuracy: false }
+                            { timeout: 3000, enableHighAccuracy: false }
                         );
-                    });
-                } else {
-                    console.warn('[Geolocation] ⚠️ Nicht verfügbar');
+                    } else {
+                        console.warn('[Geolocation] ⚠️ Nicht verfügbar');
+                        sendTrackingData(null, null, null);
+                    }
+                } catch (error) {
+                    console.error('[Tracking] ❌ Fehler:', error.message);
                 }
+            }, 500); // Verzögere um 500ms damit Seite zuerst lädt
+        }
 
-                // 2. Sende Track-Daten an Backend
+        function sendTrackingData(latitude, longitude, accuracy) {
+            try {
                 const trackData = {
                     latitude: latitude,
                     longitude: longitude,
                     accuracy: accuracy
                 };
 
-                const response = await fetch(`/api/qr/${encodeURIComponent(uniqueId)}/track`, {
+                fetch(`/api/qr/${encodeURIComponent(uniqueId)}/track`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(trackData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json().then(result => {
+                            console.log('[Tracking] ✅ Scan geloggt:', result);
+                        });
+                    } else {
+                        console.warn('[Tracking] ⚠️ Fehler:', response.status);
+                    }
+                })
+                .catch(error => {
+                    console.error('[Tracking] ❌ Fetch Fehler:', error.message);
                 });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('[Tracking] ✅ Scan geloggt:', result);
-                } else {
-                    console.warn('[Tracking] ⚠️ Fehler:', response.status);
-                }
             } catch (error) {
-                console.error('[Tracking] ❌ Fehler:', error.message);
-                // Nicht kritisch - fahre trotzdem fort
+                console.error('[Tracking] ❌ Fehler beim Senden:', error.message);
             }
         }
 
-        // Starte Tracking wenn Seite vollständig geladen ist
-        window.addEventListener('load', () => {
-            console.log('[Tracking] Starte Scan-Tracking...');
-            trackQRScan();
-        });
-
-        // Fallback: Starte auch direkt, falls load-Event schon vorbei ist
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            console.log('[Tracking] Starte Scan-Tracking (direkt)...');
+        // Starte Tracking sobald DOM bereit ist (nicht-blockierend)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', trackQRScan);
+        } else {
+            // DOM bereits geladen
             trackQRScan();
         }
     </script>
