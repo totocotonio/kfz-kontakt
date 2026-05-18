@@ -329,7 +329,10 @@
       "Bash(ssh kfz@192.168.178.47 \"python3 /tmp/test_kfz.py\")",
       "Bash(ssh kfz@192.168.178.47 'python3 -c '\\\\'' *)",
       "Bash(ssh kfz@192.168.178.47 *)",
-      "Bash(ssh kfz@212.178.47 'python3 -c \" *)"
+      "Bash(ssh kfz@212.178.47 'python3 -c \" *)",
+      "Bash(python -m py_compile main.py routes/scanner.py services/twilio_service.py)",
+      "Bash(awk '{print \"✅ HEAD: \" substr\\($1, 1, 8\\)}')",
+      "Bash(node -c frontend/dashboard/js/dashboard.js)"
     ]
   }
 }

@@ -716,6 +716,9 @@ window.addEventListener('click', (e) => {
 // ===== ANALYTICS TAB =====
 async function loadAnalytics() {
     try {
+        // Load QR codes first so dropdown can be populated
+        await loadQRCodes();
+
         const res = await apiFetch(`${API_BASE}/dashboard/stats`);
         if (res.ok) {
             const data = await res.json();
