@@ -802,10 +802,14 @@ if (document.getElementById('qrCodeSelect')) {
                         const scanEl = document.createElement('div');
                         scanEl.className = 'scan-item';
                         const date = new Date(scan.created_at).toLocaleString('de-DE');
-                        const geo = scan.latitude && scan.longitude ?
-                            `📍 ${scan.latitude.toFixed(4)}, ${scan.longitude.toFixed(4)}` :
-                            '📍 IP-based';
-                        scanEl.innerHTML = `<div class="scan-info"><div class="scan-device">${scan.device_type} • ${scan.browser_name}</div><div class="scan-country">${scan.country || 'Unknown'}</div><div class="scan-geo">${geo}</div><div class="scan-time">${date}</div></div>`;
+                        let geoHtml = '📍 IP-based';
+                        if (scan.latitude && scan.longitude) {
+                            const lat = scan.latitude.toFixed(4);
+                            const lon = scan.longitude.toFixed(4);
+                            const mapsUrl = `https://maps.google.com/?q=${lat},${lon}`;
+                            geoHtml = `📍 <a href="${mapsUrl}" target="_blank" style="color: #3b82f6; text-decoration: underline; cursor: pointer;">${lat}, ${lon}</a>`;
+                        }
+                        scanEl.innerHTML = `<div class="scan-info"><div class="scan-device">${scan.device_type} • ${scan.browser_name}</div><div class="scan-country">${scan.country || 'Unknown'}</div><div class="scan-geo">${geoHtml}</div><div class="scan-time">${date}</div></div>`;
                         scansDiv.appendChild(scanEl);
                     });
                 }
