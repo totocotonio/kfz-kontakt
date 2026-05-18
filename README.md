@@ -397,6 +397,36 @@ server {
 
 ## Changelog - Neue Features (v1.0.120+)
 
+### v1.0.257 - Dashboard Redesign & Kontaktmethoden
+✅ **Professionelles Admin-Dashboard**
+- Card-basiertes Design mit Hover-Effekten
+- Vergrößerte QR-Code Vorschaubilder (160px)
+- Größere Action-Buttons für bessere Usability
+- Responsive Grid-Layout für alle Tabs
+
+✅ **Kontaktmethoden Konsolidierung**
+- Eine einzige Telefonnummer für SMS und WhatsApp (statt zwei separaten)
+- Auswählbare Kontaktmethoden: Telegram ☑️ / SMS ☑️ / WhatsApp ☑️
+- Besucher können wählen, welche Methode sie nutzen
+- Admin-Telefonnummer bleibt privat (nicht in URLs sichtbar)
+- API-Endpoints konsolidiert: `/dashboard/contact` + `/dashboard/contact-methods`
+
+✅ **Statistiken-Seite Redesign**
+- Professionelle Card-Layouts mit Statistiken
+- Gesamtnachrichten, Ungelesene, Beantwortete anzeigen
+- Konsistent mit Dashboard-Design
+
+✅ **Responsive Layout ohne Scrolling**
+- Flexbox-basiertes Layout
+- Alle Inhalte passen auf eine Bildschirmseite (kein Scrollen nötig)
+- Header und Navigation sperren oben
+- Hauptbereich scrollt bei Bedarf
+
+✅ **Datenbank Auto-Migration**
+- Neue Spalten (`enable_telegram`, `enable_sms`, `enable_whatsapp`) werden bei Start automatisch hinzugefügt
+- `migrate.py` für manuelle Migrationen
+- Keine manuellen SQL-Befehle nötig
+
 ### v1.0.161 - Twilio SMS/WhatsApp Integration
 ✅ **Anonyme SMS und WhatsApp über Twilio**
 - `TwilioService` für SMS und WhatsApp Versand
