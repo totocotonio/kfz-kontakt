@@ -126,30 +126,32 @@ async def submit_message(unique_id: str, data: MessageSubmit, request: Request, 
 
     category_name = category.name if category else "Allgemein"
 
-    # Hole den zeitlich nächsten Scan für Geolocation
+    # Hole den Scan unmittelbar VOR dieser Nachricht (max. 15 Minuten)
     scan_location = None
     all_scans = db.query(QRCodeScan)\
         .filter(QRCodeScan.qr_code_id == qr.id)\
+        .filter(QRCodeScan.created_at <= message.created_at)\
         .all()
 
     if all_scans:
-        closest_scan = None
-        min_diff = timedelta.max
+        # Finde den neuesten Scan, der maximal 15 Minuten VOR der Nachricht liegt
+        relevant_scan = None
         for s in all_scans:
-            diff = abs((s.created_at - message.created_at).total_seconds())
-            if diff < min_diff.total_seconds():
-                min_diff = timedelta(seconds=diff)
-                closest_scan = s
+            time_diff = (message.created_at - s.created_at).total_seconds()
+            # Nur Scans die maximal 15 Minuten davor liegen
+            if 0 <= time_diff <= 900:  # 900 Sekunden = 15 Minuten
+                if not relevant_scan or s.created_at > relevant_scan.created_at:
+                    relevant_scan = s
 
-        if closest_scan:
+        if relevant_scan:
             scan_location = {
-                "latitude": closest_scan.latitude,
-                "longitude": closest_scan.longitude,
-                "country": closest_scan.country,
-                "city": closest_scan.city,
-                "device_type": closest_scan.device_type,
-                "browser_name": closest_scan.browser_name,
-                "created_at": closest_scan.created_at
+                "latitude": relevant_scan.latitude,
+                "longitude": relevant_scan.longitude,
+                "country": relevant_scan.country,
+                "city": relevant_scan.city,
+                "device_type": relevant_scan.device_type,
+                "browser_name": relevant_scan.browser_name,
+                "created_at": relevant_scan.created_at
             }
 
     # Telegram-Benachrichtigung im Hintergrund senden

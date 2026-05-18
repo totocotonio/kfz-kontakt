@@ -52,37 +52,37 @@ def get_message(message_id: int, db: Session = Depends(get_db)):
     message.read = True
     db.commit()
 
-    # Hole den zeitlich nächsten Scan zu dieser Nachricht
+    # Hole den Scan unmittelbar VOR dieser Nachricht (max. 15 Minuten)
     scan = None
     if message.qr_code_id:
         from datetime import timedelta
 
-        # Hole alle Scans für diesen QR-Code
+        # Hole alle Scans für diesen QR-Code die VOR der Nachricht liegen
         all_scans = db.query(QRCodeScan)\
             .filter(QRCodeScan.qr_code_id == message.qr_code_id)\
+            .filter(QRCodeScan.created_at <= message.created_at)\
             .all()
 
-        # Finde den Scan mit der kleinsten zeitlichen Differenz
-        closest_scan = None
-        min_diff = timedelta.max
-
+        # Finde den neuesten Scan, der maximal 15 Minuten VOR der Nachricht liegt
+        relevant_scan = None
         for s in all_scans:
-            diff = abs((s.created_at - message.created_at).total_seconds())
-            if diff < min_diff.total_seconds():
-                min_diff = timedelta(seconds=diff)
-                closest_scan = s
+            time_diff = (message.created_at - s.created_at).total_seconds()
+            # Nur Scans die maximal 15 Minuten davor liegen
+            if 0 <= time_diff <= 900:  # 900 Sekunden = 15 Minuten
+                if not relevant_scan or s.created_at > relevant_scan.created_at:
+                    relevant_scan = s
 
-        if closest_scan:
+        if relevant_scan:
             scan = {
-                "id": closest_scan.id,
-                "latitude": closest_scan.latitude,
-                "longitude": closest_scan.longitude,
-                "country": closest_scan.country,
-                "city": closest_scan.city,
-                "device_type": closest_scan.device_type,
-                "browser_name": closest_scan.browser_name,
-                "created_at": closest_scan.created_at.isoformat(),
-                "accuracy": closest_scan.accuracy
+                "id": relevant_scan.id,
+                "latitude": relevant_scan.latitude,
+                "longitude": relevant_scan.longitude,
+                "country": relevant_scan.country,
+                "city": relevant_scan.city,
+                "device_type": relevant_scan.device_type,
+                "browser_name": relevant_scan.browser_name,
+                "created_at": relevant_scan.created_at.isoformat(),
+                "accuracy": relevant_scan.accuracy
             }
 
     return {
