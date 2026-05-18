@@ -101,10 +101,10 @@ def get_stats(db: Session = Depends(get_db)):
         scans = db.query(QRCodeScan).filter(QRCodeScan.qr_code_id == qr.id).count()
         total_scans += scans
 
-    # Conversion Rate: Messages / Scans
+    # Conversion Rate: Messages / Scans (max 100%)
     conversion_rate = 0
     if total_scans > 0:
-        conversion_rate = round((total_messages / total_scans) * 100, 2)
+        conversion_rate = min(100, round((total_messages / total_scans) * 100, 2))
 
     return {
         "total_messages": total_messages,
@@ -179,10 +179,10 @@ def get_qr_stats(qr_id: int, db: Session = Depends(get_db)):
     # Zähle Messages für diesen QR-Code
     messages_count = db.query(Message).filter(Message.qr_code_id == qr_id).count()
 
-    # Conversion Rate: Messages / Scans
+    # Conversion Rate: Messages / Scans (max 100%)
     conversion_rate = 0
     if stats["total_scans"] > 0:
-        conversion_rate = round((messages_count / stats["total_scans"]) * 100, 2)
+        conversion_rate = min(100, round((messages_count / stats["total_scans"]) * 100, 2))
 
     return {
         **stats,  # Include all tracking stats
