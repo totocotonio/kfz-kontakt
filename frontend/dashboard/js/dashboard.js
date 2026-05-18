@@ -263,7 +263,7 @@ async function loadMessages() {
             <div class="message-card ${!msg.read ? 'unread' : ''}" onclick="openMessage(${msg.id})">
                 <div class="message-header">
                     <span class="message-sender">${msg.sender_name}</span>
-                    <span class="message-time">${new Date(msg.created_at).toLocaleDateString('de-DE')}</span>
+                    <span class="message-time">${new Date(msg.created_at).toLocaleString('de-DE')}</span>
                 </div>
                 ${msg.category ? `<span class="message-category">${msg.category}</span>` : ''}
                 <div class="message-preview">${msg.message}</div>

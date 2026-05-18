@@ -332,7 +332,8 @@
       "Bash(ssh kfz@212.178.47 'python3 -c \" *)",
       "Bash(python -m py_compile main.py routes/scanner.py services/twilio_service.py)",
       "Bash(awk '{print \"✅ HEAD: \" substr\\($1, 1, 8\\)}')",
-      "Bash(node -c frontend/dashboard/js/dashboard.js)"
+      "Bash(node -c frontend/dashboard/js/dashboard.js)",
+      "Bash(xargs grep -l \"telegram\\\\|Telegram\")"
     ]
   }
 }

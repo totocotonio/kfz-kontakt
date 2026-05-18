@@ -158,8 +158,8 @@ class TelegramService:
             return False
 
     @staticmethod
-    async def send_new_message_notification(qr_label: str, sender: str, message: str, category: str = None, sender_contact: str = None, vehicle_image_path: str = None, db=None):
-        logger.error(f"🔔 NOTIFICATION START: qr_label={qr_label}, sender={sender}, has_image={bool(vehicle_image_path)}")
+    async def send_new_message_notification(qr_label: str, sender: str, message: str, category: str = None, sender_contact: str = None, vehicle_image_path: str = None, scan_location: dict = None, db=None):
+        logger.error(f"🔔 NOTIFICATION START: qr_label={qr_label}, sender={sender}, has_image={bool(vehicle_image_path)}, has_location={bool(scan_location)}")
         logger.info(f"🔔 send_new_message_notification: qr_label={qr_label}, sender={sender}, contact={sender_contact}, category={category}")
 
         text = f"""
@@ -172,6 +172,25 @@ class TelegramService:
 
         if category:
             text += f"<b>Kategorie:</b> {category}\n"
+
+        # Scan-Location Information
+        if scan_location:
+            location_info = f"<b>📍 Scan-Standort:</b> "
+            if scan_location.get('country'):
+                location_info += f"{scan_location['country']}"
+                if scan_location.get('city'):
+                    location_info += f", {scan_location['city']}"
+
+            if scan_location.get('latitude') and scan_location.get('longitude'):
+                lat = round(scan_location['latitude'], 4)
+                lon = round(scan_location['longitude'], 4)
+                maps_url = f"https://maps.google.com/?q={lat},{lon}"
+                location_info += f"\n<b>Koordinaten:</b> <a href=\"{maps_url}\">{lat}, {lon}</a>"
+
+            if scan_location.get('device_type') or scan_location.get('browser_name'):
+                location_info += f"\n<b>Device:</b> {scan_location.get('device_type', 'Unknown')} • {scan_location.get('browser_name', 'Unknown')}"
+
+            text += f"\n{location_info}\n"
 
         text += f"""
 <b>Nachricht:</b>

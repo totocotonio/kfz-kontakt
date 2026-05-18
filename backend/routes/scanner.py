@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from models import QRCode, Message, Category, User
+from models import QRCode, Message, Category, User, QRCodeScan
 from database import get_db
 from pydantic import BaseModel
 from services.telegram_service import TelegramService
@@ -9,6 +9,7 @@ from services.tracking_service import tracking_service
 from config import settings
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from datetime import timedelta
 import asyncio
 import logging
 import json
@@ -125,6 +126,32 @@ async def submit_message(unique_id: str, data: MessageSubmit, request: Request, 
 
     category_name = category.name if category else "Allgemein"
 
+    # Hole den zeitlich nächsten Scan für Geolocation
+    scan_location = None
+    all_scans = db.query(QRCodeScan)\
+        .filter(QRCodeScan.qr_code_id == qr.id)\
+        .all()
+
+    if all_scans:
+        closest_scan = None
+        min_diff = timedelta.max
+        for s in all_scans:
+            diff = abs((s.created_at - message.created_at).total_seconds())
+            if diff < min_diff.total_seconds():
+                min_diff = timedelta(seconds=diff)
+                closest_scan = s
+
+        if closest_scan:
+            scan_location = {
+                "latitude": closest_scan.latitude,
+                "longitude": closest_scan.longitude,
+                "country": closest_scan.country,
+                "city": closest_scan.city,
+                "device_type": closest_scan.device_type,
+                "browser_name": closest_scan.browser_name,
+                "created_at": closest_scan.created_at
+            }
+
     # Telegram-Benachrichtigung im Hintergrund senden
     try:
         logger.info(f"Sending Telegram notification for message {message.id}...")
@@ -135,6 +162,7 @@ async def submit_message(unique_id: str, data: MessageSubmit, request: Request, 
             message=data.message,
             category=category_name,
             vehicle_image_path=qr.vehicle_image_path,
+            scan_location=scan_location,
             db=db
         )
         logger.info(f"Telegram notification sent for message {message.id}")
