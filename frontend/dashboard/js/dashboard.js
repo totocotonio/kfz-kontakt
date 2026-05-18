@@ -746,90 +746,72 @@ if (document.getElementById('qrCodeSelect')) {
             if (content) content.style.display = 'block';
             if (noQR) noQR.style.display = 'none';
 
-    try {
-        const res = await apiFetch(`${API_BASE}/dashboard/qr-stats/${qrId}`);
-        if (res.ok) {
-            const stats = await res.json();
+            const res = await apiFetch(`${API_BASE}/dashboard/qr-stats/${qrId}`);
+            if (res.ok) {
+                const stats = await res.json();
 
-            // Update stat cards
-            document.getElementById('qrTotalScans').textContent = stats.total_scans || 0;
-            document.getElementById('qrMessages').textContent = stats.messages_count || 0;
-            document.getElementById('qrConversion').textContent = (stats.conversion_rate || 0) + '%';
+                // Update stat cards
+                document.getElementById('qrTotalScans').textContent = stats.total_scans || 0;
+                document.getElementById('qrMessages').textContent = stats.messages_count || 0;
+                document.getElementById('qrConversion').textContent = (stats.conversion_rate || 0) + '%';
 
-            // Device Breakdown
-            const deviceDiv = document.getElementById('deviceBreakdown');
-            deviceDiv.innerHTML = '';
-            Object.entries(stats.scans_by_device || {}).forEach(([device, count]) => {
-                const bar = document.createElement('div');
-                bar.className = 'breakdown-item';
-                const percentage = ((count / stats.total_scans) * 100).toFixed(1);
-                bar.innerHTML = `
-                    <div class="breakdown-label">${device} <span class="breakdown-count">${count}</span></div>
-                    <div class="breakdown-bar">
-                        <div class="breakdown-fill" style="width: ${percentage}%"></div>
-                    </div>
-                    <div class="breakdown-percent">${percentage}%</div>
-                `;
-                deviceDiv.appendChild(bar);
-            });
+                // Device Breakdown
+                const deviceDiv = document.getElementById('deviceBreakdown');
+                if (deviceDiv) {
+                    deviceDiv.innerHTML = '';
+                    Object.entries(stats.scans_by_device || {}).forEach(([device, count]) => {
+                        const bar = document.createElement('div');
+                        bar.className = 'breakdown-item';
+                        const percentage = ((count / stats.total_scans) * 100).toFixed(1);
+                        bar.innerHTML = `<div class="breakdown-label">${device} <span class="breakdown-count">${count}</span></div><div class="breakdown-bar"><div class="breakdown-fill" style="width: ${percentage}%"></div></div><div class="breakdown-percent">${percentage}%</div>`;
+                        deviceDiv.appendChild(bar);
+                    });
+                }
 
-            // Browser Breakdown
-            const browserDiv = document.getElementById('browserBreakdown');
-            browserDiv.innerHTML = '';
-            Object.entries(stats.scans_by_browser || {}).forEach(([browser, count]) => {
-                const bar = document.createElement('div');
-                bar.className = 'breakdown-item';
-                const percentage = ((count / stats.total_scans) * 100).toFixed(1);
-                bar.innerHTML = `
-                    <div class="breakdown-label">${browser} <span class="breakdown-count">${count}</span></div>
-                    <div class="breakdown-bar">
-                        <div class="breakdown-fill" style="width: ${percentage}%"></div>
-                    </div>
-                    <div class="breakdown-percent">${percentage}%</div>
-                `;
-                browserDiv.appendChild(bar);
-            });
+                // Browser Breakdown
+                const browserDiv = document.getElementById('browserBreakdown');
+                if (browserDiv) {
+                    browserDiv.innerHTML = '';
+                    Object.entries(stats.scans_by_browser || {}).forEach(([browser, count]) => {
+                        const bar = document.createElement('div');
+                        bar.className = 'breakdown-item';
+                        const percentage = ((count / stats.total_scans) * 100).toFixed(1);
+                        bar.innerHTML = `<div class="breakdown-label">${browser} <span class="breakdown-count">${count}</span></div><div class="breakdown-bar"><div class="breakdown-fill" style="width: ${percentage}%"></div></div><div class="breakdown-percent">${percentage}%</div>`;
+                        browserDiv.appendChild(bar);
+                    });
+                }
 
-            // Country Breakdown
-            const countryDiv = document.getElementById('countryBreakdown');
-            countryDiv.innerHTML = '';
-            Object.entries(stats.scans_by_country || {}).forEach(([country, count]) => {
-                const bar = document.createElement('div');
-                bar.className = 'breakdown-item';
-                const percentage = ((count / stats.total_scans) * 100).toFixed(1);
-                bar.innerHTML = `
-                    <div class="breakdown-label">${country || 'Unknown'} <span class="breakdown-count">${count}</span></div>
-                    <div class="breakdown-bar">
-                        <div class="breakdown-fill" style="width: ${percentage}%"></div>
-                    </div>
-                    <div class="breakdown-percent">${percentage}%</div>
-                `;
-                countryDiv.appendChild(bar);
-            });
+                // Country Breakdown
+                const countryDiv = document.getElementById('countryBreakdown');
+                if (countryDiv) {
+                    countryDiv.innerHTML = '';
+                    Object.entries(stats.scans_by_country || {}).forEach(([country, count]) => {
+                        const bar = document.createElement('div');
+                        bar.className = 'breakdown-item';
+                        const percentage = ((count / stats.total_scans) * 100).toFixed(1);
+                        bar.innerHTML = `<div class="breakdown-label">${country || 'Unknown'} <span class="breakdown-count">${count}</span></div><div class="breakdown-bar"><div class="breakdown-fill" style="width: ${percentage}%"></div></div><div class="breakdown-percent">${percentage}%</div>`;
+                        countryDiv.appendChild(bar);
+                    });
+                }
 
-            // Latest Scans
-            const scansDiv = document.getElementById('latestScans');
-            scansDiv.innerHTML = '';
-            (stats.latest_scans || []).forEach(scan => {
-                const scanEl = document.createElement('div');
-                scanEl.className = 'scan-item';
-                const date = new Date(scan.created_at).toLocaleString('de-DE');
-                const geo = scan.latitude && scan.longitude ?
-                    `📍 ${scan.latitude.toFixed(4)}, ${scan.longitude.toFixed(4)}` :
-                    '📍 IP-based';
-                scanEl.innerHTML = `
-                    <div class="scan-info">
-                        <div class="scan-device">${scan.device_type} • ${scan.browser_name}</div>
-                        <div class="scan-country">${scan.country || 'Unknown'}</div>
-                        <div class="scan-geo">${geo}</div>
-                        <div class="scan-time">${date}</div>
-                    </div>
-                `;
-                scansDiv.appendChild(scanEl);
-            });
-        }
+                // Latest Scans
+                const scansDiv = document.getElementById('latestScans');
+                if (scansDiv) {
+                    scansDiv.innerHTML = '';
+                    (stats.latest_scans || []).forEach(scan => {
+                        const scanEl = document.createElement('div');
+                        scanEl.className = 'scan-item';
+                        const date = new Date(scan.created_at).toLocaleString('de-DE');
+                        const geo = scan.latitude && scan.longitude ?
+                            `📍 ${scan.latitude.toFixed(4)}, ${scan.longitude.toFixed(4)}` :
+                            '📍 IP-based';
+                        scanEl.innerHTML = `<div class="scan-info"><div class="scan-device">${scan.device_type} • ${scan.browser_name}</div><div class="scan-country">${scan.country || 'Unknown'}</div><div class="scan-geo">${geo}</div><div class="scan-time">${date}</div></div>`;
+                        scansDiv.appendChild(scanEl);
+                    });
+                }
+            }
         } catch (e) {
-            console.error('[Analytics] Error:', e);
+            console.error('[Analytics] Error loading QR stats:', e);
             showError('Fehler beim Laden von Analytics: ' + e.message);
         }
     });
