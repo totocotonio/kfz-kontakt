@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"Z:\\\\\" -ErrorAction SilentlyContinue | Select-Object -First 20)",
+      "Bash(curl -s -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiI4MTdmZGI1Njk0NDI0ODJmOTc4ZDEyNzY2NTY4ODYyOCIsImlhdCI6MTc3OTAwMjg3OCwiZXhwIjoyMDk0MzYyODc4fQ.H6wrRSrFUPtNqgL6Ibs9LNF_ZG44kRX_pcCMBIOAwMs\" -H \"Content-Type: application/json\" http://192.168.178.193:8123/api/states)",
+      "Bash(grep -n \"^- id:\" /root/homeassistant/config/automations.yaml 2>/dev/null | head -50 || echo \"Datei nicht erreichbar\")",
+      "PowerShell(ping -n 2 192.168.178.193 2>&1)",
+      "Bash(awk -F: '{print $3}')",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
+    ]
+  }
+}
