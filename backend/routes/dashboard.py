@@ -4,8 +4,22 @@ from models import Message, QRCode, User, Category, QRCodeScan
 from database import get_db
 from pydantic import BaseModel
 from services.tracking_service import tracking_service
+from datetime import datetime
+import pytz
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
+
+def to_cest_string(dt):
+    """Konvertiere UTC datetime zu CEST/CET ISO String"""
+    if not dt:
+        return None
+    # Annahme: dt ist UTC (naive datetime)
+    utc = pytz.UTC.localize(dt)
+    # Konvertiere zu Berlin/CEST
+    berlin = pytz.timezone('Europe/Berlin')
+    local_dt = utc.astimezone(berlin)
+    # Gib ISO format zurück mit Zeitzone
+    return local_dt.isoformat()
 
 class MessageUpdate(BaseModel):
     read: bool = None
@@ -37,7 +51,7 @@ def get_messages(db: Session = Depends(get_db)):
                 "message": msg.message,
                 "read": msg.read,
                 "responded": msg.responded,
-                "created_at": msg.created_at.isoformat()
+                "created_at": to_cest_string(msg.created_at)
             }
             for msg in messages
         ]
@@ -81,7 +95,7 @@ def get_message(message_id: int, db: Session = Depends(get_db)):
                 "city": relevant_scan.city,
                 "device_type": relevant_scan.device_type,
                 "browser_name": relevant_scan.browser_name,
-                "created_at": relevant_scan.created_at.isoformat(),
+                "created_at": to_cest_string(relevant_scan.created_at),
                 "accuracy": relevant_scan.accuracy
             }
 
@@ -94,7 +108,7 @@ def get_message(message_id: int, db: Session = Depends(get_db)):
         "message": message.message,
         "read": message.read,
         "responded": message.responded,
-        "created_at": message.created_at.isoformat(),
+        "created_at": to_cest_string(message.created_at),
         "scan": scan
     }
 
