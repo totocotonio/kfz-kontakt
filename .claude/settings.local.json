@@ -333,7 +333,8 @@
       "Bash(python -m py_compile main.py routes/scanner.py services/twilio_service.py)",
       "Bash(awk '{print \"✅ HEAD: \" substr\\($1, 1, 8\\)}')",
       "Bash(node -c frontend/dashboard/js/dashboard.js)",
-      "Bash(xargs grep -l \"telegram\\\\|Telegram\")"
+      "Bash(xargs grep -l \"telegram\\\\|Telegram\")",
+      "Bash(ssh -i \"C:\\\\Users\\\\Torst\\\\.ssh\\\\id_ed25519\" root@192.168.178.47 \"systemctl status kfz-kontakt\")"
     ]
   }
 }

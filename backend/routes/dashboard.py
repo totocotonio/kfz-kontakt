@@ -4,8 +4,8 @@ from models import Message, QRCode, User, Category, QRCodeScan
 from database import get_db
 from pydantic import BaseModel
 from services.tracking_service import tracking_service
-from datetime import datetime
-import pytz
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
 
@@ -14,10 +14,10 @@ def to_cest_string(dt):
     if not dt:
         return None
     # Annahme: dt ist UTC (naive datetime)
-    utc = pytz.UTC.localize(dt)
+    utc_dt = dt.replace(tzinfo=timezone.utc)
     # Konvertiere zu Berlin/CEST
-    berlin = pytz.timezone('Europe/Berlin')
-    local_dt = utc.astimezone(berlin)
+    berlin_tz = ZoneInfo('Europe/Berlin')
+    local_dt = utc_dt.astimezone(berlin_tz)
     # Gib ISO format zurück mit Zeitzone
     return local_dt.isoformat()
 
