@@ -2,8 +2,8 @@
 
 Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrsteilnehmern über QR-Codes. Mit Fahrzeugfotos, Kennzeichen, persönlichen Icons und PWA-Unterstützung.
 
-**Status:** ✅ Production Ready (v1.0.161) - Auto-Deploy aktiv
-**© 2026 Torsten Michaely** – Alle Rechte vorbehalten. Mit Twilio SMS/WhatsApp-Integration für anonyme Kontaktmöglichkeiten.
+**Status:** ✅ Production Ready (v1.0.257) - Auto-Deploy aktiv
+**© 2026 Torsten Michaely** – Alle Rechte vorbehalten. Mit professionellem Dashboard & auswählbaren Kontaktmethoden.
 
 ## Features
 
@@ -15,8 +15,10 @@ Sichere und anonyme Kommunikation zwischen Fahrzeughaltern und anderen Verkehrst
 ✅ **Nachrichtenformular** - Scanner können anonym Nachrichten hinterlassen  
 ✅ **Kategorien** - Nachrichten mit Kategorien (Parkplatz, Beleuchtung, Fenster, Schaden, Sonstiges)  
 ✅ **Telegram-Benachrichtigungen** - Sofortige Benachrichtigungen bei neuen Nachrichten  
-✅ **Twilio SMS/WhatsApp Integration** - Anonyme SMS und WhatsApp via Twilio ($0.008-0.005 pro Msg)  
-✅ **Admin-Dashboard** - Verwalte QR-Codes, Fahrzeugbilder, Nachrichten, Telefonnummer und Twilio-Kontakte  
+✅ **Admin-Dashboard** - Premium-Design mit Nachrichten, QR-Codes, Einstellungen & Statistiken
+✅ **Auswählbare Kontaktmethoden** - Eine Telefonnummer mit Toggle für Telegram, SMS, WhatsApp
+✅ **Statistiken-Seite** - Übersicht: Gesamtnachrichten, Ungelesen, Beantwortet
+✅ **Responsive Layout** - Kein Scrollen nötig, alle Inhalte auf einer Bildschirmseite
 ✅ **Message Tracking** - Lieferungsstatus für SMS und WhatsApp (pending/sent/delivered/failed)  
 ✅ **Datenschutz** - Keine persönlichen Daten werden öffentlich angezeigt  
 ✅ **Mobile-optimiert** - Funktioniert auf allen Geräten  
