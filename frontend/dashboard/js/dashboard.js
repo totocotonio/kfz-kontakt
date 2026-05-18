@@ -719,28 +719,32 @@ async function loadAnalytics() {
         const res = await apiFetch(`${API_BASE}/dashboard/stats`);
         if (res.ok) {
             const data = await res.json();
-            document.getElementById('totalScans').textContent = data.total_scans || 0;
-            document.getElementById('conversionRate').textContent = (data.conversion_rate || 0) + '%';
+            const scanEl = document.getElementById('totalScans');
+            const convEl = document.getElementById('conversionRate');
+            if (scanEl) scanEl.textContent = data.total_scans || 0;
+            if (convEl) convEl.textContent = (data.conversion_rate || 0) + '%';
         }
     } catch (e) {
-        console.error('Error loading analytics:', e);
+        console.error('[Analytics] Error loading main stats:', e);
     }
 }
 
 // QR-Code Selection für Analytics
-document.getElementById('qrCodeSelect')?.addEventListener('change', async (e) => {
-    const qrId = e.target.value;
-    const content = document.getElementById('analyticsContent');
-    const noQR = document.getElementById('noQRSelected');
+if (document.getElementById('qrCodeSelect')) {
+    document.getElementById('qrCodeSelect').addEventListener('change', async (e) => {
+        try {
+            const qrId = e.target.value;
+            const content = document.getElementById('analyticsContent');
+            const noQR = document.getElementById('noQRSelected');
 
-    if (!qrId) {
-        content.style.display = 'none';
-        noQR.style.display = 'block';
-        return;
-    }
+            if (!qrId) {
+                if (content) content.style.display = 'none';
+                if (noQR) noQR.style.display = 'block';
+                return;
+            }
 
-    content.style.display = 'block';
-    noQR.style.display = 'none';
+            if (content) content.style.display = 'block';
+            if (noQR) noQR.style.display = 'none';
 
     try {
         const res = await apiFetch(`${API_BASE}/dashboard/qr-stats/${qrId}`);
@@ -824,25 +828,37 @@ document.getElementById('qrCodeSelect')?.addEventListener('change', async (e) =>
                 scansDiv.appendChild(scanEl);
             });
         }
-    } catch (e) {
-        showError('Fehler beim Laden von Analytics: ' + e.message);
-    }
+        } catch (e) {
+            console.error('[Analytics] Error:', e);
+            showError('Fehler beim Laden von Analytics: ' + e.message);
+        }
+    });
 }
 
 // Populate QR Code Select on QR Codes load
 function populateQRCodeSelect() {
-    const select = document.getElementById('qrCodeSelect');
-    const qrGrid = document.getElementById('qrcodesGrid');
+    try {
+        const select = document.getElementById('qrCodeSelect');
+        const qrGrid = document.getElementById('qrcodesGrid');
 
-    const qrCards = qrGrid.querySelectorAll('[data-qr-id]');
-    select.innerHTML = '<option value="">-- QR-Code wählen --</option>';
+        // Return early if elements don't exist
+        if (!select || !qrGrid) {
+            console.warn('[Analytics] Select or Grid element not found');
+            return;
+        }
 
-    qrCards.forEach(card => {
-        const qrId = card.dataset.qrId;
-        const label = card.querySelector('.qr-label')?.textContent || `QR ${qrId}`;
-        const option = document.createElement('option');
-        option.value = qrId;
-        option.textContent = label;
-        select.appendChild(option);
-    });
+        const qrCards = qrGrid.querySelectorAll('[data-qr-id]');
+        select.innerHTML = '<option value="">-- QR-Code wählen --</option>';
+
+        qrCards.forEach(card => {
+            const qrId = card.dataset.qrId;
+            const label = card.querySelector('.qr-label')?.textContent || `QR ${qrId}`;
+            const option = document.createElement('option');
+            option.value = qrId;
+            option.textContent = label;
+            select.appendChild(option);
+        });
+    } catch (e) {
+        console.error('[Analytics] Error populating QR select:', e);
+    }
 }
